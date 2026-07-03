@@ -500,6 +500,12 @@ void dynamic_actor_update(void) BANKED {
                 actor->actor_vel_y = 0;
 #endif
                 if (moving_down && (actor->actor_vel_y == 0)) {
+#ifdef DYNAMIC_ACTOR_ENABLE_GRAVITY
+                    if (flags & BHV_GRAVITY){
+                        //apply force to stick on ground to prevent bliping between grounded and airborne states on slopes
+                        actor->actor_vel_y = 64;
+                    }
+#endif
                     state = BHV_STATE_GROUNDED;
                 }
             }

@@ -28,7 +28,7 @@
         "preset": "walker",
         "gravity": {
           "type": "number",
-          "value": 64
+          "value": 8
         },
         "maxFallVelocity": {
           "type": "number",
@@ -51,7 +51,7 @@
         "preset": "walker_ledge",
         "gravity": {
           "type": "number",
-          "value": 64
+          "value": 8
         },
         "maxFallVelocity": {
           "type": "number",
@@ -97,7 +97,7 @@
         "preset": "faller",
         "gravity": {
           "type": "number",
-          "value": 64
+          "value": 8
         },
         "maxFallVelocity": {
           "type": "number",
