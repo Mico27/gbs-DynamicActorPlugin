@@ -8,17 +8,9 @@ components in a single event, stored in RAM slots, and assigned to any number of
 Works in every action scene type (GBS 4.3.0): **Platformer, Top Down, Adventure,
 Shoot 'Em Up, and Point and Click**. (Logo scenes have no actors and are not hooked.)
 
-### Update ordering per scene type
 
-The behavior update runs once per frame in each scene type's update function:
+https://github.com/user-attachments/assets/e32d2233-d1c8-464a-ba14-fb5e5caad736
 
-- **Platformer, Adventure, Point and Click**: after the player is processed (end of
-  update). Linked actors track the player with no lag.
-- **Top Down, Shoot 'Em Up**: at the start of the update, before the player is processed.
-  These scene types have early `return` paths (e.g. Top Down landing on a trigger), so
-  the hook is placed first to guarantee dynamic actors always update every frame. Linked
-  actors in these scenes trail the player by one frame — usually desirable (trailing
-  options/shields).
 
 ## How it works
 
@@ -41,8 +33,8 @@ to share them between scenes).
 | Walker (avoid ledges) | Same, plus turns around at ledges instead of falling |
 | Bouncing ball | Gravity, bounces off walls, floor and ceiling with damping |
 | Falling object | Gravity, vertical movement only |
-| Slider | No gravity, moves and turns at walls (fish, saw blades…) |
-| Reflector | No gravity, perfect bounces off everything (pong ball, projectiles) |
+| Slider | No gravity, moves and turns at walls |
+| Reflector | No gravity, perfect bounces off everything |
 | Attached to linked actor | Follows another actor at a fixed offset |
 
 ## Custom components
