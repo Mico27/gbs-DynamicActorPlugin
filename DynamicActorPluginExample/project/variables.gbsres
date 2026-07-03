@@ -1,0 +1,21 @@
+{
+  "_resourceType": "variables",
+  "variables": [
+    {
+      "id": "0",
+      "name": "TEST_VAR",
+      "symbol": "var_test_var"
+    },
+    {
+      "id": "1",
+      "name": "ActorState",
+      "symbol": "var_actorstate"
+    },
+    {
+      "id": "2",
+      "name": "CarryingObject",
+      "symbol": "var_carryingobject"
+    }
+  ],
+  "constants": []
+}
