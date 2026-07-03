@@ -14,8 +14,8 @@
   "collisions": "0f14+3f!0013+0f!0013+0f!00!30!008+0f!013+70!50!003+0f!00!0f2+10!0f2+004+2f!003+40!60!013+0f!003+10!005+20!0f!013+70!50!003+0f!003+10!005+0f2+003+40!60!013+0f!003+0f!007+013+70!50!003+0f!003+0f!30!009+40!60!0f4+003+0f2+70!50!003+20!018+0f!003+0f4+30!40!60!01!008+0f!003+0f5+012+005+20!003+0f!00d+40!60!0f!003+0f!00c+20!0f7+002+20!0f2+007+01!005+0f2+00!20!0f5+70!50!008+20!0fb+70!50!005+20!0f16+",
   "autoFadeSpeed": 1,
   "symbol": "scene_1",
-  "x": 136,
-  "y": 136,
+  "x": 168,
+  "y": 144,
   "script": [
     {
       "id": "53a29f48-f04a-4609-88f9-ea1e57e9d3d8",
@@ -28,7 +28,7 @@
         "preset": "walker",
         "gravity": {
           "type": "number",
-          "value": 8
+          "value": 64
         },
         "maxFallVelocity": {
           "type": "number",
@@ -51,7 +51,7 @@
         "preset": "walker_ledge",
         "gravity": {
           "type": "number",
-          "value": 8
+          "value": 64
         },
         "maxFallVelocity": {
           "type": "number",
@@ -97,7 +97,7 @@
         "preset": "faller",
         "gravity": {
           "type": "number",
-          "value": 8
+          "value": 64
         },
         "maxFallVelocity": {
           "type": "number",
