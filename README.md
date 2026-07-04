@@ -62,7 +62,7 @@ where 128 keeps half the energy per bounce and 255 is a perfect bounce.
 | Set Actor Behavior | Assign a slot to an actor and set its initial state (grounded / airborne / paused / keep) |
 | Set Actor Velocity | Set X and Y velocity together |
 | Set Actor X/Y Velocity | Set one axis |
-| Set Actor Linked Actor | Set the actor to follow and the X/Y offset |
+| Set Actor Linked Actor | Set the actor to follow and the X/Y offset (the X/Y offset correspond of the value of actor velocities repurposed as pixel offsets)|
 | Set/Get Actor State | 0 = paused, 1 = grounded, 2 = airborne (auto-managed by gravity behaviors) |
 | Get Actor Behavior | Read an actor's current slot into a variable |
 
@@ -94,7 +94,7 @@ rest.
 | Component: Move vertically | Vertical movement + floor/ceiling collision routines |
 | Component: Turn at ledges | Ledge/pit detection routine |
 | Component: Turn at walls | Wall-bounce reversal (actors stop at walls instead) |
-| Component: Bounce on floor/ceiling | Bounce physics incl. 32-bit multiply (actors stop instead) |
+| Component: Bounce on floor/ceiling | Bounce physics |
 | Component: Attach to linked actor | Linked-actor following |
 | Component: Animation handling | Automatic face/idle/jump animation |
 
