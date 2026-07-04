@@ -487,7 +487,7 @@ void dynamic_actor_update(void) BANKED {
                     if (def->bounce == 255) {
                         actor->actor_vel_y = -actor->actor_vel_y;
                     } else {
-                        actor->actor_vel_y = -(WORD)(((int32_t)actor->actor_vel_y * def->bounce) >> 8);
+                        actor->actor_vel_y = -(WORD)(((int16_t)actor->actor_vel_y * def->bounce) >> 8);
                     }
                     // Kill micro-bounces caused by gravity pumping while resting
                     if (moving_down && (-actor->actor_vel_y <= def->gravity)) {
