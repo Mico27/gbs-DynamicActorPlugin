@@ -115,20 +115,3 @@ Notes:
 - RAM: 5 bytes × (slots + 1) for the behavior table (45 bytes at default), plus 7 bytes
   per actor for velocity/behavior/state/link.
 
-## Migrating from the previous version
-
-Old hard-coded behavior IDs map to presets — add Define Actor Behavior events to your
-scene init scripts using the same slot numbers:
-
-| Old ID | Preset |
-|---|---|
-| 1 | Walker |
-| 2 | Walker (avoid ledges) |
-| 3 | Bouncing ball (Gravity 2, Bounciness ~128) |
-| 4 | Falling object |
-| 5 | Slider |
-| 6 | Reflector |
-| 7 | Attached to linked actor |
-
-The old *Set Actor Linked Actor* + X/Y velocity-as-offset trick still works; the event
-now also has explicit offset fields.
