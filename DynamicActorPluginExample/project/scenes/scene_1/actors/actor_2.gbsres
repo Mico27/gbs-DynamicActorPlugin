@@ -49,7 +49,7 @@
               "actorId": "$self$",
               "xVelocity": {
                 "type": "number",
-                "value": 256
+                "value": 8
               }
             },
             "id": "28635120-061e-4881-8015-297a1cad71fa"
@@ -60,7 +60,7 @@
               "actorId": "$self$",
               "yVelocity": {
                 "type": "number",
-                "value": -128
+                "value": -4
               }
             },
             "id": "06785c7c-f982-4a6c-8fb8-cca11369f2fd"

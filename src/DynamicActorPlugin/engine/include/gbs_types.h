@@ -63,8 +63,8 @@ typedef struct actor_t
     //Dynamic actor
     uint8_t actor_behavior_id;
     uint8_t actor_state;
-    int16_t actor_vel_x;
-    int16_t actor_vel_y;
+    int8_t actor_vel_x;
+    int8_t actor_vel_y;
     uint8_t actor_linked_actor_idx;
 
     // Linked list

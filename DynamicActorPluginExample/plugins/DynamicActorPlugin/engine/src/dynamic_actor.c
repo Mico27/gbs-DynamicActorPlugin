@@ -432,8 +432,8 @@ void dynamic_actor_update(void) BANKED {
 #ifdef DYNAMIC_ACTOR_ENABLE_LINKED
         if (flags & BHV_LINKED) {
             actor_t *linked_actor = actors + actor->actor_linked_actor_idx;
-            actor->pos.x = linked_actor->pos.x + actor->actor_vel_x;
-            actor->pos.y = linked_actor->pos.y + actor->actor_vel_y;
+            actor->pos.x = linked_actor->pos.x + PX_TO_SUBPX(actor->actor_vel_x);
+            actor->pos.y = linked_actor->pos.y + PX_TO_SUBPX(actor->actor_vel_y);
             actor = actor->prev;
             continue;
         }
@@ -487,7 +487,7 @@ void dynamic_actor_update(void) BANKED {
                     if (def->bounce == 255) {
                         actor->actor_vel_y = -actor->actor_vel_y;
                     } else {
-                        actor->actor_vel_y = -(WORD)(((int32_t)actor->actor_vel_y * def->bounce) >> 8);
+                        actor->actor_vel_y = -(WORD)(((int16_t)actor->actor_vel_y * def->bounce) >> 8);
                     }
                     // Kill micro-bounces caused by gravity pumping while resting
                     if (moving_down && (-actor->actor_vel_y <= def->gravity)) {
