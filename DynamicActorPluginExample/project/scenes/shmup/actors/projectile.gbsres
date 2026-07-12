@@ -1,0 +1,57 @@
+{
+  "_resourceType": "actor",
+  "id": "d8251fcd-3ca1-4533-ad60-9a21834a69af",
+  "name": "Projectile",
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "daf95270-e30d-423b-9ee7-990ae29f57f6",
+  "prefabId": "",
+  "direction": "down",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "paletteId": "",
+  "isPinned": false,
+  "persistent": false,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "symbol": "sh_proj",
+  "script": [],
+  "startScript": [
+    {
+      "command": "EVENT_SET_ACTOR_BEHAVIOR",
+      "args": {
+        "actorId": "$self$",
+        "behaviorId": {
+          "type": "number",
+          "value": 1
+        },
+        "state": "1"
+      },
+      "id": "14a4727d-feba-4fe3-b232-cdba1e4b19f7"
+    },
+    {
+      "command": "EVENT_SET_ACTOR_VELOCITY",
+      "args": {
+        "actorId": "$self$",
+        "xVelocity": {
+          "type": "number",
+          "value": -16
+        },
+        "yVelocity": {
+          "type": "number",
+          "value": 0
+        }
+      },
+      "id": "7ff4e89f-ae27-4f66-b507-e9949d4bb2a8"
+    }
+  ],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": [],
+  "coordinateType": "tiles",
+  "x": 16,
+  "y": 10,
+  "_index": 0
+}

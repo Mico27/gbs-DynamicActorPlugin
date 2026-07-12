@@ -1,6 +1,6 @@
 {
   "_resourceType": "settings",
-  "startSceneId": "eee3e8ab-7536-4208-9037-d58326d4d66b",
+  "startSceneId": "f9d6649b-6cf3-4419-bec8-47129e86b7d4",
   "startX": 6,
   "startY": 14,
   "startMoveSpeed": 1,
@@ -99,7 +99,7 @@
   "customControlsSelect": [
     "Shift"
   ],
-  "colorMode": "mono",
+  "colorMode": "mixed",
   "colorCorrection": "default",
   "generateDebugFilesEnabled": true,
   "compilerPreset": 3000,

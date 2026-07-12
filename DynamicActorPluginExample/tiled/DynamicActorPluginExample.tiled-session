@@ -1,0 +1,44 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "platformer_test.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "base_tileset.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "platformer_test.tmx": {
+            "scale": 8,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 79.875,
+                "y": 71.375
+            }
+        }
+    },
+    "last.imagePath": "D:/GBStudio/gbs-plugins-repos/gbs-DynamicActorPlugin/DynamicActorPluginExample/assets/tilesets",
+    "map.height": 18,
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 8,
+    "map.tileWidth": 8,
+    "map.width": 20,
+    "openFiles": [
+        "base_tileset.tsx",
+        "platformer_test.tmx"
+    ],
+    "project": "DynamicActorPluginExample.tiled-project",
+    "recentFiles": [
+        "base_tileset.tsx",
+        "platformer_test.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 8,
+        "width": 8
+    }
+}

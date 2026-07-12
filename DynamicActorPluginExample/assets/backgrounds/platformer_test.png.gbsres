@@ -1,0 +1,12 @@
+{
+  "_resourceType": "background",
+  "id": "411c9fab-742d-4864-9fcb-a20455f0f97a",
+  "name": "platformer_test",
+  "symbol": "bg_platformer_test",
+  "tileColors": "",
+  "filename": "platformer_test.png",
+  "width": 20,
+  "height": 18,
+  "imageWidth": 160,
+  "imageHeight": 144
+}

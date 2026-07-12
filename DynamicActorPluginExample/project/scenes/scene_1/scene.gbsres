@@ -156,29 +156,6 @@
       }
     },
     {
-      "id": "d63a9e66-1c72-4552-9338-68c6b4b278aa",
-      "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
-      "args": {
-        "behaviorId": {
-          "type": "number",
-          "value": 7
-        },
-        "preset": "attached",
-        "gravity": {
-          "type": "number",
-          "value": 0
-        },
-        "maxFallVelocity": {
-          "type": "number",
-          "value": 0
-        },
-        "bounce": {
-          "type": "number",
-          "value": 0
-        }
-      }
-    },
-    {
       "command": "EVENT_SET_VALUE",
       "args": {
         "variable": "0",
@@ -300,6 +277,38 @@
         ]
       },
       "id": "cfa1f0cf-1765-41e2-9403-2d62358585af"
+    },
+    {
+      "command": "EVENT_SET_INPUT_SCRIPT",
+      "args": {
+        "input": [
+          "start"
+        ],
+        "override": true,
+        "__scriptTabs": "press"
+      },
+      "id": "3cdd1716-a08d-4cf9-bc93-edbcd6d1b2a2",
+      "children": {
+        "true": [
+          {
+            "command": "EVENT_SWITCH_SCENE",
+            "args": {
+              "sceneId": "f9d6649b-6cf3-4419-bec8-47129e86b7d4",
+              "x": {
+                "type": "number",
+                "value": 14
+              },
+              "y": {
+                "type": "number",
+                "value": 13
+              },
+              "direction": "",
+              "fadeSpeed": "2"
+            },
+            "id": "51370a48-ead2-424f-8d3d-26fe96e42d78"
+          }
+        ]
+      }
     }
   ],
   "playerHit1Script": [],

@@ -1,4 +1,4 @@
-#ifndef DYNAMIC_ACTOR_H
+﻿#ifndef DYNAMIC_ACTOR_H
 #define DYNAMIC_ACTOR_H
 
 #include <gbdk/platform.h>
@@ -17,12 +17,28 @@
 #define BHV_LEDGE_STOP  0x08u  // while grounded, treat ledges/pits as walls
 #define BHV_REFLECT_X   0x10u  // reverse x velocity on wall hit (otherwise stop)
 #define BHV_REFLECT_Y   0x20u  // bounce y velocity on floor/ceiling hit (otherwise stop)
-#define BHV_LINKED      0x40u  // follow linked actor at (vel_x, vel_y) offset; skips physics
+#define BHV_PLATFORM    0x40u  // moving platform: sets itself as the parent of every
+                               // actor it intersects (unless that actor already has a
+                               // different parent, or the platform has a collision
+                               // group and the actor's group differs), and clears
+                               // itself as parent when the actor stops intersecting.
+                               // Parented actors inherit the platform's movement.
+                               // 0x80 free
 
-// Animation component flags
-#define BHV2_ANIM_FACE  0x01u  // face x velocity direction
+// Animation / option flags (flags2)
+#define BHV2_ANIM_FACE  0x01u  // face x velocity direction (left/right)
 #define BHV2_ANIM_IDLE  0x02u  // idle animation when x velocity is zero
 #define BHV2_ANIM_JUMP  0x04u  // jump animation while airborne
+#define BHV2_NO_TILE_COLLISION 0x08u  // move by velocity without tile collision
+                                      // (passes through walls/floors; no wall turn,
+                                      // bounce, ledge stop or landing)
+#define BHV2_ANIM_FACE_4DIR    0x10u  // face dominant velocity axis (up/down/left/
+                                      // right) - for top down / adventure actors
+                                      // 0x20, 0x40 free
+#define BHV2_ACTOR_COLLISION   0x80u  // collide with other actors (player excluded -
+                                      // the engine already handles that): on overlap
+                                      // the frame's movement is reverted and velocity
+                                      // turns/bounces per the reflect settings
 
 // Actor behavior states (actor_state)
 #define BHV_STATE_PAUSED    0
@@ -32,7 +48,7 @@
 
 typedef struct behavior_def_t {
     UBYTE flags;         // BHV_* physics components
-    UBYTE flags2;        // BHV2_* animation components
+    UBYTE flags2;        // BHV2_* animation/option flags
     UBYTE gravity;       // subpixels/frame^2 added to y velocity
     UBYTE max_fall_vel;  // max downward velocity in subpixels/frame
     UBYTE bounce;        // energy kept on bounce, 0..255 (255 = perfect reflect)
@@ -44,3 +60,6 @@ void dynamic_actor_init(void) BANKED;
 void dynamic_actor_update(void) BANKED;
 
 #endif
+
+
+

@@ -1,0 +1,60 @@
+{
+  "_resourceType": "actor",
+  "id": "734a18d6-9163-4a2d-ab62-2689dd4d0580",
+  "name": "Homing",
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "581d34d0-9591-4e6e-a609-1d94f203b0cd",
+  "prefabId": "",
+  "direction": "down",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "paletteId": "",
+  "isPinned": false,
+  "persistent": false,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "symbol": "sh_homing",
+  "script": [],
+  "startScript": [
+    {
+      "command": "EVENT_SET_ACTOR_BEHAVIOR",
+      "args": {
+        "actorId": "$self$",
+        "behaviorId": {
+          "type": "number",
+          "value": 2
+        },
+        "state": "1"
+      },
+      "id": "65306ef9-10cb-476c-9757-7d324c023f46"
+    }
+  ],
+  "updateScript": [
+    {
+      "command": "EVENT_ACTOR_CHASE_ACTOR",
+      "args": {
+        "actorId": "$self$",
+        "targetActorId": "player",
+        "mode": "chase",
+        "speed": {
+          "type": "number",
+          "value": 10
+        },
+        "stopRange": {
+          "type": "number",
+          "value": 0
+        }
+      },
+      "id": "65306ef9-8a3b-4c5d-9e6f-3b4c5d6e7f8a"
+    }
+  ],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": [],
+  "coordinateType": "tiles",
+  "x": 16,
+  "y": 12,
+  "_index": 1
+}

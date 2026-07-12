@@ -1,0 +1,10 @@
+{
+  "type": "enginePlugin",
+  "name": "Spawn Pool Actor Plugin",
+  "author": "Mico27",
+  "url": "https://github.com/Mico27/gbs-SpawnPoolActorPlugin",
+  "description": "Spawn actors at runtime by recycling a pool of pre-placed scene actors: positions and activates the next inactive pool actor and returns its index to a variable.",
+  "license": "MIT",
+  "version": "4.3.0",
+  "gbsVersion": ">=4.3.0"
+}

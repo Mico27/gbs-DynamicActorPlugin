@@ -1,0 +1,164 @@
+{
+  "_resourceType": "scene",
+  "id": "c141cfc6-d9e0-45c7-aedf-3e8b81fe42fc",
+  "_index": 1,
+  "name": "Adventure Movers",
+  "backgroundId": "411c9fab-742d-4864-9fcb-a20455f0f97a",
+  "tilesetId": "",
+  "width": 20,
+  "height": 18,
+  "type": "ADVENTURE",
+  "colorModeOverride": "none",
+  "paletteIds": [],
+  "spritePaletteIds": [],
+  "collisions": "0f!008+0fc+008+0fc+008+0fc+008+0fc+008+0fc+008+0f!009+0f2+008+0f!009+0f2+008+0f!009+0f2+008+0f!003+0f!005+0f2+008+0f!003+0f!005+0f2+008+0f!003+0f!005+0f2+008+0f!003+0f!005+0f2+00c+0f!005+0f2+00c+0f!005+0f2+00c+0f!005+0ff+005+0ff+005+0ff+005+0f!",
+  "autoFadeSpeed": 1,
+  "symbol": "scene_adv",
+  "x": 900,
+  "y": 420,
+  "playerHit1Script": [],
+  "playerHit2Script": [],
+  "playerHit3Script": [],
+  "script": [
+    {
+      "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
+      "args": {
+        "behaviorId": {
+          "type": "number",
+          "value": 1
+        },
+        "preset": "custom",
+        "gravity": {
+          "type": "number",
+          "value": 8
+        },
+        "maxFallVelocity": {
+          "type": "number",
+          "value": 64
+        },
+        "bounce": {
+          "type": "number",
+          "value": 128
+        },
+        "compReflectX": false,
+        "compTileCollision": false,
+        "compGravity": false,
+        "animFace": false,
+        "animIdle": false,
+        "animJump": false,
+        "animFace4": true,
+        "compMoveY": true,
+        "compMoveX": true,
+        "compReflectY": false,
+        "compPlatform": false,
+        "compActorCollision": false,
+        "compLedgeStop": false
+      },
+      "id": "45b36f4f-f3ef-410b-88db-7251fb196105"
+    },
+    {
+      "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
+      "args": {
+        "behaviorId": {
+          "type": "number",
+          "value": 3
+        },
+        "preset": "custom",
+        "gravity": {
+          "type": "number",
+          "value": 0
+        },
+        "maxFallVelocity": {
+          "type": "number",
+          "value": 0
+        },
+        "bounce": {
+          "type": "number",
+          "value": 0
+        },
+        "compGravity": false,
+        "compMoveX": true,
+        "compMoveY": true,
+        "compReflectX": false,
+        "compReflectY": false,
+        "compTileCollision": true,
+        "compActorCollision": false,
+        "compPlatform": false,
+        "compLedgeStop": false,
+        "animFace": false,
+        "animFace4": true,
+        "animIdle": true,
+        "animJump": false
+      },
+      "id": "d6e8d12e-ba68-4ac5-814e-cdb3741ff1da"
+    },
+    {
+      "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
+      "args": {
+        "behaviorId": {
+          "type": "number",
+          "value": 5
+        },
+        "preset": "custom",
+        "gravity": {
+          "type": "number",
+          "value": 8
+        },
+        "maxFallVelocity": {
+          "type": "number",
+          "value": 64
+        },
+        "bounce": {
+          "type": "number",
+          "value": 0
+        },
+        "compReflectX": false,
+        "compTileCollision": false,
+        "compGravity": false,
+        "animFace": false,
+        "animIdle": false,
+        "animJump": false,
+        "animFace4": false,
+        "compMoveY": true,
+        "compMoveX": true,
+        "compReflectY": false,
+        "compPlatform": true,
+        "compActorCollision": false,
+        "compLedgeStop": false
+      },
+      "id": "bf97cae4-ad0f-4b16-917d-a397dbb4c612"
+    },
+    {
+      "command": "EVENT_SET_INPUT_SCRIPT",
+      "args": {
+        "input": [
+          "start"
+        ],
+        "override": true,
+        "__scriptTabs": "press"
+      },
+      "id": "b1bf284e-739d-4280-a19c-564f4a15e102",
+      "children": {
+        "true": [
+          {
+            "command": "EVENT_SWITCH_SCENE",
+            "args": {
+              "sceneId": "da6247b5-3aaf-4b31-ae08-51dc4adaa398",
+              "x": {
+                "type": "number",
+                "value": 1
+              },
+              "y": {
+                "type": "number",
+                "value": 8
+              },
+              "direction": "right",
+              "fadeSpeed": "2"
+            },
+            "id": "ccdfa010-c079-42f4-bdcf-d6e3b93b271f"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -2,6 +2,13 @@ Index: include\gbs_types.h
 ===================================================================
 --- include\gbs_types.h
 +++ include\gbs_types.h
+@@ -1,5 +1,5 @@
+-#ifndef GBS_TYPES_H
++﻿#ifndef GBS_TYPES_H
+ #define GBS_TYPES_H
+ 
+ #include <gbdk/platform.h>
+ #include <gbdk/metasprites.h>
 @@ -59,8 +59,15 @@
  
      // Collisions
@@ -12,9 +19,16 @@ Index: include\gbs_types.h
 +    uint8_t actor_state;
 +    int8_t actor_vel_x;
 +    int8_t actor_vel_y;
-+    uint8_t actor_linked_actor_idx;
++    struct actor_t *actor_parent;
 +
      // Linked list
      struct actor_t *next;
      struct actor_t *prev;
  } actor_t;
+@@ -197,4 +204,6 @@
+     palette_entry_t cgb_palette[];
+ } palette_t;
+ 
+ #endif
++
++

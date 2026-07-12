@@ -1,0 +1,57 @@
+{
+  "_resourceType": "actor",
+  "id": "24881bd9-0ae9-4016-ad08-42d3e87a06c2",
+  "name": "Debris",
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "daf95270-e30d-423b-9ee7-990ae29f57f6",
+  "prefabId": "",
+  "direction": "down",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "paletteId": "",
+  "isPinned": false,
+  "persistent": false,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "symbol": "sh_debris",
+  "script": [],
+  "startScript": [
+    {
+      "command": "EVENT_SET_ACTOR_BEHAVIOR",
+      "args": {
+        "actorId": "$self$",
+        "behaviorId": {
+          "type": "number",
+          "value": 3
+        },
+        "state": "1"
+      },
+      "id": "210c3a78-60fb-40a4-afe5-10b436192ad2"
+    },
+    {
+      "command": "EVENT_SET_ACTOR_VELOCITY",
+      "args": {
+        "actorId": "$self$",
+        "xVelocity": {
+          "type": "number",
+          "value": 16
+        },
+        "yVelocity": {
+          "type": "number",
+          "value": 16
+        }
+      },
+      "id": "6ab066f6-003a-4fcc-990f-9527addf4926"
+    }
+  ],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": [],
+  "coordinateType": "tiles",
+  "x": 14,
+  "y": 16,
+  "_index": 2
+}

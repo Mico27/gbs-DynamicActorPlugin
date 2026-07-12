@@ -1,4 +1,4 @@
-{
+﻿{
     "version": "4.3.0-e1",
     "fields": [
         {
@@ -89,9 +89,18 @@
           "defaultValue": 1
         },
         {
-          "key": "DYNAMIC_ACTOR_ENABLE_LINKED",
-          "label": "Component: Attach to linked actor",
-          "description": "Compile linked actor following. Uncheck to save ROM if no behavior attaches actors to other actors.",
+          "key": "DYNAMIC_ACTOR_ENABLE_PARENT",
+          "label": "Component: Parent actors / moving platforms",
+          "description": "Compile parent actor inheritance: any actor with a parent set inherits the parent's per-frame movement (tile-collision checked) and still runs its own behavior physics. Also compiles the 'Moving platform' behavior component, which automatically parents/unparents the actors it touches. Uncheck to save ROM if nothing uses parenting or platforms.",
+          "group": "Dynamic actor",
+          "type": "checkbox",
+          "cType": "define",
+          "defaultValue": 1
+        },
+        {
+          "key": "DYNAMIC_ACTOR_ENABLE_ACTOR_COLLISION",
+          "label": "Component: Collide with other actors",
+          "description": "Compile actor-vs-actor collision (blocks/turns on contact with other collidable actors; the player is already handled by the engine). Uncheck to save ROM if no behavior uses it.",
           "group": "Dynamic actor",
           "type": "checkbox",
           "cType": "define",
@@ -108,3 +117,4 @@
         }
     ]
 }
+

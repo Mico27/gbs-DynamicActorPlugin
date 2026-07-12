@@ -1,0 +1,138 @@
+{
+  "_resourceType": "scene",
+  "id": "da6247b5-3aaf-4b31-ae08-51dc4adaa398",
+  "_index": 4,
+  "name": "Shmup",
+  "backgroundId": "85264298-467f-4b96-8b3e-7a2e6aff407f",
+  "tilesetId": "",
+  "width": 20,
+  "height": 18,
+  "type": "SHMUP",
+  "colorModeOverride": "none",
+  "paletteIds": [],
+  "spritePaletteIds": [],
+  "collisions": "0f15+0012+0f2+0012+0f2+0012+0f2+00!0f2+00!0f2+00c+0f2+003+10!006+0f!007+0f2+003+10!005+0f2+007+0f2+003+0f!00e+0f2+003+0f!00c+0f4+003+0f2+00d+0f2+003+0f4+00b+0f2+003+0f5+00a+0f2+00f+0f!002+0f2+00d+0f7+003+0f2+00d+0f2+002+0f5+00b+0fb+008+0f16+",
+  "autoFadeSpeed": 1,
+  "symbol": "scene_shmup",
+  "x": 1140,
+  "y": 420,
+  "playerHit1Script": [],
+  "playerHit2Script": [],
+  "playerHit3Script": [],
+  "script": [
+    {
+      "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
+      "args": {
+        "behaviorId": {
+          "type": "number",
+          "value": 1
+        },
+        "preset": "projectile",
+        "gravity": {
+          "type": "number",
+          "value": 8
+        },
+        "maxFallVelocity": {
+          "type": "number",
+          "value": 64
+        },
+        "bounce": {
+          "type": "number",
+          "value": 128
+        }
+      },
+      "id": "4b2d1791-471f-4aca-b979-627f663043f5"
+    },
+    {
+      "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
+      "args": {
+        "behaviorId": {
+          "type": "number",
+          "value": 2
+        },
+        "preset": "custom",
+        "gravity": {
+          "type": "number",
+          "value": 0
+        },
+        "maxFallVelocity": {
+          "type": "number",
+          "value": 0
+        },
+        "bounce": {
+          "type": "number",
+          "value": 0
+        },
+        "compGravity": false,
+        "compMoveX": true,
+        "compMoveY": true,
+        "compReflectX": false,
+        "compReflectY": false,
+        "compTileCollision": false,
+        "compActorCollision": false,
+        "compPlatform": false,
+        "compLedgeStop": false,
+        "animFace": false,
+        "animFace4": true,
+        "animIdle": false,
+        "animJump": false
+      },
+      "id": "7977476b-2efa-45d6-bad7-8cea8d3abe7a"
+    },
+    {
+      "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
+      "args": {
+        "behaviorId": {
+          "type": "number",
+          "value": 3
+        },
+        "preset": "reflector",
+        "gravity": {
+          "type": "number",
+          "value": 8
+        },
+        "maxFallVelocity": {
+          "type": "number",
+          "value": 64
+        },
+        "bounce": {
+          "type": "number",
+          "value": 255
+        }
+      },
+      "id": "eaad0e69-1458-4862-b788-67d15c35031a"
+    },
+    {
+      "command": "EVENT_SET_INPUT_SCRIPT",
+      "args": {
+        "input": [
+          "start"
+        ],
+        "override": true,
+        "__scriptTabs": "press"
+      },
+      "id": "c7388343-438d-4c2d-8d08-c32356b49f3e",
+      "children": {
+        "true": [
+          {
+            "command": "EVENT_SWITCH_SCENE",
+            "args": {
+              "sceneId": "5e7a2c23-6bb6-46a5-8c39-035fe446ce4b",
+              "x": {
+                "type": "number",
+                "value": 10
+              },
+              "y": {
+                "type": "number",
+                "value": 8
+              },
+              "direction": "",
+              "fadeSpeed": "2"
+            },
+            "id": "46377d20-ff25-4f2a-b95a-09bd50d289c7"
+          }
+        ]
+      }
+    }
+  ]
+}

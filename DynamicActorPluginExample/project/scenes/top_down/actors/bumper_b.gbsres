@@ -1,0 +1,57 @@
+{
+  "_resourceType": "actor",
+  "id": "50a8229e-6155-4749-8f36-f6fc96c97091",
+  "name": "Bumper B",
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "daf95270-e30d-423b-9ee7-990ae29f57f6",
+  "prefabId": "",
+  "direction": "down",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "paletteId": "",
+  "isPinned": false,
+  "persistent": false,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "symbol": "td_bumper_b",
+  "script": [],
+  "startScript": [
+    {
+      "command": "EVENT_SET_ACTOR_BEHAVIOR",
+      "args": {
+        "actorId": "$self$",
+        "behaviorId": {
+          "type": "number",
+          "value": 4
+        },
+        "state": "1"
+      },
+      "id": "1e189a59-4d89-4500-90d9-c2eaa72580dd"
+    },
+    {
+      "command": "EVENT_SET_ACTOR_VELOCITY",
+      "args": {
+        "actorId": "$self$",
+        "xVelocity": {
+          "type": "number",
+          "value": -16
+        },
+        "yVelocity": {
+          "type": "number",
+          "value": 0
+        }
+      },
+      "id": "7f03ff1e-6dbc-4efb-a713-d4061cfd6fec"
+    }
+  ],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": [],
+  "coordinateType": "tiles",
+  "x": 14,
+  "y": 2,
+  "_index": 4
+}

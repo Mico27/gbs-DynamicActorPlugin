@@ -1,0 +1,57 @@
+{
+  "_resourceType": "actor",
+  "id": "cdd1e926-948f-4a03-bac7-31a6dd5a5250",
+  "name": "Ferry",
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "daf95270-e30d-423b-9ee7-990ae29f57f6",
+  "prefabId": "",
+  "direction": "down",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "paletteId": "",
+  "isPinned": false,
+  "persistent": false,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "symbol": "plat2_ferry",
+  "script": [],
+  "startScript": [
+    {
+      "command": "EVENT_SET_ACTOR_BEHAVIOR",
+      "args": {
+        "actorId": "$self$",
+        "behaviorId": {
+          "type": "number",
+          "value": 1
+        },
+        "state": "1"
+      },
+      "id": "3a863336-54b3-4b71-ac9c-b1aff6f93712"
+    },
+    {
+      "command": "EVENT_SET_ACTOR_VELOCITY",
+      "args": {
+        "actorId": "$self$",
+        "xVelocity": {
+          "type": "number",
+          "value": 8
+        },
+        "yVelocity": {
+          "type": "number",
+          "value": 0
+        }
+      },
+      "id": "db81c119-3354-4666-901f-0ce677d82a2b"
+    }
+  ],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": [],
+  "coordinateType": "tiles",
+  "x": 12,
+  "y": 15,
+  "_index": 0
+}

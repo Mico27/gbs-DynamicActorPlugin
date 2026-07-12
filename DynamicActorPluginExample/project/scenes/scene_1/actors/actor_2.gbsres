@@ -44,48 +44,15 @@
             "id": "9266f3f5-b617-4359-9fa0-3da936a69222"
           },
           {
-            "command": "EVENT_SET_ACTOR_X_VELOCITY",
-            "args": {
-              "actorId": "$self$",
-              "xVelocity": {
-                "type": "number",
-                "value": 8
-              }
-            },
-            "id": "28635120-061e-4881-8015-297a1cad71fa"
-          },
-          {
-            "command": "EVENT_SET_ACTOR_Y_VELOCITY",
-            "args": {
-              "actorId": "$self$",
-              "yVelocity": {
-                "type": "number",
-                "value": -4
-              }
-            },
-            "id": "06785c7c-f982-4a6c-8fb8-cca11369f2fd"
-          },
-          {
             "command": "EVENT_SET_ACTOR_BEHAVIOR",
             "args": {
               "actorId": "$self$",
               "behaviorId": {
                 "type": "number",
-                "value": 7
+                "value": 0
               }
             },
             "id": "7905f763-0f7a-4512-8b83-5039471bedaa"
-          },
-          {
-            "command": "EVENT_SET_ACTOR_STATE",
-            "args": {
-              "actorId": "$self$",
-              "stateId": {
-                "type": "number",
-                "value": 1
-              }
-            },
-            "id": "a6fbc97d-932b-49d2-ba15-47cba83a4c65"
           },
           {
             "command": "EVENT_SET_VALUE",

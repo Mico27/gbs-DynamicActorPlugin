@@ -9,12 +9,15 @@ const BHV_MOVE_Y = 0x04;
 const BHV_LEDGE_STOP = 0x08;
 const BHV_REFLECT_X = 0x10;
 const BHV_REFLECT_Y = 0x20;
-const BHV_LINKED = 0x40;
+const BHV_PLATFORM = 0x40;
 
-// Animation component flags
+// Animation / option flags
 const BHV2_ANIM_FACE = 0x01;
 const BHV2_ANIM_IDLE = 0x02;
 const BHV2_ANIM_JUMP = 0x04;
+const BHV2_NO_TILE_COLLISION = 0x08;
+const BHV2_ANIM_FACE_4DIR = 0x10;
+const BHV2_ACTOR_COLLISION = 0x80;
 
 const PRESETS = {
   walker: {
@@ -41,9 +44,17 @@ const PRESETS = {
     flags: BHV_MOVE_X | BHV_MOVE_Y | BHV_REFLECT_X | BHV_REFLECT_Y,
     flags2: BHV2_ANIM_FACE,
   },
-  attached: {
-    flags: BHV_LINKED,
+  platform: {
+    flags: BHV_PLATFORM | BHV_MOVE_X | BHV_MOVE_Y,
     flags2: 0,
+  },
+  wanderer: {
+    flags: BHV_MOVE_X | BHV_MOVE_Y | BHV_REFLECT_X | BHV_REFLECT_Y,
+    flags2: BHV2_ANIM_FACE_4DIR | BHV2_ANIM_IDLE,
+  },
+  projectile: {
+    flags: BHV_MOVE_X | BHV_MOVE_Y,
+    flags2: BHV2_NO_TILE_COLLISION,
   },
 };
 
@@ -55,7 +66,9 @@ export const autoLabel = (fetchArg, input) => {
     faller: "Falling object",
     slider: "Slider (no gravity)",
     reflector: "Reflector (no gravity)",
-    attached: "Attached to actor",
+    platform: "Moving platform",
+    wanderer: "Wanderer (top down)",
+    projectile: "Projectile",
     custom: "Custom",
   };
   return `Define Behavior : ${presetLabels[input.preset] || "Custom"}`;
@@ -81,13 +94,15 @@ export const fields = [
     description: "Start from a ready-made behavior or build a custom one from components",
     type: "select",
     options: [
-      ["walker", "Walker (gravity, turns at walls)"],
-      ["walker_ledge", "Walker (gravity, turns at walls and ledges)"],
-      ["bouncing_ball", "Bouncing ball (gravity, bounces off everything)"],
-      ["faller", "Falling object (gravity, vertical only)"],
-      ["slider", "Slider (no gravity, turns at walls)"],
-      ["reflector", "Reflector (no gravity, bounces off everything)"],
-      ["attached", "Attached to linked actor"],
+      ["walker", "Platformer: Walker (gravity, turns at walls)"],
+      ["walker_ledge", "Platformer: Walker (turns at walls and ledges)"],
+      ["bouncing_ball", "Platformer: Bouncing ball (gravity, bounces)"],
+      ["faller", "Platformer: Falling object (gravity, vertical only)"],
+      ["platform", "Any: Moving platform (carries actors that touch it)"],
+      ["wanderer", "Top down: Wanderer (bounces around, set Bounciness 255)"],
+      ["slider", "Any: Slider (no gravity, turns at walls)"],
+      ["reflector", "Any: Reflector (bounces, set Bounciness 255)"],
+      ["projectile", "Shmup/Any: Projectile (through walls, no collision)"],
       ["custom", "Custom (choose components)"],
     ],
     defaultValue: "walker",
@@ -117,6 +132,33 @@ export const fields = [
     conditions: [{ key: "preset", eq: "custom" }],
   },
   {
+    key: "compTileCollision",
+    label: "Tile collision",
+    description:
+      "Collide with collision tiles while moving. Untick to pass through walls and floors (ghosts, flying pickups) — turning, bouncing, ledge stop and landing are skipped too.",
+    type: "checkbox",
+    defaultValue: true,
+    conditions: [{ key: "preset", eq: "custom" }],
+  },
+  {
+    key: "compActorCollision",
+    label: "Collide with other actors",
+    description:
+      "Block and turn/bounce when running into another collidable actor (uses 'Turn at walls' / 'Bounce' settings). The player is already handled by the engine. Costs one overlap check per on-screen actor each frame.",
+    type: "checkbox",
+    defaultValue: false,
+    conditions: [{ key: "preset", eq: "custom" }],
+  },
+  {
+    key: "compPlatform",
+    label: "Moving platform",
+    description:
+      "Claim every actor this actor touches as a child, so they inherit its movement (ride along), and release them when they stop touching. Skips actors that already have a different parent, and - if this actor has a collision group set - actors in a different group. Combine with Move horizontally/vertically so the platform itself moves.",
+    type: "checkbox",
+    defaultValue: false,
+    conditions: [{ key: "preset", eq: "custom" }],
+  },
+  {
     key: "compLedgeStop",
     label: "Turn at ledges",
     description: "While grounded, treat ledges/pits like walls (smart ledge detection)",
@@ -141,20 +183,20 @@ export const fields = [
     conditions: [{ key: "preset", eq: "custom" }],
   },
   {
-    key: "compLinked",
-    label: "Attach to linked actor",
-    description:
-      "Follow the linked actor at a fixed offset (set with 'Set Actor Linked Actor'). Overrides all other components.",
-    type: "checkbox",
-    defaultValue: false,
-    conditions: [{ key: "preset", eq: "custom" }],
-  },
-  {
     key: "animFace",
     label: "Face move direction",
     description: "Face left/right based on horizontal velocity",
     type: "checkbox",
     defaultValue: true,
+    conditions: [{ key: "preset", eq: "custom" }],
+  },
+  {
+    key: "animFace4",
+    label: "Face 4 directions (top down)",
+    description:
+      "Face up/down/left/right based on the dominant movement axis. Overrides 'Face move direction'.",
+    type: "checkbox",
+    defaultValue: false,
     conditions: [{ key: "preset", eq: "custom" }],
   },
   {
@@ -215,12 +257,10 @@ export const fields = [
 export const compile = (input, helpers) => {
   const {
     _callNative,
-    _stackPush,
     _stackPushConst,
     _stackPop,
     _addComment,
-    _declareLocal,
-    variableSetToScriptValue,
+    _stackPushScriptValue,
   } = helpers;
 
   let flags = 0;
@@ -236,30 +276,23 @@ export const compile = (input, helpers) => {
     if (input.compLedgeStop) flags |= BHV_LEDGE_STOP;
     if (input.compReflectX) flags |= BHV_REFLECT_X;
     if (input.compReflectY) flags |= BHV_REFLECT_Y;
-    if (input.compLinked) flags |= BHV_LINKED;
+    if (input.compPlatform) flags |= BHV_PLATFORM;
+    if (input.compTileCollision === false) flags2 |= BHV2_NO_TILE_COLLISION;
+    if (input.compActorCollision) flags2 |= BHV2_ACTOR_COLLISION;
+    if (input.animFace4) flags2 |= BHV2_ANIM_FACE_4DIR;
     if (input.animFace) flags2 |= BHV2_ANIM_FACE;
     if (input.animIdle) flags2 |= BHV2_ANIM_IDLE;
     if (input.animJump) flags2 |= BHV2_ANIM_JUMP;
   }
 
-  const tmpSlot = _declareLocal("tmp_slot", 1, true);
-  const tmpGravity = _declareLocal("tmp_gravity", 1, true);
-  const tmpMaxFall = _declareLocal("tmp_max_fall", 1, true);
-  const tmpBounce = _declareLocal("tmp_bounce", 1, true);
-
-  variableSetToScriptValue(tmpSlot, input.behaviorId);
-  variableSetToScriptValue(tmpGravity, input.gravity || { type: "number", value: 8 });
-  variableSetToScriptValue(tmpMaxFall, input.maxFallVelocity || { type: "number", value: 64 });
-  variableSetToScriptValue(tmpBounce, input.bounce || { type: "number", value: 128 });
-
   _addComment(`Define Actor Behavior (flags: ${flags}, anim: ${flags2})`);
 
-  _stackPush(tmpBounce);
-  _stackPush(tmpMaxFall);
-  _stackPush(tmpGravity);
+  _stackPushScriptValue(input.bounce || { type: "number", value: 128 });
+  _stackPushScriptValue(input.maxFallVelocity || { type: "number", value: 64 });
+  _stackPushScriptValue(input.gravity || { type: "number", value: 8 });
   _stackPushConst(flags2);
   _stackPushConst(flags);
-  _stackPush(tmpSlot);
+  _stackPushScriptValue(input.behaviorId);
 
   _callNative("vm_define_actor_behavior");
   _stackPop(6);

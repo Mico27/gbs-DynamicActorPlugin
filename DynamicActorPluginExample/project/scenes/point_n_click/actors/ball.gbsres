@@ -1,0 +1,57 @@
+{
+  "_resourceType": "actor",
+  "id": "9e715ce7-8d40-4254-bbc5-b13fb628768e",
+  "name": "Ball",
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "daf95270-e30d-423b-9ee7-990ae29f57f6",
+  "prefabId": "",
+  "direction": "down",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "paletteId": "",
+  "isPinned": false,
+  "persistent": false,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "symbol": "pnc_ball",
+  "script": [],
+  "startScript": [
+    {
+      "command": "EVENT_SET_ACTOR_BEHAVIOR",
+      "args": {
+        "actorId": "$self$",
+        "behaviorId": {
+          "type": "number",
+          "value": 2
+        },
+        "state": "1"
+      },
+      "id": "147605f8-faac-42d7-99e4-e4c1dda9e2ba"
+    },
+    {
+      "command": "EVENT_SET_ACTOR_VELOCITY",
+      "args": {
+        "actorId": "$self$",
+        "xVelocity": {
+          "type": "number",
+          "value": 12
+        },
+        "yVelocity": {
+          "type": "number",
+          "value": 12
+        }
+      },
+      "id": "1b243776-c074-45cc-81d6-9e8db7b091ce"
+    }
+  ],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": [],
+  "coordinateType": "tiles",
+  "x": 8,
+  "y": 1,
+  "_index": 1
+}

@@ -1,4 +1,4 @@
-#ifndef GBS_TYPES_H
+﻿#ifndef GBS_TYPES_H
 #define GBS_TYPES_H
 
 #include <gbdk/platform.h>
@@ -65,7 +65,7 @@ typedef struct actor_t
     uint8_t actor_state;
     int8_t actor_vel_x;
     int8_t actor_vel_y;
-    uint8_t actor_linked_actor_idx;
+    struct actor_t *actor_parent;
 
     // Linked list
     struct actor_t *next;
@@ -205,3 +205,5 @@ typedef struct palette_t {
 } palette_t;
 
 #endif
+
+

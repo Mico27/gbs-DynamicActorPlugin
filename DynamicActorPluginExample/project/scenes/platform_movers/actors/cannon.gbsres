@@ -1,0 +1,66 @@
+{
+  "_resourceType": "actor",
+  "id": "bbfacd57-19da-4818-b0e0-ff551312ed19",
+  "name": "Cannon",
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "daf95270-e30d-423b-9ee7-990ae29f57f6",
+  "prefabId": "",
+  "direction": "right",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "paletteId": "",
+  "isPinned": false,
+  "persistent": false,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "symbol": "cannon",
+  "script": [],
+  "startScript": [],
+  "updateScript": [
+    {
+      "command": "EVENT_WAIT",
+      "args": {
+        "time": {
+          "type": "number",
+          "value": 0.5
+        },
+        "frames": {
+          "type": "number",
+          "value": 90
+        },
+        "units": "frames"
+      },
+      "id": "3431791e-d730-43e3-8f08-9692e80f104d"
+    },
+    {
+      "command": "EVENT_SPAWN_POOL_ACTOR",
+      "args": {
+        "poolActorId": "0d8dedda-506e-4b0a-961e-2dc353314763",
+        "poolCount": {
+          "type": "number",
+          "value": 3
+        },
+        "x": {
+          "type": "number",
+          "value": 2
+        },
+        "y": {
+          "type": "number",
+          "value": 13
+        },
+        "variable": "4",
+        "units": "tiles"
+      },
+      "id": "934d39a9-2c6b-4ef9-86d3-ec469a5147ac"
+    }
+  ],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": [],
+  "coordinateType": "tiles",
+  "x": 1,
+  "y": 14,
+  "_index": 3
+}

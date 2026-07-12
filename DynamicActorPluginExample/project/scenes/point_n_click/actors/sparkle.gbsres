@@ -1,0 +1,38 @@
+{
+  "_resourceType": "actor",
+  "id": "bb71efa8-af7e-4c66-96ba-e15fdfd50afc",
+  "name": "Sparkle",
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "daf95270-e30d-423b-9ee7-990ae29f57f6",
+  "prefabId": "",
+  "direction": "down",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "paletteId": "",
+  "isPinned": false,
+  "persistent": false,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "symbol": "pnc_sparkle",
+  "script": [],
+  "startScript": [
+    {
+      "command": "EVENT_SET_ACTOR_LINKED_ACTOR",
+      "args": {
+        "actorId": "$self$",
+        "linkedActorId": "player"
+      },
+      "id": "b48b5202-86f5-4e81-a34e-0be626658fbd"
+    }
+  ],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": [],
+  "coordinateType": "tiles",
+  "x": 10,
+  "y": 8,
+  "_index": 0
+}
