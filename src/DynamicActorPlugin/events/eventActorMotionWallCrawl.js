@@ -30,16 +30,6 @@ export const fields = [
     defaultValue: "right",
   },
   {
-    key: "speed",
-    label: "Speed",
-    description:
-      "Crawl velocity in subpixels per frame (32 = 1 pixel/frame). Snapped to 1/2/4/8/16/32/64 so the actor lands exactly on the 8px cells where turns happen.",
-    type: "number",
-    min: 1,
-    max: 64,
-    defaultValue: 16,
-  },
-  {
     key: "startDirection",
     label: "Start direction",
     description:
@@ -65,12 +55,6 @@ export const compile = (input, helpers) => {
     setActorId,
   } = helpers;
 
-  // Snap speed down to a power of two so it divides 256 (one 8px cell)
-  let speed = Math.round(Number(input.speed));
-  if (!isFinite(speed)) speed = 16;
-  speed = Math.max(1, Math.min(64, speed));
-  speed = 1 << Math.floor(Math.log2(speed));
-
   const side = input.wallSide === "left" ? 1 : 0;
   const dirValues = { up: 0, right: 1, down: 2, left: 3 };
   const startDir =
@@ -82,13 +66,12 @@ export const compile = (input, helpers) => {
 
   setActorId(actorRef, input.actorId);
 
-  _addComment(
-    `Actor Motion: Wall Crawl (${side ? "left" : "right"} hand, speed ${speed})`,
-  );
+  _addComment(`Actor Motion: Wall Crawl (${side ? "left" : "right"} hand)`);
 
   _stackPush(actorRef);
   _stackPushConst(startDir);
   _stackPushConst(side);
-  _stackPushConst(speed);
-  _invoke("vm_actor_crawl_step", 4, ".ARG3");
+  _stackPushConst(0);
+  _stackPushConst(0);
+  _invoke("vm_actor_crawl_step", 5, ".ARG4");
 };

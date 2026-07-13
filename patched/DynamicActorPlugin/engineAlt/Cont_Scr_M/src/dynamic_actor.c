@@ -960,7 +960,11 @@ UBYTE vm_wait_for_collision(void * THIS, UBYTE start, UWORD * stack_frame) OLDCA
 // the target on all steered axes; a flee completes when it is beyond range on
 // any steered axis; 0 = never completes (permanent behavior - put the event
 // in an actor's update script or a looping thread).
-// stack_frame: [0] actor idx, [1] target idx, [2] speed, [3] flee, [4] stop_range
+// interval mask: power-of-two refresh period minus one for cached target
+// position refresh from the target actor.
+// stack_frame: [0] actor idx, [1] target idx, [2] flee,
+//              [3] stop_range, [4] interval, [5] cached_target_x,
+//              [6] cached_target_y
 UBYTE vm_actor_chase_actor(void * THIS, UBYTE start, UWORD * stack_frame) OLDCALL BANKED {
     actor_t *actor = actors + (UBYTE)stack_frame[0];
     if (start){
@@ -972,13 +976,22 @@ UBYTE vm_actor_chase_actor(void * THIS, UBYTE start, UWORD * stack_frame) OLDCAL
         }
     }
     actor_t *target = actors + (UBYTE)stack_frame[1];
-    UBYTE spd = (UBYTE)stack_frame[2];
-    UBYTE flee = (UBYTE)stack_frame[3];
-    UWORD range = stack_frame[4];
-    WORD move = spd;
+    UBYTE flee = (UBYTE)stack_frame[2];
+    UWORD range = stack_frame[3];
+    UBYTE interval = (UBYTE)stack_frame[4];
+    WORD speed = actor->move_speed >> 1; // player max velocity is 128, so divide by 2 to get a speed that lands on cell boundaries;
     UBYTE steer_y = 1;
+
+    if (start || ((game_time & interval) == 0)) {
+        stack_frame[5] = target->pos.x;
+        stack_frame[6] = target->pos.y;
+    }
+
+    UWORD target_x = stack_frame[5];
+    UWORD target_y = stack_frame[6];
+
     if (flee) {
-        move = -move;
+        speed = -speed;
     }
 
 #ifdef DYNAMIC_ACTOR_ENABLE_GRAVITY
@@ -987,23 +1000,23 @@ UBYTE vm_actor_chase_actor(void * THIS, UBYTE start, UWORD * stack_frame) OLDCAL
     }
 #endif
 
-    WORD dx = (WORD)(target->pos.x - actor->pos.x);
-    WORD dy = (WORD)(target->pos.y - actor->pos.y);
+    WORD dx = (WORD)(target_x - actor->pos.x);
+    WORD dy = (WORD)(target_y - actor->pos.y);
     UWORD adx = (dx < 0) ? (UWORD)(-dx) : (UWORD)dx;
     UWORD ady = (dy < 0) ? (UWORD)(-dy) : (UWORD)dy;
 
-    if (dx > (WORD)spd) {
-        actor->actor_vel_x = move;
-    } else if (dx < -(WORD)spd) {
-        actor->actor_vel_x = -move;
+    if (dx > speed) {
+        actor->actor_vel_x = speed;
+    } else if (dx < -speed) {
+        actor->actor_vel_x = -speed;
     } else {
         actor->actor_vel_x = 0;
     }
     if (steer_y) {
-        if (dy > (WORD)spd) {
-            actor->actor_vel_y = move;
-        } else if (dy < -(WORD)spd) {
-            actor->actor_vel_y = -move;
+        if (dy > speed) {
+            actor->actor_vel_y = speed;
+        } else if (dy < -speed) {
+            actor->actor_vel_y = -speed;
         } else {
             actor->actor_vel_y = 0;
         }
@@ -1037,7 +1050,7 @@ UBYTE vm_actor_chase_actor(void * THIS, UBYTE start, UWORD * stack_frame) OLDCAL
 // the actor doesn't oscillate on the destination.
 // target_x/target_y are in pixels; stop_range is in pixels (0 = exact match).
 // stack_frame: [0] actor idx, [1] target_x_px, [2] target_y_px,
-//              [3] speed_subpx, [4] stop_range_px
+//              [3] stop_range_px
 UBYTE vm_actor_move_to_pos_by_velocity(void * THIS, UBYTE start, UWORD * stack_frame) OLDCALL BANKED {
         
     actor_t *actor = actors + (UBYTE)stack_frame[0];
@@ -1052,9 +1065,8 @@ UBYTE vm_actor_move_to_pos_by_velocity(void * THIS, UBYTE start, UWORD * stack_f
 
     UWORD target_x = PX_TO_SUBPX(stack_frame[1]);
     UWORD target_y = PX_TO_SUBPX(stack_frame[2]);
-    UBYTE spd = (UBYTE)stack_frame[3];
-    UWORD range = PX_TO_SUBPX(stack_frame[4]);
-    WORD move = spd;
+    UWORD range = PX_TO_SUBPX(stack_frame[3]);
+    WORD speed = actor->move_speed >> 1; // player max velocity is 128, so divide by 2 to get a speed that lands on cell boundaries;
     UBYTE steer_y = 1;
 
 #ifdef DYNAMIC_ACTOR_ENABLE_GRAVITY
@@ -1068,18 +1080,18 @@ UBYTE vm_actor_move_to_pos_by_velocity(void * THIS, UBYTE start, UWORD * stack_f
     UWORD adx = (dx < 0) ? (UWORD)(-dx) : (UWORD)dx;
     UWORD ady = (dy < 0) ? (UWORD)(-dy) : (UWORD)dy;
 
-    if (dx > (WORD)spd) {
-        actor->actor_vel_x = move;
-    } else if (dx < -(WORD)spd) {
-        actor->actor_vel_x = -move;
+    if (dx > speed) {
+        actor->actor_vel_x = speed;
+    } else if (dx < -speed) {
+        actor->actor_vel_x = -speed;
     } else {
         actor->actor_vel_x = 0;
     }
     if (steer_y) {
-        if (dy > (WORD)spd) {
-            actor->actor_vel_y = move;
-        } else if (dy < -(WORD)spd) {
-            actor->actor_vel_y = -move;
+        if (dy > speed) {
+            actor->actor_vel_y = speed;
+        } else if (dy < -speed) {
+            actor->actor_vel_y = -speed;
         } else {
             actor->actor_vel_y = 0;
         }
@@ -1100,75 +1112,24 @@ UBYTE vm_actor_move_to_pos_by_velocity(void * THIS, UBYTE start, UWORD * stack_f
 
 #define CRAWL_SOLID(tx, ty) ((tile_at((tx), (ty)) & COLLISION_ALL) == COLLISION_ALL)
 
-static const BYTE crawl_dir_x[4] = {0, 1, 0, -1};   // 0=up, 1=right, 2=down, 3=left
-static const BYTE crawl_dir_y[4] = {-1, 0, 1, 0};
+#define DIR_XMOD(value, dir) (((dir) & 1) ? ((dir) == 1 ? (value) : -(value)) : 0)
+#define DIR_YMOD(value, dir) (((dir) & 1) ? 0 : ((dir) == 0 ? -(value) : (value)))
 
-#if DYNAMIC_ACTOR_COLLISION_TYPE == DYNAMIC_ACTOR_COLLISION_BOUNDING_BOX
-// Returns non-zero when any tile along the actor's bounding-box edge in the
-// given direction is solid. This makes wall-crawl collision size-aware.
-static UBYTE crawl_edge_is_solid(actor_t *actor, UBYTE dir) {
-    UBYTE tx_start = SUBPX_TO_TILE(actor->pos.x + actor->bounds.left);
-    UBYTE tx_end = SUBPX_TO_TILE(actor->pos.x + actor->bounds.right);
-    UBYTE ty_start = SUBPX_TO_TILE(actor->pos.y + actor->bounds.top);
-    UBYTE ty_end = SUBPX_TO_TILE(actor->pos.y + actor->bounds.bottom);
-    UBYTE tx;
-    UBYTE ty;
+#define DIR_BOUNDS_X(bounds, dir) (((dir) & 1) ? ((dir) == 1 ? (bounds).right : (bounds).left) : 0)
+#define DIR_BOUNDS_Y(bounds, dir) (((dir) & 1) ? 0 : ((dir) == 0 ? (bounds).top : (bounds).bottom))
 
-    if (dir == 0) { // up
-        ty = ty_start - 1;
-        tx = tx_start;
-        while (1) {
-            if (CRAWL_SOLID(tx, ty)) return 1;
-            if (tx == tx_end) break;
-            tx++;
-        }
-        return 0;
-    }
-
-    if (dir == 1) { // right
-        tx = tx_end + 1;
-        ty = ty_start;
-        while (1) {
-            if (CRAWL_SOLID(tx, ty)) return 1;
-            if (ty == ty_end) break;
-            ty++;
-        }
-        return 0;
-    }
-
-    if (dir == 2) { // down
-        ty = ty_end + 1;
-        tx = tx_start;
-        while (1) {
-            if (CRAWL_SOLID(tx, ty)) return 1;
-            if (tx == tx_end) break;
-            tx++;
-        }
-        return 0;
-    }
-
-    // left
-    tx = tx_start - 1;
-    ty = ty_start;
-    while (1) {
-        if (CRAWL_SOLID(tx, ty)) return 1;
-        if (ty == ty_end) break;
-        ty++;
-    }
-    return 0;
-}
-#endif
 
 // One step of wall/ceiling crawling (right/left-hand wall follower).
 // Call every frame from a looping script; the current direction lives in a
 // script local owned by the caller, so every crawler keeps its own state and
 // no per-actor engine RAM is needed. The behavior applies the velocity, so
-// the actor needs Move X + Move Y (tile collision off recommended - the crawl
-// logic is what keeps the actor out of walls). Speed must divide 256
-// (1/2/4/8/16/32/64/128) so the actor lands exactly on the 8px cell
-// boundaries where turn decisions happen. A wall is a fully solid tile (all
+// the actor needs Move X + Move Y (tile collision is not needed - the crawl
+// logic already does the tile collision correction of the behavior). 
+// A wall is a fully solid tile (all
 // four collision bits); out-of-bounds reads count as solid, so map borders
-// can be crawled.
+// can be crawled. Stack frame slots [3] and [4] cache the last tile X/Y that
+// was processed so the collision test only runs when the actor enters a new
+// tile instead of depending on exact grid alignment.
 UBYTE vm_actor_crawl_step(void * THIS, UBYTE start, UWORD * stack_frame) OLDCALL BANKED {
     actor_t * actor = actors + (UBYTE)stack_frame[0];
     if (start){
@@ -1181,67 +1142,115 @@ UBYTE vm_actor_crawl_step(void * THIS, UBYTE start, UWORD * stack_frame) OLDCALL
     }
     UBYTE dir = ((UBYTE)stack_frame[1]) & 3;
     UBYTE side = (UBYTE)stack_frame[2];   // 0 = wall on right hand (clockwise around blocks), 1 = left hand
-    UBYTE speed = (UBYTE)stack_frame[3];
+    UBYTE speed = actor->move_speed >> 1; // player max velocity is 128, so divide by 2 to get a speed that lands on cell boundaries
+#if DYNAMIC_ACTOR_COLLISION_TYPE == DYNAMIC_ACTOR_COLLISION_SINGLE_POINT
+    UBYTE tile_x = SUBPX_TO_TILE(actor->pos.x + DIR_XMOD(speed, dir));
+    UBYTE tile_y = SUBPX_TO_TILE(actor->pos.y + DIR_YMOD(speed, dir));
+#else
+    UBYTE tile_x = SUBPX_TO_TILE(actor->pos.x + DIR_BOUNDS_X(actor->bounds, dir) + DIR_XMOD(speed, dir));
+    UBYTE tile_y = SUBPX_TO_TILE(actor->pos.y + DIR_BOUNDS_Y(actor->bounds, dir) + DIR_YMOD(speed, dir));
+#endif
+    if (start) {
+        stack_frame[3] = tile_x;
+        stack_frame[4] = tile_y;
+    } else if ((tile_x != (UBYTE)stack_frame[3]) || (tile_y != (UBYTE)stack_frame[4])) {
+#if DYNAMIC_ACTOR_COLLISION_TYPE != DYNAMIC_ACTOR_COLLISION_SINGLE_POINT
+        if (dir & 1){
+            UBYTE sdir = (dir + (side ? 3 : 1)) & 3; 
+            UWORD new_actor_y = actor->pos.y + DIR_YMOD(speed, sdir);
+            actor->pos.y = CHECK_COL_V(actor->pos.x, new_actor_y, actor, sdir == 2);
+            if (actor->pos.y == new_actor_y) {
+                // Outer corner: the wall beside us ended - turn toward it to wrap around
+                dir = sdir;
+                //Adjust horizontal overshoot
+                sdir = (dir + (side ? 3 : 1)) & 3;
+                UWORD new_actor_x = actor->pos.x + DIR_XMOD(speed, sdir);
+                actor->pos.x = CHECK_COL_H(new_actor_x, actor->pos.y, actor, sdir == 1);
 
-#if DYNAMIC_ACTOR_COLLISION_TYPE == DYNAMIC_ACTOR_COLLISION_BOUNDING_BOX
-    // Turn decisions only where the moving edge of the bounding box sits
-    // exactly on a cell boundary.
-#else
-    // Legacy point-based crawl checks for non-bounding-box collision types.
-#endif
-    UBYTE aligned;
-#if DYNAMIC_ACTOR_COLLISION_TYPE == DYNAMIC_ACTOR_COLLISION_BOUNDING_BOX
-    if (dir == 0) {
-        aligned = (((actor->pos.y + actor->bounds.top) & 0xFF) == 0);
-    } else if (dir == 1) {
-        aligned = (((actor->pos.x + actor->bounds.right) & 0xFF) == 0);
-    } else if (dir == 2) {
-        aligned = (((actor->pos.y + actor->bounds.bottom) & 0xFF) == 0);
-    } else {
-        aligned = (((actor->pos.x + actor->bounds.left) & 0xFF) == 0);
-    }
-#else
-    if (dir & 1) {
-        aligned = ((actor->pos.x & 0xFF) == 0);
-    } else {
-        aligned = ((actor->pos.y & 0xFF) == 0);
-    }
-#endif
+            } else {
+                UWORD new_actor_x = actor->pos.x + DIR_XMOD(speed, dir);
+                actor->pos.x = CHECK_COL_H(new_actor_x, actor->pos.y, actor, dir == 1);
+                if (new_actor_x != actor->pos.x) {
+                    // Ran into a wall: turn away from the wall side
+                    dir = (dir + (side ? 1 : 3)) & 3;
+                }            
+            }
+        } else {
+            UBYTE sdir = (dir + (side ? 3 : 1)) & 3; 
+            UWORD new_actor_x = actor->pos.x + DIR_XMOD(speed, sdir);    
+            actor->pos.x = CHECK_COL_H(new_actor_x, actor->pos.y, actor, sdir == 1);   
+            if (actor->pos.x == new_actor_x) {
+                // Outer corner: the wall beside us ended - turn toward it to wrap around
+                dir = sdir;
+                //Adjust vertical overshoot
+                sdir = (dir + (side ? 3 : 1)) & 3;
+                UWORD new_actor_y = actor->pos.y + DIR_YMOD(speed, sdir);
+                actor->pos.y = CHECK_COL_V(actor->pos.x, new_actor_y, actor, sdir == 2);
 
-    if (aligned) {
-        UBYTE sdir = (dir + (side ? 3 : 1)) & 3;
-#if DYNAMIC_ACTOR_COLLISION_TYPE == DYNAMIC_ACTOR_COLLISION_BOUNDING_BOX
-        if (!crawl_edge_is_solid(actor, sdir)) {
-            // Outer corner: the wall beside us ended - turn toward it to wrap around
-            dir = sdir;
-        }
-        UBYTE tries = 4;
-        while (crawl_edge_is_solid(actor, dir)) {
-#else
-        UBYTE tx = SUBPX_TO_TILE(actor->pos.x);
-        UBYTE ty = SUBPX_TO_TILE(actor->pos.y);
-        if (!CRAWL_SOLID(tx + crawl_dir_x[sdir], ty + crawl_dir_y[sdir])) {
-            // Outer corner: the wall beside us ended - turn toward it to wrap around
-            dir = sdir;
-        }
-        UBYTE tries = 4;
-        while (CRAWL_SOLID(tx + crawl_dir_x[dir], ty + crawl_dir_y[dir])) {
-#endif
-            // Blocked ahead (inner corner / dead end): turn away from the wall side
-            dir = (dir + (side ? 1 : 3)) & 3;
-            if (--tries == 0) {
-                // Enclosed on all four sides: stop
-                actor->actor_vel_x = 0;
-                actor->actor_vel_y = 0;
-                stack_frame[1] = dir;
-                ((SCRIPT_CTX *)THIS)->waitable = TRUE;
-                return FALSE;
+            } else {
+                UWORD new_actor_y = actor->pos.y + DIR_YMOD(speed, dir);
+                actor->pos.y = CHECK_COL_V(actor->pos.x, new_actor_y, actor, dir == 2);
+                if (new_actor_y != actor->pos.y) {
+                    // Ran into a wall: turn away from the wall side
+                    dir = (dir + (side ? 1 : 3)) & 3;
+                }
             }
         }
+#else
+        if (dir & 1){
+            UWORD new_actor_x = actor->pos.x + DIR_XMOD(speed, dir);
+            actor->pos.x = CHECK_COL_H(new_actor_x, actor->pos.y, actor, dir == 1);
+            if (new_actor_x != actor->pos.x) {
+                // Ran into a wall: turn away from the wall side
+                dir = (dir + (side ? 1 : 3)) & 3;
+            } else {
+                UBYTE sdir = (dir + (side ? 3 : 1)) & 3; 
+                UWORD new_actor_y = actor->pos.y + DIR_YMOD(speed, sdir);
+                actor->pos.y = CHECK_COL_V(actor->pos.x, new_actor_y, actor, sdir == 2);
+                if (actor->pos.y == new_actor_y) {
+                    // Outer corner: the wall beside us ended - turn toward it to wrap around
+                    dir = sdir;
+                }
+            }
+        } else {
+            UWORD new_actor_y = actor->pos.y + DIR_YMOD(speed, dir);
+            actor->pos.y = CHECK_COL_V(actor->pos.x, new_actor_y, actor, dir == 2);
+            if (new_actor_y != actor->pos.y) {
+                // Ran into a wall: turn away from the wall side
+                dir = (dir + (side ? 1 : 3)) & 3;
+            } else {
+                UBYTE sdir = (dir + (side ? 3 : 1)) & 3; 
+                UWORD new_actor_x = actor->pos.x + DIR_XMOD(speed, sdir);    
+                actor->pos.x = CHECK_COL_H(new_actor_x, actor->pos.y, actor, sdir == 1);   
+                if (actor->pos.x == new_actor_x) {
+                    // Outer corner: the wall beside us ended - turn toward it to wrap around
+                    dir = sdir;
+                }
+            }
+        }
+#endif
+        stack_frame[3] = tile_x;
+        stack_frame[4] = tile_y;
     }
 
-    actor->actor_vel_x = crawl_dir_x[dir] * speed;
-    actor->actor_vel_y = crawl_dir_y[dir] * speed;
+    switch (dir) {
+        case 0:
+            actor->actor_vel_x = 0;
+            actor->actor_vel_y = -speed;
+            break;
+        case 1:
+            actor->actor_vel_x = speed;
+            actor->actor_vel_y = 0;
+            break;
+        case 2:
+            actor->actor_vel_x = 0;
+            actor->actor_vel_y = speed;
+            break;
+        default:
+            actor->actor_vel_x = -speed;
+            actor->actor_vel_y = 0;
+            break;
+    }
     stack_frame[1] = dir;
     ((SCRIPT_CTX *)THIS)->waitable = TRUE;
     return FALSE;

@@ -1,21 +1,21 @@
 {
   "_resourceType": "scene",
-  "id": "c141cfc6-d9e0-45c7-aedf-3e8b81fe42fc",
-  "_index": 1,
-  "name": "Adventure Movers",
-  "backgroundId": "411c9fab-742d-4864-9fcb-a20455f0f97a",
+  "id": "7f89ff41-7e1a-4145-9d24-c0acc4adca05",
+  "_index": 6,
+  "name": "TEST CRAWLER",
+  "backgroundId": "01346570-a786-4aa5-8792-31694fb40c74",
   "tilesetId": "",
   "width": 20,
   "height": 18,
-  "type": "ADVENTURE",
+  "type": "PLATFORM",
   "colorModeOverride": "none",
   "paletteIds": [],
   "spritePaletteIds": [],
-  "collisions": "0f!008+0fc+008+0fc+008+0fc+008+0fc+008+0fc+008+0f!00!0f!007+0f2+008+0f!00!0f!007+0f2+008+0f!00!0f!007+0f2+008+0f!003+0f!005+0f2+008+0f!003+0f!005+0f2+008+0f!003+0f!005+0f2+008+0f!003+0f!005+0f2+00c+0f!005+0f2+00c+0f!005+0f2+00c+0f!005+0ff+005+0ff+005+0ff+005+0f!",
+  "collisions": "0f15+008+0fc+008+0fc+008+0fc+008+0fc+008+0f!00!0f!007+0f2+008+0f!00!0f!007+0f2+008+0f!00!0f!007+0f2+008+0f!003+0f!005+0f2+008+0f!003+0f2+004+0f3+004+0f!002+0f!003+0f!004+0f3+005+0f!002+0f!003+0f!005+0f2+005+0f!006+0f!005+0f5+002+0f!006+0f!003+0f4+005+0f!006+0f!005+0ff+002+0f12+005+0f15+",
   "autoFadeSpeed": 1,
-  "symbol": "scene_adv",
-  "x": 900,
-  "y": 420,
+  "symbol": "test_crawler",
+  "x": 640,
+  "y": 144,
   "playerHit1Script": [],
   "playerHit2Script": [],
   "playerHit3Script": [],
@@ -52,9 +52,10 @@
         "compReflectY": false,
         "compPlatform": false,
         "compActorCollision": false,
-        "compLedgeStop": false
+        "compLedgeStop": false,
+        "__collapse": false
       },
-      "id": "45b36f4f-f3ef-410b-88db-7251fb196105"
+      "id": "5dd2cbf8-98e0-48ec-ba55-48742c7e0017"
     },
     {
       "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
@@ -88,9 +89,10 @@
         "animFace": false,
         "animFace4": true,
         "animIdle": true,
-        "animJump": false
+        "animJump": false,
+        "__collapse": true
       },
-      "id": "d6e8d12e-ba68-4ac5-814e-cdb3741ff1da"
+      "id": "5081f7b3-94a4-4d69-982f-cd970f70e517"
     },
     {
       "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
@@ -124,87 +126,16 @@
         "compReflectY": false,
         "compPlatform": true,
         "compActorCollision": false,
-        "compLedgeStop": false
+        "compLedgeStop": false,
+        "__collapse": true
       },
-      "id": "bf97cae4-ad0f-4b16-917d-a397dbb4c612"
+      "id": "070f24af-1f6f-4cfe-9ea3-cf86a8ff173d"
     },
     {
-      "command": "EVENT_SET_INPUT_SCRIPT",
-      "args": {
-        "input": [
-          "start"
-        ],
-        "override": true,
-        "__scriptTabs": "press"
-      },
-      "id": "b1bf284e-739d-4280-a19c-564f4a15e102",
-      "children": {
-        "true": [
-          {
-            "command": "EVENT_SWITCH_SCENE",
-            "args": {
-              "sceneId": "da6247b5-3aaf-4b31-ae08-51dc4adaa398",
-              "x": {
-                "type": "number",
-                "value": 1
-              },
-              "y": {
-                "type": "number",
-                "value": 8
-              },
-              "direction": "right",
-              "fadeSpeed": "2"
-            },
-            "id": "ccdfa010-c079-42f4-bdcf-d6e3b93b271f"
-          }
-        ]
-      }
-    },
-    {
-      "command": "EVENT_SET_INPUT_SCRIPT",
-      "args": {
-        "input": [
-          "b"
-        ],
-        "override": true,
-        "__scriptTabs": "press"
-      },
-      "children": {
-        "true": [
-          {
-            "command": "EVENT_ACTOR_SET_MOVEMENT_SPEED",
-            "args": {
-              "actorId": "72667753-0af4-4bbd-b4d5-21b332b9cbe7",
-              "speed": 4
-            },
-            "id": "0f2f5f3b-5792-4ffa-9bfd-d13f13f16f51"
-          }
-        ]
-      },
-      "id": "6e1a1e0d-e0b7-434e-a646-4481996e6efd"
-    },
-    {
-      "command": "EVENT_SET_INPUT_SCRIPT",
-      "args": {
-        "input": [
-          "a"
-        ],
-        "override": true,
-        "__scriptTabs": "press"
-      },
-      "children": {
-        "true": [
-          {
-            "command": "EVENT_ACTOR_SET_MOVEMENT_SPEED",
-            "args": {
-              "actorId": "72667753-0af4-4bbd-b4d5-21b332b9cbe7",
-              "speed": 0.25
-            },
-            "id": "905f94df-b2f5-4d99-a134-668faf4da2d2"
-          }
-        ]
-      },
-      "id": "4d62fb43-0c8d-4267-ba8c-84927e2444a3"
+      "command": "EVENT_SCRIPT_UNLOCK",
+      "args": {},
+      "id": "1dc2f6c1-4c0e-4041-8594-d86f5c143c93"
     }
-  ]
+  ],
+  "autoFadeEventCollapse": true
 }

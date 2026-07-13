@@ -1,0 +1,12 @@
+{
+  "_resourceType": "background",
+  "id": "01346570-a786-4aa5-8792-31694fb40c74",
+  "name": "crawler_test_bg",
+  "symbol": "bg_crawler_test_bg",
+  "tileColors": "",
+  "filename": "crawler_test_bg.png",
+  "width": 20,
+  "height": 18,
+  "imageWidth": 160,
+  "imageHeight": 144
+}

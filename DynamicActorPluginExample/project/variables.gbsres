@@ -15,6 +15,16 @@
       "id": "2",
       "name": "CarryingObject",
       "symbol": "var_carryingobject"
+    },
+    {
+      "id": "3",
+      "name": "CrawlerX",
+      "symbol": "var_crawlerx"
+    },
+    {
+      "id": "4",
+      "name": "CrawlerY",
+      "symbol": "var_crawlery"
     }
   ],
   "constants": []

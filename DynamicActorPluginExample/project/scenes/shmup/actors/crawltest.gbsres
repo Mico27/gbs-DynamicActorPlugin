@@ -1,21 +1,21 @@
 {
   "_resourceType": "actor",
-  "id": "9b349093-6b48-41ad-9399-f9abd0393539",
-  "name": "",
+  "id": "efc1ba61-87dc-42d9-aa35-ee5355e113c8",
+  "name": "CrawlTest",
   "frame": 0,
   "animate": false,
-  "spriteSheetId": "581d34d0-9591-4e6e-a609-1d94f203b0cd",
+  "spriteSheetId": "daf95270-e30d-423b-9ee7-990ae29f57f6",
   "prefabId": "",
   "direction": "down",
   "moveSpeed": 1,
   "animSpeed": 15,
   "paletteId": "",
-  "isPinned": true,
+  "isPinned": false,
   "persistent": false,
   "collisionGroup": "",
   "collisionExtraFlags": [],
   "prefabScriptOverrides": {},
-  "symbol": "actor_3",
+  "symbol": "sh_crawltest",
   "script": [],
   "startScript": [
     {
@@ -24,19 +24,29 @@
         "actorId": "$self$",
         "behaviorId": {
           "type": "number",
-          "value": 1
+          "value": 4
         },
         "state": "1"
       },
-      "id": "771de471-8708-4d0d-9ad2-fa3ed03e4495"
+      "id": "9f206ed7-1cf0-4ef4-be99-bde9896b1099"
     }
   ],
-  "updateScript": [],
+  "updateScript": [
+    {
+      "command": "EVENT_ACTOR_MOTION_WALL_CRAWL",
+      "args": {
+        "actorId": "$self$",
+        "wallSide": "right",
+        "startDirection": "right"
+      },
+      "id": "0d1a2b3c-4d5e-6f70-8192-a3b4c5d6e7f8"
+    }
+  ],
   "hit1Script": [],
   "hit2Script": [],
   "hit3Script": [],
   "coordinateType": "tiles",
   "x": 2,
-  "y": 1,
+  "y": 9,
   "_index": 3
 }

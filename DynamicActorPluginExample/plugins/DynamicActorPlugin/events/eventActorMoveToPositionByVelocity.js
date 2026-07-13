@@ -51,19 +51,6 @@ export const fields = [
     unitsAllowed: ["tiles", "pixels"],
   },
   {
-    key: "speed",
-    label: "Speed",
-    description:
-      "Movement speed in subpixels per frame (32 = 1 pixel/frame). Also used as the arrival dead zone so the actor does not oscillate on the destination.",
-    type: "value",
-    min: 0,
-    max: 127,
-    defaultValue: {
-      type: "number",
-      value: 8,
-    },
-  },
-  {
     key: "stopRange",
     label: "Stop range (px)",
     description:
@@ -110,17 +97,14 @@ export const compile = (input, helpers) => {
   setActorId(actorRef, input.actorId);
 
   _addComment("Actor Move To Position By Velocity");
-
-  _stackPush(actorRef);
   _stackPushScriptValue(
     scriptValueToPixels(input.targetX || { type: "number", value: 0 }, input.units),
   );
   _stackPushScriptValue(
     scriptValueToPixels(input.targetY || { type: "number", value: 0 }, input.units),
   );
-  _stackPushScriptValue(input.speed || { type: "number", value: 8 });
   _stackPushScriptValue(input.stopRange || { type: "number", value: 0 });
 
-  _invoke("vm_actor_move_to_pos_by_velocity", 5, ".ARG4");
+  _invoke("vm_actor_move_to_pos_by_velocity", 4, ".ARG3");
 };
 
