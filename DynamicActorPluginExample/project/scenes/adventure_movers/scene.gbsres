@@ -11,7 +11,7 @@
   "colorModeOverride": "none",
   "paletteIds": [],
   "spritePaletteIds": [],
-  "collisions": "0f!008+0fc+008+0fc+008+0fc+008+0fc+008+0fc+008+0f!00!0f!007+0f2+008+0f!00!0f!007+0f2+008+0f!00!0f!007+0f2+008+0f!003+0f!005+0f2+008+0f!003+0f!005+0f2+008+0f!003+0f!005+0f2+008+0f!003+0f!005+0f2+00c+0f!005+0f2+00c+0f!005+0f2+00c+0f!005+0ff+005+0ff+005+0ff+005+0f!",
+  "collisions": "0f!008+0fc+008+0fc+008+0fc+008+0fc+008+0fc+008+0f!009+0f2+008+0f!009+0f2+008+0f!009+0f2+008+0f!003+0f!005+0f2+008+0f!003+0f!005+0f2+008+0f!003+0f!005+0f2+008+0f!003+0f!005+0f2+00c+0f!005+0f2+00c+0f!005+0f2+00c+0f!005+0ff+005+0ff+005+0ff+005+0f!",
   "autoFadeSpeed": 1,
   "symbol": "scene_adv",
   "x": 900,
@@ -52,7 +52,8 @@
         "compReflectY": false,
         "compPlatform": false,
         "compActorCollision": false,
-        "compLedgeStop": false
+        "compLedgeStop": false,
+        "__collapse": true
       },
       "id": "45b36f4f-f3ef-410b-88db-7251fb196105"
     },

@@ -29,6 +29,13 @@
         "state": "1"
       },
       "id": "930e7678-630b-4643-869c-5c8c09e71154"
+    },
+    {
+      "command": "EVENT_ACTOR_DEACTIVATE",
+      "args": {
+        "actorId": "$self$"
+      },
+      "id": "cdd002c5-1424-4948-95b2-cebbb213a6f0"
     }
   ],
   "updateScript": [

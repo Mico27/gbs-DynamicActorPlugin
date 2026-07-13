@@ -71,6 +71,14 @@ export const fields = [
 export const compile = (input, helpers) => {
   const { _invoke, _stackPush, _stackPushScriptValue, _addComment, _declareLocal, setActorId } = helpers;
 
+  const toScriptNumber = (value, fallback = 0) => {
+    if (value && typeof value === "object") {
+      return value;
+    }
+    const n = Number(value);
+    return { type: "number", value: Number.isFinite(n) ? n : fallback };
+  };
+
   const actorRef = _declareLocal("actorRef", 1, true);
   const targetRef = _declareLocal("targetRef", 1, true);
   setActorId(actorRef, input.actorId);
@@ -81,8 +89,8 @@ export const compile = (input, helpers) => {
   _stackPush(actorRef);
   _stackPush(targetRef);
   _stackPushScriptValue(input.mode === "flee" ? { type: "number", value: 1 } : { type: "number", value: 0 });
-  _stackPushScriptValue(input.stopRange || { type: "number", value: 0 });
-  _stackPushScriptValue(input.interval || { type: "number", value: 0 });
+  _stackPushScriptValue(toScriptNumber(input.stopRange, 0));
+  _stackPushScriptValue(toScriptNumber(input.interval, 0));
   _stackPush(0);
   _stackPush(0);
   

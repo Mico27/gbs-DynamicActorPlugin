@@ -1,13 +1,13 @@
 {
   "_resourceType": "actor",
-  "id": "8c3df47f-0898-4516-bba3-cc3e02cdf813",
-  "name": "Chaser",
+  "id": "b36c2402-2ba8-42ea-af68-cd0259038cc3",
+  "name": "Follower 2",
   "frame": 0,
   "animate": false,
   "spriteSheetId": "581d34d0-9591-4e6e-a609-1d94f203b0cd",
   "prefabId": "",
   "direction": "down",
-  "moveSpeed": 1,
+  "moveSpeed": 2,
   "animSpeed": 15,
   "paletteId": "",
   "isPinned": false,
@@ -15,7 +15,7 @@
   "collisionGroup": "",
   "collisionExtraFlags": [],
   "prefabScriptOverrides": {},
-  "symbol": "adv_chaser",
+  "symbol": "actor_3",
   "script": [],
   "startScript": [
     {
@@ -28,7 +28,7 @@
         },
         "state": "1"
       },
-      "id": "c78d3ab0-a8b2-498c-9c97-9c48e26ea29c"
+      "id": "f1f54c05-77b0-4f2c-b22a-ed5fe2513407"
     }
   ],
   "updateScript": [
@@ -38,38 +38,35 @@
         "actorId": "$self$",
         "targetActorId": "player",
         "mode": "chase",
-        "speed": {
-          "type": "number",
-          "value": 16
-        },
         "stopRange": {
           "type": "number",
-          "value": 4
+          "value": 800
         },
-        "__comment": false
+        "interval": 0
       },
-      "id": "c78d3ab0-9c1b-4f2e-8d3a-6b5e7c8f9a0b"
+      "id": "604accfd-d532-40c7-b4b2-1fcf0b4c1eb8"
     },
     {
       "command": "EVENT_WAIT",
       "args": {
         "time": {
           "type": "number",
-          "value": 0.5
+          "value": 2
         },
         "frames": {
           "type": "number",
           "value": 1
-        }
+        },
+        "units": "frames"
       },
-      "id": "91d0ec88-6df6-4d12-859f-5d78464c5fd1"
+      "id": "cbf293c6-d2ef-4d7c-9b1c-fae1969d1ea0"
     }
   ],
   "hit1Script": [],
   "hit2Script": [],
   "hit3Script": [],
   "coordinateType": "tiles",
-  "x": 15,
-  "y": 10,
+  "x": 16,
+  "y": 12,
   "_index": 2
 }
