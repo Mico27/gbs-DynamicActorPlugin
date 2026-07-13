@@ -1,4 +1,4 @@
-#pragma bank 255
+﻿#pragma bank 255
 
 #include <string.h>
 #include <gbdk/platform.h>
@@ -16,9 +16,6 @@
 #define DYNAMIC_ACTOR_COLLISION_SINGLE_POINT 0
 #define DYNAMIC_ACTOR_COLLISION_TRIANGLE 1
 #define DYNAMIC_ACTOR_COLLISION_BOUNDING_BOX 2
-#ifndef DYNAMIC_ACTOR_COLLISION_TYPE
-#define DYNAMIC_ACTOR_COLLISION_TYPE DYNAMIC_ACTOR_COLLISION_SINGLE_POINT
-#endif
 
 #define COLLISION_SLOPE_LEFT          0x10u
 #define COLLISION_SLOPE_45            0x20u
@@ -59,10 +56,10 @@ void dynamic_actor_init(void) BANKED {
 #endif
 }
 
-#if DYNAMIC_ACTOR_COLLISION_TYPE == DYNAMIC_ACTOR_COLLISION_SINGLE_POINT
+#ifdef DYNAMIC_ACTOR_ENABLE_COLLISION_SINGLE_POINT
 
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Y
-static UWORD check_vertical_collision(UWORD start_x, UWORD start_y, UBYTE down) {
+static UWORD check_vertical_collision_point(UWORD start_x, UWORD start_y, UBYTE down) {
     col_ty = SUBPX_TO_TILE(start_y);
     col_tx = SUBPX_TO_TILE(start_x);
     if (down) {
@@ -120,7 +117,7 @@ static UWORD check_vertical_collision(UWORD start_x, UWORD start_y, UBYTE down) 
 #endif
 
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_X
-static UWORD check_horizontal_collision(UWORD start_x, UWORD start_y, UBYTE right) {
+static UWORD check_horizontal_collision_point(UWORD start_x, UWORD start_y, UBYTE right) {
     col_ty = SUBPX_TO_TILE(start_y);
     col_tx = SUBPX_TO_TILE(start_x);
     if (right) {
@@ -149,7 +146,7 @@ static UWORD check_horizontal_collision(UWORD start_x, UWORD start_y, UBYTE righ
 #endif
 
 #if defined(DYNAMIC_ACTOR_ENABLE_MOVE_X) && defined(DYNAMIC_ACTOR_ENABLE_LEDGE_STOP)
-static UWORD check_pit(UWORD start_x, UWORD start_y, UBYTE right) {
+static UWORD check_pit_point(UWORD start_x, UWORD start_y, UBYTE right) {
     col_ty = SUBPX_TO_TILE(start_y);
     col_tx = SUBPX_TO_TILE(start_x);
     if (right) {
@@ -181,13 +178,9 @@ static UWORD check_pit(UWORD start_x, UWORD start_y, UBYTE right) {
 }
 #endif
 
-#define CHECK_COL_H(x, y, actor, right) check_horizontal_collision((x), (y), (right))
-#define CHECK_COL_V(x, y, actor, down)  check_vertical_collision((x), (y), (down))
-#define CHECK_COL_PIT(x, y, actor, right) check_pit((x), (y), (right))
+#endif
 
-#else
-
-#if defined(DYNAMIC_ACTOR_ENABLE_SLOPE_COLLISION) && defined(DYNAMIC_ACTOR_ENABLE_MOVE_Y)
+#if defined(DYNAMIC_ACTOR_ENABLE_SLOPE_COLLISION) && defined(DYNAMIC_ACTOR_ENABLE_MOVE_Y) && (defined(DYNAMIC_ACTOR_ENABLE_COLLISION_TRIANGLE) || defined(DYNAMIC_ACTOR_ENABLE_COLLISION_BOUNDING_BOX))
 static UBYTE on_slope;
 static UWORD check_collision_slope(UWORD start_x, UWORD start_y, rect16_t *bounds){
     col_ty = SUBPX_TO_TILE(start_y + bounds->bottom);
@@ -234,10 +227,11 @@ static UWORD check_collision_slope(UWORD start_x, UWORD start_y, rect16_t *bound
 
 #endif
 
-#if DYNAMIC_ACTOR_COLLISION_TYPE == DYNAMIC_ACTOR_COLLISION_TRIANGLE
+
+#ifdef DYNAMIC_ACTOR_ENABLE_COLLISION_TRIANGLE
 
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Y
-static UWORD check_vertical_collision(UWORD start_x, UWORD start_y, rect16_t *bounds, UBYTE down) {
+static UWORD check_vertical_collision_triangle(UWORD start_x, UWORD start_y, rect16_t *bounds, UBYTE down) {
     if (down) {
 #ifdef DYNAMIC_ACTOR_ENABLE_SLOPE_COLLISION
         UWORD middle_pos = start_x + bounds->left + ((bounds->right - bounds->left) >> 1);
@@ -265,7 +259,7 @@ static UWORD check_vertical_collision(UWORD start_x, UWORD start_y, rect16_t *bo
 #endif
 
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_X
-static UWORD check_horizontal_collision(UWORD start_x, UWORD start_y, rect16_t *bounds, UBYTE right) {
+static UWORD check_horizontal_collision_triangle(UWORD start_x, UWORD start_y, rect16_t *bounds, UBYTE right) {
     if (right) {
         col_tx = SUBPX_TO_TILE(start_x + bounds->right);
         col_ty = SUBPX_TO_TILE(start_y + bounds->bottom);
@@ -294,7 +288,7 @@ static UWORD check_horizontal_collision(UWORD start_x, UWORD start_y, rect16_t *
 #endif
 
 #if defined(DYNAMIC_ACTOR_ENABLE_MOVE_X) && defined(DYNAMIC_ACTOR_ENABLE_LEDGE_STOP)
-static UWORD check_pit(UWORD start_x, UWORD start_y, rect16_t *bounds, UBYTE right) {
+static UWORD check_pit_triangle(UWORD start_x, UWORD start_y, rect16_t *bounds, UBYTE right) {
     if (right) {
         col_tx = SUBPX_TO_TILE(start_x + bounds->right);
         col_ty = SUBPX_TO_TILE(start_y + bounds->bottom);
@@ -328,10 +322,12 @@ static UWORD check_pit(UWORD start_x, UWORD start_y, rect16_t *bounds, UBYTE rig
 }
 #endif
 
-#else //DYNAMIC_ACTOR_COLLISION_TYPE == DYNAMIC_ACTOR_COLLISION_BOUNDING_BOX
+#endif
+
+#ifdef DYNAMIC_ACTOR_ENABLE_COLLISION_BOUNDING_BOX
 
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Y
-static UWORD check_vertical_collision(UWORD start_x, UWORD start_y, rect16_t *bounds, UBYTE down) {
+static UWORD check_vertical_collision_bbox(UWORD start_x, UWORD start_y, rect16_t *bounds, UBYTE down) {
     UBYTE tile_x_start = SUBPX_TO_TILE(start_x + bounds->left);
     UBYTE tile_x_end = SUBPX_TO_TILE(start_x + bounds->right);
     if (down) {
@@ -357,7 +353,7 @@ static UWORD check_vertical_collision(UWORD start_x, UWORD start_y, rect16_t *bo
 #endif
 
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_X
-static UWORD check_horizontal_collision(UWORD start_x, UWORD start_y, rect16_t *bounds, UBYTE right) {
+static UWORD check_horizontal_collision_bbox(UWORD start_x, UWORD start_y, rect16_t *bounds, UBYTE right) {
     UBYTE tile_y_start = SUBPX_TO_TILE(start_y + bounds->bottom);
     UBYTE tile_y_end = SUBPX_TO_TILE(start_y + bounds->top);
     if (right) {
@@ -386,7 +382,7 @@ static UWORD check_horizontal_collision(UWORD start_x, UWORD start_y, rect16_t *
 #endif
 
 #if defined(DYNAMIC_ACTOR_ENABLE_MOVE_X) && defined(DYNAMIC_ACTOR_ENABLE_LEDGE_STOP)
-static UWORD check_pit(UWORD start_x, UWORD start_y, rect16_t *bounds, UBYTE right) {
+static UWORD check_pit_bbox(UWORD start_x, UWORD start_y, rect16_t *bounds, UBYTE right) {
     UBYTE tile_y_start = SUBPX_TO_TILE(start_y + bounds->bottom);
     UBYTE tile_y_end = SUBPX_TO_TILE(start_y + bounds->top);
     if (right) {
@@ -422,27 +418,97 @@ static UWORD check_pit(UWORD start_x, UWORD start_y, rect16_t *bounds, UBYTE rig
 
 #endif
 
-#define CHECK_COL_H(x, y, actor, right) check_horizontal_collision((x), (y), &(actor)->bounds, (right))
-#define CHECK_COL_V(x, y, actor, down)  check_vertical_collision((x), (y), &(actor)->bounds, (down))
-#define CHECK_COL_PIT(x, y, actor, right) check_pit((x), (y), &(actor)->bounds, (right))
+#define ACTOR_COLLISION_TYPE(actor) (behavior_defs[(actor)->actor_behavior_id].collision_type)
 
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_X
+static UWORD check_horizontal_collision_by_type(UWORD start_x, UWORD start_y, actor_t *actor, UBYTE right, UBYTE collision_type) {
+    (void)actor;
+    switch (collision_type) {
+#ifdef DYNAMIC_ACTOR_ENABLE_COLLISION_TRIANGLE
+        case DYNAMIC_ACTOR_COLLISION_TRIANGLE:
+            return check_horizontal_collision_triangle(start_x, start_y, &actor->bounds, right);
+#endif
+#ifdef DYNAMIC_ACTOR_ENABLE_COLLISION_BOUNDING_BOX
+        case DYNAMIC_ACTOR_COLLISION_BOUNDING_BOX:
+            return check_horizontal_collision_bbox(start_x, start_y, &actor->bounds, right);
+#endif
+#ifdef DYNAMIC_ACTOR_ENABLE_COLLISION_SINGLE_POINT
+        case DYNAMIC_ACTOR_COLLISION_SINGLE_POINT:
+            return check_horizontal_collision_point(start_x, start_y, right);
+#endif
+    }
+    return start_x;
+}
+#else
+#endif
+
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Y
+static UWORD check_vertical_collision_by_type(UWORD start_x, UWORD start_y, actor_t *actor, UBYTE down, UBYTE collision_type) {
+    (void)actor;
+    switch (collision_type) {
+#ifdef DYNAMIC_ACTOR_ENABLE_COLLISION_TRIANGLE
+        case DYNAMIC_ACTOR_COLLISION_TRIANGLE:
+            return check_vertical_collision_triangle(start_x, start_y, &actor->bounds, down);
+#endif
+#ifdef DYNAMIC_ACTOR_ENABLE_COLLISION_BOUNDING_BOX
+        case DYNAMIC_ACTOR_COLLISION_BOUNDING_BOX:
+            return check_vertical_collision_bbox(start_x, start_y, &actor->bounds, down);
+#endif
+#ifdef DYNAMIC_ACTOR_ENABLE_COLLISION_SINGLE_POINT
+        case DYNAMIC_ACTOR_COLLISION_SINGLE_POINT:
+            return check_vertical_collision_point(start_x, start_y, down);
+#endif
+    }
+    return start_y;
+}
+#endif
+
+#if defined(DYNAMIC_ACTOR_ENABLE_MOVE_X) && defined(DYNAMIC_ACTOR_ENABLE_LEDGE_STOP)
+static UWORD check_pit_by_type(UWORD start_x, UWORD start_y, actor_t *actor, UBYTE right, UBYTE collision_type) {
+    (void)actor;
+    switch (collision_type) {
+#ifdef DYNAMIC_ACTOR_ENABLE_COLLISION_TRIANGLE
+        case DYNAMIC_ACTOR_COLLISION_TRIANGLE:
+            return check_pit_triangle(start_x, start_y, &actor->bounds, right);
+#endif
+#ifdef DYNAMIC_ACTOR_ENABLE_COLLISION_BOUNDING_BOX
+        case DYNAMIC_ACTOR_COLLISION_BOUNDING_BOX:
+            return check_pit_bbox(start_x, start_y, &actor->bounds, right);
+#endif
+#ifdef DYNAMIC_ACTOR_ENABLE_COLLISION_SINGLE_POINT
+        case DYNAMIC_ACTOR_COLLISION_SINGLE_POINT:
+            return check_pit_point(start_x, start_y, right);
+#endif
+    }
+    return start_x;
+}
 #endif
 
 #ifdef DYNAMIC_ACTOR_ENABLE_PARENT
 static UBYTE actor_intersects_platform(actor_t *actor, actor_t *platform) {
-#if DYNAMIC_ACTOR_COLLISION_TYPE == DYNAMIC_ACTOR_COLLISION_SINGLE_POINT
-    return bb_contains(&platform->bounds, &platform->pos, &actor->pos);
-#elif DYNAMIC_ACTOR_COLLISION_TYPE == DYNAMIC_ACTOR_COLLISION_TRIANGLE
-    UWORD point_x = actor->pos.x + actor->bounds.left + ((actor->bounds.right - actor->bounds.left) >> 1);
-    UWORD point_y = actor->pos.y + actor->bounds.bottom;
-    UWORD left = platform->pos.x + platform->bounds.left;
-    UWORD right = platform->pos.x + platform->bounds.right;
-    UWORD top = platform->pos.y + platform->bounds.top;
-    UWORD bottom = platform->pos.y + platform->bounds.bottom;
-    return (point_x >= left) && (point_x <= right) && (point_y >= top) && (point_y <= bottom);
-#else
-    return bb_intersects(&actor->bounds, &actor->pos, &platform->bounds, &platform->pos);
+    UBYTE collision_type = ACTOR_COLLISION_TYPE(platform);
+    switch (collision_type) {
+#ifdef DYNAMIC_ACTOR_ENABLE_COLLISION_TRIANGLE
+        case DYNAMIC_ACTOR_COLLISION_TRIANGLE: {
+            UWORD point_x = actor->pos.x + actor->bounds.left + ((actor->bounds.right - actor->bounds.left) >> 1);
+            UWORD point_y = actor->pos.y + actor->bounds.bottom;
+            UWORD left = platform->pos.x + platform->bounds.left;
+            UWORD right = platform->pos.x + platform->bounds.right;
+            UWORD top = platform->pos.y + platform->bounds.top;
+            UWORD bottom = platform->pos.y + platform->bounds.bottom;
+            return (point_x >= left) && (point_x <= right) && (point_y >= top) && (point_y <= bottom);
+        }
 #endif
+#ifdef DYNAMIC_ACTOR_ENABLE_COLLISION_BOUNDING_BOX
+        case DYNAMIC_ACTOR_COLLISION_BOUNDING_BOX:
+            return bb_intersects(&actor->bounds, &actor->pos, &platform->bounds, &platform->pos);
+#endif
+#ifdef DYNAMIC_ACTOR_ENABLE_COLLISION_SINGLE_POINT
+        case DYNAMIC_ACTOR_COLLISION_SINGLE_POINT:
+            return bb_contains(&platform->bounds, &platform->pos, &actor->pos);
+#endif
+    }
+    return FALSE;
 }
 #endif
 
@@ -453,6 +519,7 @@ void dynamic_actor_update(void) BANKED {
         UBYTE behavior_id = actor->actor_behavior_id;
         UBYTE state = actor->actor_state;
         behavior_def_t *def = &behavior_defs[behavior_id];
+        UBYTE collision_type = def->collision_type;
         UBYTE flags = def->flags;
 #if defined(DYNAMIC_ACTOR_ENABLE_MOVE_X) || defined(DYNAMIC_ACTOR_ENABLE_MOVE_Y) || defined(DYNAMIC_ACTOR_ENABLE_ANIMATION) || defined(DYNAMIC_ACTOR_ENABLE_PARENT) || defined(DYNAMIC_ACTOR_ENABLE_ACTOR_COLLISION)
         UBYTE flags2 = def->flags2;
@@ -488,7 +555,7 @@ void dynamic_actor_update(void) BANKED {
                 if (flags2 & BHV2_NO_TILE_COLLISION) {
                     actor->pos.x = new_actor_x;
                 } else {
-                    actor->pos.x = CHECK_COL_H(new_actor_x, actor->pos.y, actor, (parent_actor_delta_x > 0));
+                    actor->pos.x = check_horizontal_collision_by_type(new_actor_x, actor->pos.y, actor, (parent_actor_delta_x > 0), collision_type);
                 }
 #else
                 actor->pos.x = new_actor_x;
@@ -500,7 +567,7 @@ void dynamic_actor_update(void) BANKED {
                 if (flags2 & BHV2_NO_TILE_COLLISION) {
                     actor->pos.y = new_actor_y;
                 } else {
-                    actor->pos.y = CHECK_COL_V(actor->pos.x, new_actor_y, actor, (parent_actor_delta_y > 0));
+                    actor->pos.y = check_vertical_collision_by_type(actor->pos.x, new_actor_y, actor, (parent_actor_delta_y > 0), collision_type);
                 }
 #else
                 actor->pos.y = new_actor_y;
@@ -566,12 +633,12 @@ void dynamic_actor_update(void) BANKED {
                 UBYTE moving_right = (actor->pos.x < (UWORD)new_actor_x);
 #ifdef DYNAMIC_ACTOR_ENABLE_LEDGE_STOP
                 if ((flags & BHV_LEDGE_STOP) && (state == BHV_STATE_GROUNDED)) {
-                    actor->pos.x = CHECK_COL_PIT(new_actor_x, actor->pos.y, actor, moving_right);
+                    actor->pos.x = check_pit_by_type(new_actor_x, actor->pos.y, actor, moving_right, collision_type);
                 } else {
-                    actor->pos.x = CHECK_COL_H(new_actor_x, actor->pos.y, actor, moving_right);
+                    actor->pos.x = check_horizontal_collision_by_type(new_actor_x, actor->pos.y, actor, moving_right, collision_type);
                 }
 #else
-                actor->pos.x = CHECK_COL_H(new_actor_x, actor->pos.y, actor, moving_right);
+                actor->pos.x = check_horizontal_collision_by_type(new_actor_x, actor->pos.y, actor, moving_right, collision_type);
 #endif
                 if (actor->pos.x != (UWORD)new_actor_x) {
 #ifdef DYNAMIC_ACTOR_ENABLE_REFLECT_X
@@ -602,7 +669,7 @@ void dynamic_actor_update(void) BANKED {
                 actor->actor_state = state;
             } else {
             UBYTE moving_down = (actor->pos.y <= (UWORD)new_actor_y);
-            actor->pos.y = CHECK_COL_V(actor->pos.x, new_actor_y, actor, moving_down);
+            actor->pos.y = check_vertical_collision_by_type(actor->pos.x, new_actor_y, actor, moving_down, collision_type);
             if (actor->pos.y != (UWORD)new_actor_y) {
                 // Hit floor (moving down) or ceiling (moving up)
 #ifdef DYNAMIC_ACTOR_ENABLE_BOUNCE
@@ -737,6 +804,7 @@ void vm_define_actor_behavior(SCRIPT_CTX * THIS) OLDCALL BANKED {
     UBYTE slot = *(uint8_t *)VM_REF_TO_PTR(FN_ARG0);
     if ((slot == 0) || (slot > DYNAMIC_ACTOR_MAX_BEHAVIORS)) return;
     behavior_def_t *def = &behavior_defs[slot];
+    def->collision_type = *(uint8_t *)VM_REF_TO_PTR(FN_ARG6);
     def->flags        = *(uint8_t *)VM_REF_TO_PTR(FN_ARG1);
     def->flags2       = *(uint8_t *)VM_REF_TO_PTR(FN_ARG2);
     def->gravity      = *(uint8_t *)VM_REF_TO_PTR(FN_ARG3);
@@ -814,7 +882,7 @@ void vm_get_actor_velocity_y(SCRIPT_CTX * THIS) OLDCALL BANKED {
 void vm_set_actor_parent(SCRIPT_CTX * THIS) OLDCALL BANKED {
     (void)THIS;
     actor_t * actor = actors + *(uint8_t *)VM_REF_TO_PTR(FN_ARG0);
-    UBYTE parent_actor_idx = *(uint8_t *)VM_REF_TO_PTR(FN_ARG1);
+    int8_t parent_actor_idx = *(int8_t *)VM_REF_TO_PTR(FN_ARG1);
     if (parent_actor_idx == -1) {
         actor->actor_parent = NULL;
     } else {
@@ -878,6 +946,7 @@ void vm_get_actor_collision(SCRIPT_CTX * THIS) OLDCALL BANKED {
 
 UBYTE vm_wait_for_collision(void * THIS, UBYTE start, UWORD * stack_frame) OLDCALL BANKED {
     actor_t* actor = actors + stack_frame[0];
+    UBYTE collision_type = behavior_defs[actor->actor_behavior_id].collision_type;
     if (start){
         CLR_FLAG(actor->flags, ACTOR_FLAG_INTERRUPT);
     } else {
@@ -895,7 +964,7 @@ UBYTE vm_wait_for_collision(void * THIS, UBYTE start, UWORD * stack_frame) OLDCA
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_X
     if ((collision_flag & WAIT_COL_H) && actor->actor_vel_x) {
         new_actor_x = actor->pos.x + actor->actor_vel_x;
-        if (CHECK_COL_H(new_actor_x, actor->pos.y, actor, (actor->actor_vel_x > 0)) != (UWORD)new_actor_x) {
+        if (check_horizontal_collision_by_type(new_actor_x, actor->pos.y, actor, (actor->actor_vel_x > 0), collision_type) != (UWORD)new_actor_x) {
             return TRUE;
         }
     }
@@ -904,7 +973,7 @@ UBYTE vm_wait_for_collision(void * THIS, UBYTE start, UWORD * stack_frame) OLDCA
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Y
     if ((collision_flag & WAIT_COL_V) && actor->actor_vel_y) {
         new_actor_y = actor->pos.y + actor->actor_vel_y;
-        if (CHECK_COL_V(actor->pos.x, new_actor_y, actor, (actor->actor_vel_y > 0)) != (UWORD)new_actor_y) {
+        if (check_vertical_collision_by_type(actor->pos.x, new_actor_y, actor, (actor->actor_vel_y > 0), collision_type) != (UWORD)new_actor_y) {
             return TRUE;
         }
     }
@@ -913,7 +982,7 @@ UBYTE vm_wait_for_collision(void * THIS, UBYTE start, UWORD * stack_frame) OLDCA
 #if defined(DYNAMIC_ACTOR_ENABLE_MOVE_X) && defined(DYNAMIC_ACTOR_ENABLE_LEDGE_STOP)
     if ((collision_flag & WAIT_COL_PIT) && actor->actor_vel_x) {
         new_actor_x = actor->pos.x + actor->actor_vel_x;
-        if (CHECK_COL_PIT(new_actor_x, actor->pos.y, actor, (actor->actor_vel_x > 0)) != (UWORD)new_actor_x) {
+        if (check_pit_by_type(new_actor_x, actor->pos.y, actor, (actor->actor_vel_x > 0), collision_type) != (UWORD)new_actor_x) {
             return TRUE;
         }
     }
@@ -1143,92 +1212,100 @@ UBYTE vm_actor_crawl_step(void * THIS, UBYTE start, UWORD * stack_frame) OLDCALL
     UBYTE dir = ((UBYTE)stack_frame[1]) & 3;
     UBYTE side = (UBYTE)stack_frame[2];   // 0 = wall on right hand (clockwise around blocks), 1 = left hand
     UBYTE speed = actor->move_speed >> 1; // player max velocity is 128, so divide by 2 to get a speed that lands on cell boundaries
-#if DYNAMIC_ACTOR_COLLISION_TYPE == DYNAMIC_ACTOR_COLLISION_SINGLE_POINT
-    UBYTE tile_x = SUBPX_TO_TILE(actor->pos.x + DIR_XMOD(speed, dir));
-    UBYTE tile_y = SUBPX_TO_TILE(actor->pos.y + DIR_YMOD(speed, dir));
-#else
-    UBYTE tile_x = SUBPX_TO_TILE(actor->pos.x + DIR_BOUNDS_X(actor->bounds, dir) + DIR_XMOD(speed, dir));
-    UBYTE tile_y = SUBPX_TO_TILE(actor->pos.y + DIR_BOUNDS_Y(actor->bounds, dir) + DIR_YMOD(speed, dir));
-#endif
+    UBYTE collision_type = ACTOR_COLLISION_TYPE(actor);
+    UBYTE tile_x;
+    UBYTE tile_y;
+
+    if (collision_type == DYNAMIC_ACTOR_COLLISION_SINGLE_POINT) {
+        tile_x = SUBPX_TO_TILE(actor->pos.x + DIR_XMOD(speed, dir));
+        tile_y = SUBPX_TO_TILE(actor->pos.y + DIR_YMOD(speed, dir));
+    } else {
+        tile_x = SUBPX_TO_TILE(actor->pos.x + DIR_BOUNDS_X(actor->bounds, dir) + DIR_XMOD(speed, dir));
+        tile_y = SUBPX_TO_TILE(actor->pos.y + DIR_BOUNDS_Y(actor->bounds, dir) + DIR_YMOD(speed, dir));
+    }
     if (start) {
         stack_frame[3] = tile_x;
         stack_frame[4] = tile_y;
     } else if ((tile_x != (UBYTE)stack_frame[3]) || (tile_y != (UBYTE)stack_frame[4])) {
-#if DYNAMIC_ACTOR_COLLISION_TYPE != DYNAMIC_ACTOR_COLLISION_SINGLE_POINT
-        if (dir & 1){
-            UBYTE sdir = (dir + (side ? 3 : 1)) & 3; 
-            UWORD new_actor_y = actor->pos.y + DIR_YMOD(speed, sdir);
-            actor->pos.y = CHECK_COL_V(actor->pos.x, new_actor_y, actor, sdir == 2);
-            if (actor->pos.y == new_actor_y) {
-                // Outer corner: the wall beside us ended - turn toward it to wrap around
-                dir = sdir;
-                //Adjust horizontal overshoot
-                sdir = (dir + (side ? 3 : 1)) & 3;
-                UWORD new_actor_x = actor->pos.x + DIR_XMOD(speed, sdir);
-                actor->pos.x = CHECK_COL_H(new_actor_x, actor->pos.y, actor, sdir == 1);
-
-            } else {
-                UWORD new_actor_x = actor->pos.x + DIR_XMOD(speed, dir);
-                actor->pos.x = CHECK_COL_H(new_actor_x, actor->pos.y, actor, dir == 1);
-                if (new_actor_x != actor->pos.x) {
-                    // Ran into a wall: turn away from the wall side
-                    dir = (dir + (side ? 1 : 3)) & 3;
-                }            
-            }
-        } else {
-            UBYTE sdir = (dir + (side ? 3 : 1)) & 3; 
-            UWORD new_actor_x = actor->pos.x + DIR_XMOD(speed, sdir);    
-            actor->pos.x = CHECK_COL_H(new_actor_x, actor->pos.y, actor, sdir == 1);   
-            if (actor->pos.x == new_actor_x) {
-                // Outer corner: the wall beside us ended - turn toward it to wrap around
-                dir = sdir;
-                //Adjust vertical overshoot
-                sdir = (dir + (side ? 3 : 1)) & 3;
-                UWORD new_actor_y = actor->pos.y + DIR_YMOD(speed, sdir);
-                actor->pos.y = CHECK_COL_V(actor->pos.x, new_actor_y, actor, sdir == 2);
-
-            } else {
-                UWORD new_actor_y = actor->pos.y + DIR_YMOD(speed, dir);
-                actor->pos.y = CHECK_COL_V(actor->pos.x, new_actor_y, actor, dir == 2);
-                if (new_actor_y != actor->pos.y) {
-                    // Ran into a wall: turn away from the wall side
-                    dir = (dir + (side ? 1 : 3)) & 3;
-                }
-            }
-        }
-#else
-        if (dir & 1){
-            UWORD new_actor_x = actor->pos.x + DIR_XMOD(speed, dir);
-            actor->pos.x = CHECK_COL_H(new_actor_x, actor->pos.y, actor, dir == 1);
-            if (new_actor_x != actor->pos.x) {
-                // Ran into a wall: turn away from the wall side
-                dir = (dir + (side ? 1 : 3)) & 3;
-            } else {
+        if (collision_type != DYNAMIC_ACTOR_COLLISION_SINGLE_POINT) {
+#ifdef DYNAMIC_ACTOR_ENABLE_COLLISION_BOUNDING_BOX
+            if (dir & 1){
                 UBYTE sdir = (dir + (side ? 3 : 1)) & 3; 
                 UWORD new_actor_y = actor->pos.y + DIR_YMOD(speed, sdir);
-                actor->pos.y = CHECK_COL_V(actor->pos.x, new_actor_y, actor, sdir == 2);
+                actor->pos.y = check_vertical_collision_bbox(actor->pos.x, new_actor_y, &actor->bounds, sdir == 2);
                 if (actor->pos.y == new_actor_y) {
                     // Outer corner: the wall beside us ended - turn toward it to wrap around
                     dir = sdir;
+                    //Adjust horizontal overshoot
+                    sdir = (dir + (side ? 3 : 1)) & 3;
+                    UWORD new_actor_x = actor->pos.x + DIR_XMOD(speed, sdir);
+                    actor->pos.x = check_horizontal_collision_bbox(new_actor_x, actor->pos.y, &actor->bounds, sdir == 1);
+
+                } else {
+                    UWORD new_actor_x = actor->pos.x + DIR_XMOD(speed, dir);
+                    actor->pos.x = check_horizontal_collision_bbox(new_actor_x, actor->pos.y, &actor->bounds, dir == 1);
+                    if (new_actor_x != actor->pos.x) {
+                        // Ran into a wall: turn away from the wall side
+                        dir = (dir + (side ? 1 : 3)) & 3;
+                    }
                 }
-            }
-        } else {
-            UWORD new_actor_y = actor->pos.y + DIR_YMOD(speed, dir);
-            actor->pos.y = CHECK_COL_V(actor->pos.x, new_actor_y, actor, dir == 2);
-            if (new_actor_y != actor->pos.y) {
-                // Ran into a wall: turn away from the wall side
-                dir = (dir + (side ? 1 : 3)) & 3;
-            } else {
-                UBYTE sdir = (dir + (side ? 3 : 1)) & 3; 
-                UWORD new_actor_x = actor->pos.x + DIR_XMOD(speed, sdir);    
-                actor->pos.x = CHECK_COL_H(new_actor_x, actor->pos.y, actor, sdir == 1);   
+            } else {                
+                UBYTE sdir = (dir + (side ? 3 : 1)) & 3;
+                UWORD new_actor_x = actor->pos.x + DIR_XMOD(speed, sdir);
+                actor->pos.x = check_horizontal_collision_bbox(new_actor_x, actor->pos.y, &actor->bounds, sdir == 1);
                 if (actor->pos.x == new_actor_x) {
                     // Outer corner: the wall beside us ended - turn toward it to wrap around
                     dir = sdir;
+                    //Adjust vertical overshoot
+                    sdir = (dir + (side ? 3 : 1)) & 3;
+                    UWORD new_actor_y = actor->pos.y + DIR_YMOD(speed, sdir);
+                    actor->pos.y = check_vertical_collision_bbox(actor->pos.x, new_actor_y, &actor->bounds, sdir == 2);
+
+                } else {
+                    UWORD new_actor_y = actor->pos.y + DIR_YMOD(speed, dir);
+                    actor->pos.y = check_vertical_collision_bbox(actor->pos.x, new_actor_y, &actor->bounds, dir == 2);
+                    if (new_actor_y != actor->pos.y) {
+                        // Ran into a wall: turn away from the wall side
+                        dir = (dir + (side ? 1 : 3)) & 3;
+                    }
                 }
             }
-        }
 #endif
+        } else {
+#ifdef DYNAMIC_ACTOR_ENABLE_COLLISION_SINGLE_POINT
+            if (dir & 1){
+                UWORD new_actor_x = actor->pos.x + DIR_XMOD(speed, dir);
+                actor->pos.x = check_horizontal_collision_point(new_actor_x, actor->pos.y, dir == 1);
+                if (new_actor_x != actor->pos.x) {
+                    // Ran into a wall: turn away from the wall side
+                    dir = (dir + (side ? 1 : 3)) & 3;
+                } else {
+                    UBYTE sdir = (dir + (side ? 3 : 1)) & 3;
+                    UWORD new_actor_y = actor->pos.y + DIR_YMOD(speed, sdir);
+                    actor->pos.y = check_vertical_collision_point(actor->pos.x, new_actor_y, sdir == 2);
+                    if (actor->pos.y == new_actor_y) {
+                        // Outer corner: the wall beside us ended - turn toward it to wrap around
+                        dir = sdir;
+                    }
+                }
+            } else {
+                UWORD new_actor_y = actor->pos.y + DIR_YMOD(speed, dir);
+                actor->pos.y = check_vertical_collision_point(actor->pos.x, new_actor_y, dir == 2);
+                if (new_actor_y != actor->pos.y) {
+                    // Ran into a wall: turn away from the wall side
+                    dir = (dir + (side ? 1 : 3)) & 3;
+                } else {
+                    UBYTE sdir = (dir + (side ? 3 : 1)) & 3;
+                    UWORD new_actor_x = actor->pos.x + DIR_XMOD(speed, sdir);
+                    actor->pos.x = check_horizontal_collision_point(new_actor_x, actor->pos.y, sdir == 1);
+                    if (actor->pos.x == new_actor_x) {
+                        // Outer corner: the wall beside us ended - turn toward it to wrap around
+                        dir = sdir;
+                    }
+                }
+            }
+#endif
+        }
         stack_frame[3] = tile_x;
         stack_frame[4] = tile_y;
     }

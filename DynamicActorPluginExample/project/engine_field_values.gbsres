@@ -26,47 +26,27 @@
       "value": "COLLISION_GROUP_NONE"
     },
     {
-      "id": "DYNAMIC_ACTOR_ENABLE_SLOPE_COLLISION",
-      "value": 1
-    },
-    {
       "id": "DYNAMIC_ACTOR_COLLISION_TYPE",
-      "value": "DYNAMIC_ACTOR_COLLISION_SINGLE_POINT"
-    },
-    {
-      "id": "DYNAMIC_ACTOR_ENABLE_GRAVITY",
-      "value": 1
-    },
-    {
-      "id": "DYNAMIC_ACTOR_ENABLE_MOVE_X",
-      "value": 1
-    },
-    {
-      "id": "DYNAMIC_ACTOR_ENABLE_MOVE_Y",
-      "value": 1
-    },
-    {
-      "id": "DYNAMIC_ACTOR_ENABLE_LEDGE_STOP",
-      "value": 1
-    },
-    {
-      "id": "DYNAMIC_ACTOR_ENABLE_REFLECT_X",
-      "value": 1
-    },
-    {
-      "id": "DYNAMIC_ACTOR_ENABLE_BOUNCE",
-      "value": 1
+      "value": "DYNAMIC_ACTOR_COLLISION_BOUNDING_BOX"
     },
     {
       "id": "DYNAMIC_ACTOR_ENABLE_LINKED",
       "value": 1
     },
     {
-      "id": "DYNAMIC_ACTOR_ENABLE_ANIMATION",
+      "id": "DYNAMIC_ACTOR_ENABLE_SLOPE_COLLISION",
       "value": 1
     },
     {
-      "id": "DYNAMIC_ACTOR_ENABLE_ACTOR_COLLISION",
+      "id": "DYNAMIC_ACTOR_ENABLE_COLLISION_SINGLE_POINT",
+      "value": 1
+    },
+    {
+      "id": "DYNAMIC_ACTOR_ENABLE_COLLISION_TRIANGLE",
+      "value": 1
+    },
+    {
+      "id": "DYNAMIC_ACTOR_ENABLE_COLLISION_BOUNDING_BOX",
       "value": 1
     }
   ]

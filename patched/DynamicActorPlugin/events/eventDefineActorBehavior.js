@@ -19,42 +19,55 @@ const BHV2_NO_TILE_COLLISION = 0x08;
 const BHV2_ANIM_FACE_4DIR = 0x10;
 const BHV2_ACTOR_COLLISION = 0x80;
 
+const DYNAMIC_ACTOR_COLLISION_SINGLE_POINT = 0;
+const DYNAMIC_ACTOR_COLLISION_TRIANGLE = 1;
+const DYNAMIC_ACTOR_COLLISION_BOUNDING_BOX = 2;
+
 const PRESETS = {
   walker: {
     flags: BHV_GRAVITY | BHV_MOVE_X | BHV_MOVE_Y | BHV_REFLECT_X,
     flags2: BHV2_ANIM_FACE | BHV2_ANIM_IDLE | BHV2_ANIM_JUMP,
+    collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
   },
   walker_ledge: {
     flags: BHV_GRAVITY | BHV_MOVE_X | BHV_MOVE_Y | BHV_REFLECT_X | BHV_LEDGE_STOP,
     flags2: BHV2_ANIM_FACE | BHV2_ANIM_IDLE | BHV2_ANIM_JUMP,
+    collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
   },
   bouncing_ball: {
     flags: BHV_GRAVITY | BHV_MOVE_X | BHV_MOVE_Y | BHV_REFLECT_X | BHV_REFLECT_Y,
     flags2: BHV2_ANIM_FACE,
+    collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
   },
   faller: {
     flags: BHV_GRAVITY | BHV_MOVE_Y,
     flags2: BHV2_ANIM_FACE | BHV2_ANIM_IDLE | BHV2_ANIM_JUMP,
+    collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
   },
   slider: {
     flags: BHV_MOVE_X | BHV_MOVE_Y | BHV_REFLECT_X,
     flags2: BHV2_ANIM_FACE | BHV2_ANIM_IDLE,
+    collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
   },
   reflector: {
     flags: BHV_MOVE_X | BHV_MOVE_Y | BHV_REFLECT_X | BHV_REFLECT_Y,
     flags2: BHV2_ANIM_FACE,
+    collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
   },
   platform: {
     flags: BHV_PLATFORM | BHV_MOVE_X | BHV_MOVE_Y,
     flags2: 0,
+    collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
   },
   wanderer: {
     flags: BHV_MOVE_X | BHV_MOVE_Y | BHV_REFLECT_X | BHV_REFLECT_Y,
     flags2: BHV2_ANIM_FACE_4DIR | BHV2_ANIM_IDLE,
+    collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
   },
   projectile: {
     flags: BHV_MOVE_X | BHV_MOVE_Y,
     flags2: BHV2_NO_TILE_COLLISION,
+    collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
   },
 };
 
@@ -216,6 +229,18 @@ export const fields = [
     conditions: [{ key: "preset", eq: "custom" }],
   },
   {
+    key: "collisionType",
+    label: "Tile collision type",
+    description: "Collision model for this behavior slot",
+    type: "select",
+    options: [
+      [String(DYNAMIC_ACTOR_COLLISION_SINGLE_POINT), "Origin point (fastest)"],
+      [String(DYNAMIC_ACTOR_COLLISION_TRIANGLE), "Triangle"],
+      [String(DYNAMIC_ACTOR_COLLISION_BOUNDING_BOX), "Bounding box"],
+    ],
+    defaultValue: String(DYNAMIC_ACTOR_COLLISION_SINGLE_POINT),
+  },
+  {
     key: "gravity",
     label: "Gravity",
     description: "Acceleration in subpixels per frame (position units: 16 subpixels = 1 pixel)",
@@ -265,10 +290,12 @@ export const compile = (input, helpers) => {
 
   let flags = 0;
   let flags2 = 0;
+  let collisionType = DYNAMIC_ACTOR_COLLISION_SINGLE_POINT;
 
   if (input.preset && input.preset !== "custom" && PRESETS[input.preset]) {
     flags = PRESETS[input.preset].flags;
     flags2 = PRESETS[input.preset].flags2;
+    collisionType = PRESETS[input.preset].collisionType;
   } else {
     if (input.compGravity) flags |= BHV_GRAVITY;
     if (input.compMoveX) flags |= BHV_MOVE_X;
@@ -285,8 +312,13 @@ export const compile = (input, helpers) => {
     if (input.animJump) flags2 |= BHV2_ANIM_JUMP;
   }
 
-  _addComment(`Define Actor Behavior (flags: ${flags}, anim: ${flags2})`);
+  if (input.collisionType !== undefined) {
+    collisionType = Number(input.collisionType);
+  }
 
+  _addComment(`Define Actor Behavior (flags: ${flags}, anim: ${flags2}, collision: ${collisionType})`);
+
+  _stackPushConst(collisionType);
   _stackPushScriptValue(input.bounce || { type: "number", value: 128 });
   _stackPushScriptValue(input.maxFallVelocity || { type: "number", value: 64 });
   _stackPushScriptValue(input.gravity || { type: "number", value: 8 });
@@ -295,5 +327,5 @@ export const compile = (input, helpers) => {
   _stackPushScriptValue(input.behaviorId);
 
   _callNative("vm_define_actor_behavior");
-  _stackPop(6);
+  _stackPop(7);
 };

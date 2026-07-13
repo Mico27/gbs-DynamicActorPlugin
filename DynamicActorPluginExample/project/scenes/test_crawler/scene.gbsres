@@ -30,15 +30,15 @@
         "preset": "custom",
         "gravity": {
           "type": "number",
-          "value": 8
+          "value": 0
         },
         "maxFallVelocity": {
           "type": "number",
-          "value": 64
+          "value": 0
         },
         "bounce": {
           "type": "number",
-          "value": 128
+          "value": 0
         },
         "compReflectX": false,
         "compTileCollision": false,
@@ -53,9 +53,47 @@
         "compPlatform": false,
         "compActorCollision": false,
         "compLedgeStop": false,
-        "__collapse": false
+        "__collapse": false,
+        "collisionType": "2"
       },
       "id": "5dd2cbf8-98e0-48ec-ba55-48742c7e0017"
+    },
+    {
+      "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
+      "args": {
+        "behaviorId": {
+          "type": "number",
+          "value": 2
+        },
+        "preset": "custom",
+        "gravity": {
+          "type": "number",
+          "value": 0
+        },
+        "maxFallVelocity": {
+          "type": "number",
+          "value": 0
+        },
+        "bounce": {
+          "type": "number",
+          "value": 0
+        },
+        "compGravity": false,
+        "compMoveX": true,
+        "compMoveY": true,
+        "compReflectX": false,
+        "compReflectY": false,
+        "compTileCollision": false,
+        "compActorCollision": false,
+        "compPlatform": false,
+        "compLedgeStop": false,
+        "animFace": false,
+        "animFace4": true,
+        "animIdle": false,
+        "animJump": false,
+        "__collapse": false
+      },
+      "id": "5081f7b3-94a4-4d69-982f-cd970f70e517"
     },
     {
       "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
@@ -82,59 +120,18 @@
         "compMoveY": true,
         "compReflectX": false,
         "compReflectY": false,
-        "compTileCollision": true,
+        "compTileCollision": false,
         "compActorCollision": false,
         "compPlatform": false,
         "compLedgeStop": false,
         "animFace": false,
         "animFace4": true,
-        "animIdle": true,
-        "animJump": false,
-        "__collapse": true
-      },
-      "id": "5081f7b3-94a4-4d69-982f-cd970f70e517"
-    },
-    {
-      "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
-      "args": {
-        "behaviorId": {
-          "type": "number",
-          "value": 5
-        },
-        "preset": "custom",
-        "gravity": {
-          "type": "number",
-          "value": 8
-        },
-        "maxFallVelocity": {
-          "type": "number",
-          "value": 64
-        },
-        "bounce": {
-          "type": "number",
-          "value": 0
-        },
-        "compReflectX": false,
-        "compTileCollision": false,
-        "compGravity": false,
-        "animFace": false,
         "animIdle": false,
         "animJump": false,
-        "animFace4": false,
-        "compMoveY": true,
-        "compMoveX": true,
-        "compReflectY": false,
-        "compPlatform": true,
-        "compActorCollision": false,
-        "compLedgeStop": false,
-        "__collapse": true
+        "__collapse": false,
+        "collisionType": "1"
       },
-      "id": "070f24af-1f6f-4cfe-9ea3-cf86a8ff173d"
-    },
-    {
-      "command": "EVENT_SCRIPT_UNLOCK",
-      "args": {},
-      "id": "1dc2f6c1-4c0e-4041-8594-d86f5c143c93"
+      "id": "9694d197-2616-496e-a200-5e9be793f11e"
     }
   ],
   "autoFadeEventCollapse": true

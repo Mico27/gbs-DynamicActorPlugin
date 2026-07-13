@@ -7,7 +7,7 @@
   "spriteSheetId": "581d34d0-9591-4e6e-a609-1d94f203b0cd",
   "prefabId": "",
   "direction": "right",
-  "moveSpeed": 4,
+  "moveSpeed": 2,
   "animSpeed": 15,
   "paletteId": "",
   "isPinned": false,
@@ -24,7 +24,7 @@
         "actorId": "$self$",
         "behaviorId": {
           "type": "number",
-          "value": 1
+          "value": 3
         },
         "state": "1"
       },

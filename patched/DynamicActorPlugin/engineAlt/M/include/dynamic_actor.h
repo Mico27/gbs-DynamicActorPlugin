@@ -1,4 +1,4 @@
-﻿#ifndef DYNAMIC_ACTOR_H
+#ifndef DYNAMIC_ACTOR_H
 #define DYNAMIC_ACTOR_H
 
 #include <gbdk/platform.h>
@@ -50,7 +50,7 @@ typedef struct behavior_def_t {
     UBYTE flags;         // BHV_* physics components
     UBYTE flags2;        // BHV2_* animation/option flags
     UBYTE gravity;       // subpixels/frame^2 added to y velocity
-    UBYTE max_fall_vel;  // max downward velocity in subpixels/frame
+    BYTE max_fall_vel;  // max downward velocity in subpixels/frame
     UBYTE bounce;        // energy kept on bounce, 0..255 (255 = perfect reflect)
 } behavior_def_t;
 
