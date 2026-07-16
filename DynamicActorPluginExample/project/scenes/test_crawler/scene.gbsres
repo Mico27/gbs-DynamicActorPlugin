@@ -7,7 +7,7 @@
   "tilesetId": "",
   "width": 20,
   "height": 18,
-  "type": "PLATFORM",
+  "type": "ADVENTURE",
   "colorModeOverride": "none",
   "paletteIds": [],
   "spritePaletteIds": [],
@@ -21,79 +21,77 @@
   "playerHit3Script": [],
   "script": [
     {
-      "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
+      "command": "EVENT_SET_INPUT_SCRIPT",
       "args": {
-        "behaviorId": {
-          "type": "number",
-          "value": 1
-        },
-        "preset": "custom",
-        "gravity": {
-          "type": "number",
-          "value": 0
-        },
-        "maxFallVelocity": {
-          "type": "number",
-          "value": 0
-        },
-        "bounce": {
-          "type": "number",
-          "value": 0
-        },
-        "compReflectX": false,
-        "compTileCollision": false,
-        "compGravity": false,
-        "animFace": false,
-        "animIdle": false,
-        "animJump": false,
-        "animFace4": true,
-        "compMoveY": true,
-        "compMoveX": true,
-        "compReflectY": false,
-        "compPlatform": false,
-        "compActorCollision": false,
-        "compLedgeStop": false,
-        "__collapse": false,
-        "collisionType": "2"
-      },
-      "id": "5dd2cbf8-98e0-48ec-ba55-48742c7e0017"
-    },
-    {
-      "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
-      "args": {
-        "behaviorId": {
-          "type": "number",
-          "value": 2
-        },
-        "preset": "custom",
-        "gravity": {
-          "type": "number",
-          "value": 0
-        },
-        "maxFallVelocity": {
-          "type": "number",
-          "value": 0
-        },
-        "bounce": {
-          "type": "number",
-          "value": 0
-        },
-        "compGravity": false,
-        "compMoveX": true,
-        "compMoveY": true,
-        "compReflectX": false,
-        "compReflectY": false,
-        "compTileCollision": false,
-        "compActorCollision": false,
-        "compPlatform": false,
-        "compLedgeStop": false,
-        "animFace": false,
-        "animFace4": true,
-        "animIdle": false,
-        "animJump": false,
+        "input": [
+          "a"
+        ],
+        "override": false,
+        "__scriptTabs": "press",
         "__collapse": false
       },
-      "id": "5081f7b3-94a4-4d69-982f-cd970f70e517"
+      "children": {
+        "true": [
+          {
+            "command": "EVENT_SET_VALUE",
+            "args": {
+              "variable": "5",
+              "value": {
+                "type": "true"
+              },
+              "__collapse": false
+            },
+            "id": "2e503629-c4f9-446b-b218-77e33d48865a"
+          },
+          {
+            "command": "EVENT_IDLE",
+            "args": {},
+            "id": "e67bf94a-909b-4d70-bc57-bea30e023788"
+          },
+          {
+            "command": "EVENT_IF",
+            "args": {
+              "condition": {
+                "type": "variable",
+                "value": "5"
+              },
+              "__collapseElse": true
+            },
+            "children": {
+              "true": [
+                {
+                  "command": "EVENT_TEXT",
+                  "args": {
+                    "text": [
+                      "Attacked"
+                    ],
+                    "__section": "text",
+                    "avatarId": "",
+                    "minHeight": 4,
+                    "maxHeight": 7,
+                    "textX": 1,
+                    "textY": 1,
+                    "textHeight": 5,
+                    "position": "bottom",
+                    "clearPrevious": true,
+                    "showFrame": "true",
+                    "speedIn": -1,
+                    "speedOut": -1,
+                    "closeWhen": "key",
+                    "closeButton": "a",
+                    "closeDelayTime": 0.5,
+                    "closeDelayFrames": 30
+                  },
+                  "id": "cfdbcb3e-9f3e-40b5-8e4b-55ac2c7717c7"
+                }
+              ],
+              "false": []
+            },
+            "id": "277b5729-1856-40b3-b3a7-dc6e59835f1b"
+          }
+        ]
+      },
+      "id": "4a2ef39e-f352-44d8-8d0b-eb9dad623e42"
     },
     {
       "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
@@ -128,10 +126,85 @@
         "animFace4": true,
         "animIdle": false,
         "animJump": false,
-        "__collapse": false,
+        "__collapse": true,
         "collisionType": "1"
       },
       "id": "9694d197-2616-496e-a200-5e9be793f11e"
+    },
+    {
+      "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
+      "args": {
+        "behaviorId": {
+          "type": "number",
+          "value": 2
+        },
+        "preset": "custom",
+        "gravity": {
+          "type": "number",
+          "value": 0
+        },
+        "maxFallVelocity": {
+          "type": "number",
+          "value": 0
+        },
+        "bounce": {
+          "type": "number",
+          "value": 0
+        },
+        "compGravity": false,
+        "compMoveX": true,
+        "compMoveY": true,
+        "compReflectX": false,
+        "compReflectY": false,
+        "compTileCollision": false,
+        "compActorCollision": false,
+        "compPlatform": false,
+        "compLedgeStop": false,
+        "animFace": false,
+        "animFace4": true,
+        "animIdle": false,
+        "animJump": false,
+        "__collapse": true
+      },
+      "id": "5081f7b3-94a4-4d69-982f-cd970f70e517"
+    },
+    {
+      "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
+      "args": {
+        "behaviorId": {
+          "type": "number",
+          "value": 1
+        },
+        "preset": "custom",
+        "gravity": {
+          "type": "number",
+          "value": 0
+        },
+        "maxFallVelocity": {
+          "type": "number",
+          "value": 0
+        },
+        "bounce": {
+          "type": "number",
+          "value": 0
+        },
+        "compReflectX": false,
+        "compTileCollision": false,
+        "compGravity": false,
+        "animFace": false,
+        "animIdle": false,
+        "animJump": false,
+        "animFace4": true,
+        "compMoveY": true,
+        "compMoveX": true,
+        "compReflectY": false,
+        "compPlatform": false,
+        "compActorCollision": false,
+        "compLedgeStop": false,
+        "__collapse": true,
+        "collisionType": "2"
+      },
+      "id": "5dd2cbf8-98e0-48ec-ba55-48742c7e0017"
     }
   ],
   "autoFadeEventCollapse": true

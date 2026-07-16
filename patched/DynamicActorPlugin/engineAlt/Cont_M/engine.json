@@ -2,17 +2,31 @@
     "version": "4.3.0-e1",
     "fields": [
         {
-            "key": "DYNAMIC_ACTOR_COLLISION_TYPE",
-            "label": "Tile collision type",
-            "group": "Dynamic actor",
-            "type": "select",
-            "options": [
-                ["DYNAMIC_ACTOR_COLLISION_SINGLE_POINT", "Origin point (Fast)"],
-                ["DYNAMIC_ACTOR_COLLISION_TRIANGLE", "Triangle (Slower)"],
-                ["DYNAMIC_ACTOR_COLLISION_BOUNDING_BOX", "Bounding box (Slowest)"]
-            ],
-            "cType": "define",
-            "defaultValue": "DYNAMIC_ACTOR_COLLISION_SINGLE_POINT"
+          "key": "DYNAMIC_ACTOR_ENABLE_COLLISION_SINGLE_POINT",
+          "label": "Collision model: Origin point",
+          "description": "Compile the single-point collision model.",
+          "group": "Dynamic actor",
+          "type": "checkbox",
+          "cType": "define",
+          "defaultValue": 1
+        },
+        {
+          "key": "DYNAMIC_ACTOR_ENABLE_COLLISION_TRIANGLE",
+          "label": "Collision model: Triangle",
+          "description": "Compile the triangle collision model.",
+          "group": "Dynamic actor",
+          "type": "checkbox",
+          "cType": "define",
+          "defaultValue": 1
+        },
+        {
+          "key": "DYNAMIC_ACTOR_ENABLE_COLLISION_BOUNDING_BOX",
+          "label": "Collision model: Bounding box",
+          "description": "Compile the bounding-box collision model.",
+          "group": "Dynamic actor",
+          "type": "checkbox",
+          "cType": "define",
+          "defaultValue": 1
         },
         {
           "key": "DYNAMIC_ACTOR_ENABLE_SLOPE_COLLISION",
@@ -26,7 +40,7 @@
         {
           "key": "DYNAMIC_ACTOR_MAX_BEHAVIORS",
           "label": "Max behavior slots",
-          "description": "Number of behavior definition slots available (each slot uses 5 bytes of RAM)",
+          "description": "Number of behavior definition slots available (each slot uses 6 bytes of RAM)",
           "group": "Dynamic actor",
           "type": "slider",
           "cType": "define",
@@ -110,6 +124,60 @@
           "key": "DYNAMIC_ACTOR_ENABLE_ANIMATION",
           "label": "Component: Animation handling",
           "description": "Compile automatic animation (face direction, idle, jump). Uncheck if you handle animations yourself.",
+          "group": "Dynamic actor",
+          "type": "checkbox",
+          "cType": "define",
+          "defaultValue": 1
+        },
+        {
+          "key": "DYNAMIC_ACTOR_ENABLE_VM_WAIT_FOR_COLLISION",
+          "label": "VM: Wait for collision",
+          "description": "Compile vm_wait_for_collision waitable helper.",
+          "group": "Dynamic actor",
+          "type": "checkbox",
+          "cType": "define",
+          "defaultValue": 1
+        },
+        {
+          "key": "DYNAMIC_ACTOR_ENABLE_VM_MOTION_CHASE_ACTOR",
+          "label": "VM motion: Chase actor",
+          "description": "Compile vm_actor_chase_actor.",
+          "group": "Dynamic actor",
+          "type": "checkbox",
+          "cType": "define",
+          "defaultValue": 1
+        },
+        {
+          "key": "DYNAMIC_ACTOR_ENABLE_VM_MOTION_MOVE_TO_POS_BY_VELOCITY",
+          "label": "VM motion: Move to position by velocity",
+          "description": "Compile vm_actor_move_to_pos_by_velocity.",
+          "group": "Dynamic actor",
+          "type": "checkbox",
+          "cType": "define",
+          "defaultValue": 1
+        },
+        {
+          "key": "DYNAMIC_ACTOR_ENABLE_VM_MOTION_CIRCLE_VARIABLE",
+          "label": "VM motion: Circle variable",
+          "description": "Compile vm_actor_motion_circle_variable.",
+          "group": "Dynamic actor",
+          "type": "checkbox",
+          "cType": "define",
+          "defaultValue": 1
+        },
+        {
+          "key": "DYNAMIC_ACTOR_ENABLE_VM_MOTION_BEZIER_TO",
+          "label": "VM motion: Bezier to",
+          "description": "Compile vm_actor_move_bezier_to.",
+          "group": "Dynamic actor",
+          "type": "checkbox",
+          "cType": "define",
+          "defaultValue": 1
+        },
+        {
+          "key": "DYNAMIC_ACTOR_ENABLE_VM_MOTION_CRAWL_STEP",
+          "label": "VM motion: Crawl step",
+          "description": "Compile vm_actor_crawl_step.",
           "group": "Dynamic actor",
           "type": "checkbox",
           "cType": "define",

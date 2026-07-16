@@ -38,16 +38,13 @@
         "actorId": "$self$",
         "targetActorId": "player",
         "mode": "chase",
-        "speed": {
-          "type": "number",
-          "value": 10
-        },
         "stopRange": {
           "type": "number",
           "value": 0
-        }
+        },
+        "interval": 0
       },
-      "id": "65306ef9-8a3b-4c5d-9e6f-3b4c5d6e7f8a"
+      "id": "11c2ee8a-95cf-4de6-a8ce-cf4299ab487a"
     }
   ],
   "hit1Script": [],

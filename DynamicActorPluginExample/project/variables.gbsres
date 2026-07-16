@@ -25,6 +25,11 @@
       "id": "4",
       "name": "CrawlerY",
       "symbol": "var_crawlery"
+    },
+    {
+      "id": "5",
+      "name": "CanAttack",
+      "symbol": "var_canattack"
     }
   ],
   "constants": []

@@ -128,6 +128,60 @@
           "type": "checkbox",
           "cType": "define",
           "defaultValue": 1
+        },
+        {
+          "key": "DYNAMIC_ACTOR_ENABLE_VM_WAIT_FOR_COLLISION",
+          "label": "VM: Wait for collision",
+          "description": "Compile vm_wait_for_collision waitable helper.",
+          "group": "Dynamic actor",
+          "type": "checkbox",
+          "cType": "define",
+          "defaultValue": 1
+        },
+        {
+          "key": "DYNAMIC_ACTOR_ENABLE_VM_MOTION_CHASE_ACTOR",
+          "label": "VM motion: Chase actor",
+          "description": "Compile vm_actor_chase_actor.",
+          "group": "Dynamic actor",
+          "type": "checkbox",
+          "cType": "define",
+          "defaultValue": 1
+        },
+        {
+          "key": "DYNAMIC_ACTOR_ENABLE_VM_MOTION_MOVE_TO_POS_BY_VELOCITY",
+          "label": "VM motion: Move to position by velocity",
+          "description": "Compile vm_actor_move_to_pos_by_velocity.",
+          "group": "Dynamic actor",
+          "type": "checkbox",
+          "cType": "define",
+          "defaultValue": 1
+        },
+        {
+          "key": "DYNAMIC_ACTOR_ENABLE_VM_MOTION_CIRCLE_VARIABLE",
+          "label": "VM motion: Circle variable",
+          "description": "Compile vm_actor_motion_circle_variable.",
+          "group": "Dynamic actor",
+          "type": "checkbox",
+          "cType": "define",
+          "defaultValue": 1
+        },
+        {
+          "key": "DYNAMIC_ACTOR_ENABLE_VM_MOTION_BEZIER_TO",
+          "label": "VM motion: Bezier to",
+          "description": "Compile vm_actor_move_bezier_to.",
+          "group": "Dynamic actor",
+          "type": "checkbox",
+          "cType": "define",
+          "defaultValue": 1
+        },
+        {
+          "key": "DYNAMIC_ACTOR_ENABLE_VM_MOTION_CRAWL_STEP",
+          "label": "VM motion: Crawl step",
+          "description": "Compile vm_actor_crawl_step.",
+          "group": "Dynamic actor",
+          "type": "checkbox",
+          "cType": "define",
+          "defaultValue": 1
         }
     ]
 }

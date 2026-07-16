@@ -1,0 +1,63 @@
+{
+  "_resourceType": "scene",
+  "id": "d365f871-5d34-4d84-8270-c4d5a16477f5",
+  "_index": 7,
+  "name": "TEST CIRCLE",
+  "backgroundId": "01346570-a786-4aa5-8792-31694fb40c74",
+  "tilesetId": "",
+  "width": 20,
+  "height": 18,
+  "type": "ADVENTURE",
+  "colorModeOverride": "none",
+  "paletteIds": [],
+  "spritePaletteIds": [],
+  "collisions": "0f15+008+0fc+008+0fc+008+0fc+008+0fc+008+0f!00!0f!007+0f2+008+0f!00!0f!007+0f2+008+0f!00!0f!007+0f2+008+0f!003+0f!005+0f2+008+0f!003+0f2+004+0f3+004+0f!002+0f!003+0f!004+0f3+005+0f!002+0f!003+0f!005+0f2+005+0f!006+0f!005+0f5+002+0f!006+0f!003+0f4+005+0f!006+0f!005+0ff+002+0f12+005+0f15+",
+  "autoFadeSpeed": 1,
+  "symbol": "scene_8",
+  "x": 856,
+  "y": 144,
+  "playerHit1Script": [],
+  "playerHit2Script": [],
+  "playerHit3Script": [],
+  "script": [
+    {
+      "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
+      "args": {
+        "behaviorId": {
+          "type": "number",
+          "value": 1
+        },
+        "preset": "custom",
+        "gravity": {
+          "type": "number",
+          "value": 0
+        },
+        "maxFallVelocity": {
+          "type": "number",
+          "value": 0
+        },
+        "bounce": {
+          "type": "number",
+          "value": 0
+        },
+        "compReflectX": false,
+        "compTileCollision": false,
+        "compGravity": false,
+        "animFace": false,
+        "animIdle": false,
+        "animJump": false,
+        "animFace4": true,
+        "compMoveY": true,
+        "compMoveX": true,
+        "compReflectY": false,
+        "compPlatform": false,
+        "compActorCollision": false,
+        "compLedgeStop": false,
+        "__collapse": false,
+        "collisionType": "2"
+      },
+      "id": "e8aceb48-4f2d-4095-ae20-aa3fe703dec5"
+    }
+  ],
+  "autoFadeEventCollapse": true
+}

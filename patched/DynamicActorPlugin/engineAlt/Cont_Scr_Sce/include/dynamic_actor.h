@@ -49,6 +49,7 @@
 typedef struct behavior_def_t {
     UBYTE flags;         // BHV_* physics components
     UBYTE flags2;        // BHV2_* animation/option flags
+    UBYTE collision_type;// DYNAMIC_ACTOR_COLLISION_* collision model
     UBYTE gravity;       // subpixels/frame^2 added to y velocity
     BYTE max_fall_vel;  // max downward velocity in subpixels/frame
     UBYTE bounce;        // energy kept on bounce, 0..255 (255 = perfect reflect)

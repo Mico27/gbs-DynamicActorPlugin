@@ -1,0 +1,131 @@
+{
+  "_resourceType": "actor",
+  "id": "c199e0b3-b63f-4a7a-a740-eca730d4664f",
+  "name": "Crawler",
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "581d34d0-9591-4e6e-a609-1d94f203b0cd",
+  "prefabId": "",
+  "direction": "right",
+  "moveSpeed": 2,
+  "animSpeed": 15,
+  "paletteId": "",
+  "isPinned": false,
+  "persistent": false,
+  "collisionGroup": "1",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "symbol": "actor_9",
+  "script": [],
+  "startScript": [
+    {
+      "command": "EVENT_SET_ACTOR_BEHAVIOR",
+      "args": {
+        "actorId": "$self$",
+        "behaviorId": {
+          "type": "number",
+          "value": 1
+        },
+        "state": "1"
+      },
+      "id": "b62ae967-de6e-43bd-944b-66785d429f66"
+    }
+  ],
+  "updateScript": [
+    {
+      "command": "EVENT_ACTOR_MOTION_BEZIER_VAR",
+      "args": {
+        "actorId": "$self$",
+        "bezierType": "quadratic",
+        "incremental": {
+          "type": "number",
+          "value": 8
+        },
+        "p0x": {
+          "type": "number",
+          "value": 0
+        },
+        "p0y": {
+          "type": "number",
+          "value": 0
+        },
+        "p1x": {
+          "type": "number",
+          "value": 32
+        },
+        "p1y": {
+          "type": "number",
+          "value": 32
+        },
+        "p2x": {
+          "type": "number",
+          "value": 32
+        },
+        "p2y": {
+          "type": "number",
+          "value": 0
+        },
+        "p3x": {
+          "type": "number",
+          "value": 96
+        },
+        "p3y": {
+          "type": "number",
+          "value": 0
+        }
+      },
+      "id": "ef51e1a7-2b6e-4e8a-b86e-f2ca6aa031f8"
+    },
+    {
+      "command": "EVENT_ACTOR_MOTION_BEZIER_VAR",
+      "args": {
+        "actorId": "$self$",
+        "bezierType": "quadratic",
+        "incremental": {
+          "type": "number",
+          "value": 8
+        },
+        "p0x": {
+          "type": "number",
+          "value": 0
+        },
+        "p0y": {
+          "type": "number",
+          "value": 0
+        },
+        "p1x": {
+          "type": "number",
+          "value": -32
+        },
+        "p1y": {
+          "type": "number",
+          "value": -32
+        },
+        "p2x": {
+          "type": "number",
+          "value": -32
+        },
+        "p2y": {
+          "type": "number",
+          "value": 0
+        },
+        "p3x": {
+          "type": "number",
+          "value": 96
+        },
+        "p3y": {
+          "type": "number",
+          "value": 0
+        }
+      },
+      "id": "88a4f463-5cc3-4531-92fa-5502042051be"
+    }
+  ],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": [],
+  "coordinateType": "tiles",
+  "x": 5,
+  "y": 8,
+  "_index": 0
+}

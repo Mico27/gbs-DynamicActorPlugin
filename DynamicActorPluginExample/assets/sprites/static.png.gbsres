@@ -7,8 +7,8 @@
     {
       "id": "c37ce5b9-288c-45f6-8b07-926ae6f64d52",
       "name": "",
-      "animationType": "fixed",
-      "flipLeft": false,
+      "animationType": "horizontal_movement",
+      "flipLeft": true,
       "animations": [
         {
           "id": "e1e8a579-58fc-4314-9592-d188b16d06b0",
@@ -78,7 +78,34 @@
           "frames": [
             {
               "id": "499e3970-c673-46e5-b14d-e46754866b16",
-              "tiles": []
+              "tiles": [
+                {
+                  "id": "8fab1688-3a71-4e15-acce-c460fa668eb5",
+                  "x": 0,
+                  "y": 0,
+                  "sliceX": 0,
+                  "sliceY": 0,
+                  "palette": 0,
+                  "flipX": false,
+                  "flipY": false,
+                  "objPalette": "OBP0",
+                  "paletteIndex": 0,
+                  "priority": false
+                },
+                {
+                  "id": "43af966a-1121-4507-b111-22e45da9bb89",
+                  "x": 8,
+                  "y": 0,
+                  "sliceX": 8,
+                  "sliceY": 0,
+                  "palette": 0,
+                  "flipX": false,
+                  "flipY": false,
+                  "objPalette": "OBP0",
+                  "paletteIndex": 0,
+                  "priority": false
+                }
+              ]
             }
           ]
         },

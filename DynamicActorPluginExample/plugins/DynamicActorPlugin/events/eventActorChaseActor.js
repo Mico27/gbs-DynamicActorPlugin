@@ -55,29 +55,21 @@ export const fields = [
       "How often (in frames) to refresh the chased target position from the target actor. Must be a power of 2.",
     type: "select",
     options: [
-      [0, "1 frame"],
-      [1, "2 frames"],
-      [3, "4 frames"],
-      [7, "8 frames"],
-      [15, "16 frames"],
-      [31, "32 frames"],
-      [63, "64 frames"],
-      [127, "128 frames"],
+      ["0", "1 frame"],
+      ["1", "2 frames"],
+      ["3", "4 frames"],
+      ["7", "8 frames"],
+      ["15", "16 frames"],
+      ["31", "32 frames"],
+      ["63", "64 frames"],
+      ["127", "128 frames"],
     ],
-    defaultValue: 0,
+    defaultValue: "0",
   },
 ];
 
 export const compile = (input, helpers) => {
-  const { _invoke, _stackPush, _stackPushScriptValue, _addComment, _declareLocal, setActorId } = helpers;
-
-  const toScriptNumber = (value, fallback = 0) => {
-    if (value && typeof value === "object") {
-      return value;
-    }
-    const n = Number(value);
-    return { type: "number", value: Number.isFinite(n) ? n : fallback };
-  };
+  const { _invoke, _stackPush, _stackPushConst, _stackPushScriptValue, _addComment, _declareLocal, setActorId } = helpers;
 
   const actorRef = _declareLocal("actorRef", 1, true);
   const targetRef = _declareLocal("targetRef", 1, true);
@@ -88,11 +80,11 @@ export const compile = (input, helpers) => {
 
   _stackPush(actorRef);
   _stackPush(targetRef);
-  _stackPushScriptValue(input.mode === "flee" ? { type: "number", value: 1 } : { type: "number", value: 0 });
-  _stackPushScriptValue(toScriptNumber(input.stopRange, 0));
-  _stackPushScriptValue(toScriptNumber(input.interval, 0));
-  _stackPush(0);
-  _stackPush(0);
+  _stackPushConst(input.mode === "flee" ? 1 : 0);
+  _stackPushScriptValue(input.stopRange);
+  _stackPushConst(input.interval);
+  _stackPushConst(0);
+  _stackPushConst(0);
   
   _invoke("vm_actor_chase_actor", 7, ".ARG6");
 };
