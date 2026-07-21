@@ -1,0 +1,82 @@
+{
+  "_resourceType": "actor",
+  "id": "92d695d5-0dcc-4629-910a-e61ac8f72c9f",
+  "name": "Circle",
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "581d34d0-9591-4e6e-a609-1d94f203b0cd",
+  "prefabId": "",
+  "direction": "right",
+  "moveSpeed": 2,
+  "animSpeed": 15,
+  "paletteId": "",
+  "isPinned": false,
+  "persistent": true,
+  "collisionGroup": "1",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "symbol": "actor_8",
+  "script": [],
+  "startScript": [
+    {
+      "command": "EVENT_SET_ACTOR_BEHAVIOR",
+      "args": {
+        "actorId": "$self$",
+        "behaviorId": {
+          "type": "number",
+          "value": 1
+        },
+        "state": "1"
+      },
+      "id": "d487764c-6582-410b-9631-b03e8de9b902"
+    },
+    {
+      "command": "EVENT_SET_ACTOR_LINKED_ACTOR",
+      "args": {
+        "actorId": "c199e0b3-b63f-4a7a-a740-eca730d4664f",
+        "linkedActorId": "92d695d5-0dcc-4629-910a-e61ac8f72c9f",
+        "__comment": false
+      },
+      "id": "a4b65c55-f2ac-4fef-801c-d56c26efd5ee"
+    }
+  ],
+  "updateScript": [
+    {
+      "command": "EVENT_ACTOR_MOTION_CIRCLE",
+      "args": {
+        "actorId": "$self$",
+        "radius": 24,
+        "period": 180,
+        "direction": "cw",
+        "startAngle": 90,
+        "arcDegrees": 360,
+        "stepFrames": 4,
+        "cycles": 1,
+        "stopAtEnd": true
+      },
+      "id": "76f3ac78-b4a4-4cb2-90e3-9fad09fb6504"
+    },
+    {
+      "command": "EVENT_ACTOR_MOTION_CIRCLE",
+      "args": {
+        "actorId": "$self$",
+        "radius": 24,
+        "period": 180,
+        "direction": "ccw",
+        "startAngle": 270,
+        "arcDegrees": 360,
+        "stepFrames": 4,
+        "cycles": 1,
+        "stopAtEnd": true
+      },
+      "id": "a21e5d58-c371-4d30-8137-36f1580ac500"
+    }
+  ],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": [],
+  "coordinateType": "tiles",
+  "x": 10,
+  "y": 6,
+  "_index": 1
+}

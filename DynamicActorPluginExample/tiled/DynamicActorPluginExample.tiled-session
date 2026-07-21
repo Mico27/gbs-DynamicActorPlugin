@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "platformer_test.tmx",
+    "activeFile": "base_tileset.tsx",
     "expandedProjectPaths": [
         "."
     ],
@@ -33,8 +33,8 @@
     ],
     "project": "DynamicActorPluginExample.tiled-project",
     "recentFiles": [
-        "base_tileset.tsx",
-        "platformer_test.tmx"
+        "platformer_test.tmx",
+        "base_tileset.tsx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {

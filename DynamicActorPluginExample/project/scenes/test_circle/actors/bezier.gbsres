@@ -1,0 +1,85 @@
+{
+  "_resourceType": "actor",
+  "id": "c199e0b3-b63f-4a7a-a740-eca730d4664f",
+  "name": "Bezier",
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "581d34d0-9591-4e6e-a609-1d94f203b0cd",
+  "prefabId": "",
+  "direction": "right",
+  "moveSpeed": 2,
+  "animSpeed": 15,
+  "paletteId": "",
+  "isPinned": false,
+  "persistent": true,
+  "collisionGroup": "1",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "symbol": "actor_9",
+  "script": [],
+  "startScript": [
+    {
+      "command": "EVENT_SET_ACTOR_BEHAVIOR",
+      "args": {
+        "actorId": "$self$",
+        "behaviorId": {
+          "type": "number",
+          "value": 1
+        },
+        "state": "1"
+      },
+      "id": "b62ae967-de6e-43bd-944b-66785d429f66"
+    }
+  ],
+  "updateScript": [
+    {
+      "command": "EVENT_ACTOR_MOTION_BEZIER",
+      "args": {
+        "actorId": "$self$",
+        "bezierType": "cubic",
+        "incremental": 4,
+        "stepFrames": 1,
+        "cycles": 1,
+        "stopAtEnd": true,
+        "p0x": 0,
+        "p0y": 0,
+        "p1x": 0,
+        "p1y": 32,
+        "p2x": 64,
+        "p2y": 32,
+        "p3x": 64,
+        "p3y": 0,
+        "__collapse": false
+      },
+      "id": "a2477ac8-67d4-420d-a99c-dc780fa372ba"
+    },
+    {
+      "command": "EVENT_ACTOR_MOTION_BEZIER",
+      "args": {
+        "actorId": "$self$",
+        "bezierType": "cubic",
+        "incremental": 4,
+        "stepFrames": 1,
+        "cycles": 1,
+        "stopAtEnd": true,
+        "p0x": 64,
+        "p0y": 0,
+        "p1x": 64,
+        "p1y": 32,
+        "p2x": 0,
+        "p2y": 32,
+        "p3x": 0,
+        "p3y": 0,
+        "__collapse": false
+      },
+      "id": "e2776143-a67b-4a35-ae01-c613d2a5e69d"
+    }
+  ],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": [],
+  "coordinateType": "tiles",
+  "x": 6,
+  "y": 7,
+  "_index": 0
+}
