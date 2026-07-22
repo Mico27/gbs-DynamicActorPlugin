@@ -1,0 +1,50 @@
+{
+  "_resourceType": "actor",
+  "id": "a1bf50c6-41e5-418d-b4d5-8c76bbf67ddf",
+  "name": "Shadow",
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "deb01eb3-774e-4390-b0e4-7e9818f49f69",
+  "prefabId": "",
+  "direction": "down",
+  "moveSpeed": 1,
+  "animSpeed": 0,
+  "paletteId": "",
+  "isPinned": false,
+  "persistent": false,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "symbol": "actor_0",
+  "script": [],
+  "startScript": [
+    {
+      "command": "EVENT_SET_ACTOR_BEHAVIOR",
+      "args": {
+        "actorId": "$self$",
+        "behaviorId": {
+          "type": "number",
+          "value": 3
+        },
+        "state": "1"
+      },
+      "id": "9c1f4a10-d93c-4332-89b4-20331dfc9fbf"
+    },
+    {
+      "command": "EVENT_SET_ACTOR_LINKED_ACTOR",
+      "args": {
+        "actorId": "$self$",
+        "linkedActorId": "92d695d5-0dcc-4629-910a-e61ac8f72c9f"
+      },
+      "id": "55178b0b-e05b-4848-9a15-ce33848874f4"
+    }
+  ],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": [],
+  "coordinateType": "tiles",
+  "x": 10,
+  "y": 7,
+  "_index": 0
+}

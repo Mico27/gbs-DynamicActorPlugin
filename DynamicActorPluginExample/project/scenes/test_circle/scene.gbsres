@@ -64,8 +64,9 @@
           "type": "number",
           "value": 140
         },
-        "__collapse": false,
-        "__comment": false
+        "__collapse": true,
+        "__comment": false,
+        "__label": "Circling Behavior"
       },
       "id": "8e148a02-f2fa-44d5-9f63-6f5e7369eb65"
     },
@@ -107,9 +108,53 @@
           "value": 128
         },
         "__collapse": true,
-        "__comment": false
+        "__comment": false,
+        "__label": "Swinging Behavior"
       },
       "id": "a5e7cbb3-a41d-414e-8b19-b55c7b61112c"
+    },
+    {
+      "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
+      "args": {
+        "behaviorId": {
+          "type": "number",
+          "value": 3
+        },
+        "preset": "custom",
+        "compGravityY": false,
+        "compGravityZ": false,
+        "compTileCollision": false,
+        "compActorCollision": false,
+        "compPlatform": false,
+        "compLedgeStop": false,
+        "compReflectX": false,
+        "compReflectY": false,
+        "compReflectZ": false,
+        "animJumpY": false,
+        "animJumpZ": false,
+        "lockPositionAxes": "4",
+        "lockDirectionAxes": "24",
+        "collisionType": "0",
+        "triggerStateChange": false,
+        "triggerTileCollision": false,
+        "triggerTileEnter": false,
+        "gravity": {
+          "type": "number",
+          "value": 0
+        },
+        "maxFallVelocity": {
+          "type": "number",
+          "value": 0
+        },
+        "bounce": {
+          "type": "number",
+          "value": 0
+        },
+        "__collapse": true,
+        "__comment": false,
+        "__label": "Shadow Behavior"
+      },
+      "id": "d10c4e04-de5b-40e0-9678-edb6705a11b1"
     },
     {
       "command": "EVENT_SET_VALUE",
@@ -164,19 +209,6 @@
             "children": {
               "true": [
                 {
-                  "command": "EVENT_SET_ACTOR_Z_VELOCITY",
-                  "args": {
-                    "actorId": "92d695d5-0dcc-4629-910a-e61ac8f72c9f",
-                    "zVelocity": {
-                      "type": "number",
-                      "value": -64
-                    },
-                    "__comment": false,
-                    "__collapse": true
-                  },
-                  "id": "90544bc0-c3dd-46bf-aa3c-2da119434a1a"
-                },
-                {
                   "command": "EVENT_INC_VALUE",
                   "args": {
                     "variable": "6"
@@ -200,6 +232,19 @@
                     "__comment": false
                   },
                   "id": "bf8a5772-62d8-481d-8df1-b1d33b4bb8dd"
+                },
+                {
+                  "command": "EVENT_SET_ACTOR_Z_VELOCITY",
+                  "args": {
+                    "actorId": "92d695d5-0dcc-4629-910a-e61ac8f72c9f",
+                    "zVelocity": {
+                      "type": "number",
+                      "value": -64
+                    },
+                    "__comment": false,
+                    "__collapse": true
+                  },
+                  "id": "90544bc0-c3dd-46bf-aa3c-2da119434a1a"
                 }
               ],
               "false": []
