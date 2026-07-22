@@ -185,6 +185,26 @@
           "runtimeOnly": true
         },
         {
+          "key": "dynamic_actor_event_behavior_idx",
+          "label": "Event behavior index",
+          "description": "Behavior index for the current dynamic actor event.",
+          "group": "Dynamic actor",
+          "type": "number",
+          "cType": "UBYTE",
+          "defaultValue": 0,
+          "runtimeOnly": true
+        },
+        {
+          "key": "dynamic_actor_event_state",
+          "label": "Event state",
+          "description": "State for the current dynamic actor event.",
+          "group": "Dynamic actor",
+          "type": "number",
+          "cType": "UBYTE",
+          "defaultValue": 0,
+          "runtimeOnly": true
+        },
+        {
           "key": "dynamic_actor_event_tile_idx",
           "label": "Event tile collision",
           "description": "Tile collision value for the current dynamic actor event.",
