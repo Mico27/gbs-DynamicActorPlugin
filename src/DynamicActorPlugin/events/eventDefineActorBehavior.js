@@ -23,6 +23,10 @@ const BHV3_LOCK_POS_Z = 0x04;
 const BHV3_LOCK_DIR_H = 0x08;
 const BHV3_LOCK_DIR_V = 0x10;
 
+const BHV_EVENT_STATE_CHANGE = 0x01;
+const BHV_EVENT_TILE_COLLISION = 0x02;
+const BHV_EVENT_TILE_ENTER = 0x04;
+
 const DYNAMIC_ACTOR_COLLISION_SINGLE_POINT = 0;
 const DYNAMIC_ACTOR_COLLISION_TRIANGLE = 1;
 const DYNAMIC_ACTOR_COLLISION_BOUNDING_BOX = 2;
@@ -32,46 +36,55 @@ const PRESETS = {
     flags: BHV_GRAVITY_Y | BHV_REFLECT_X,
     flags2: BHV3_LOCK_DIR_V | BHV2_ANIM_IDLE | BHV2_ANIM_JUMP,
     collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
+    eventFlags: BHV_EVENT_STATE_CHANGE | BHV_EVENT_TILE_COLLISION | BHV_EVENT_TILE_ENTER,
   },
   walker_ledge: {
     flags: BHV_GRAVITY_Y | BHV_REFLECT_X | BHV_LEDGE_STOP,
     flags2: BHV3_LOCK_DIR_V | BHV2_ANIM_IDLE | BHV2_ANIM_JUMP,
     collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
+    eventFlags: BHV_EVENT_STATE_CHANGE | BHV_EVENT_TILE_COLLISION | BHV_EVENT_TILE_ENTER,
   },
   bouncing_ball: {
     flags: BHV_GRAVITY_Y | BHV_REFLECT_X | BHV_REFLECT_Y,
     flags2: BHV3_LOCK_DIR_V,
     collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
+    eventFlags: BHV_EVENT_STATE_CHANGE | BHV_EVENT_TILE_COLLISION | BHV_EVENT_TILE_ENTER,
   },
   faller: {
     flags: BHV_GRAVITY_Y,
     flags2: BHV3_LOCK_POS_X | BHV3_LOCK_DIR_V | BHV2_ANIM_IDLE | BHV2_ANIM_JUMP,
     collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
+    eventFlags: BHV_EVENT_STATE_CHANGE | BHV_EVENT_TILE_COLLISION | BHV_EVENT_TILE_ENTER,
   },
   slider: {
     flags: BHV_REFLECT_X,
     flags2: BHV3_LOCK_DIR_V | BHV2_ANIM_IDLE,
     collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
+    eventFlags: BHV_EVENT_STATE_CHANGE | BHV_EVENT_TILE_COLLISION | BHV_EVENT_TILE_ENTER,
   },
   reflector: {
     flags: BHV_REFLECT_X | BHV_REFLECT_Y,
     flags2: BHV3_LOCK_DIR_V,
     collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
+    eventFlags: BHV_EVENT_STATE_CHANGE | BHV_EVENT_TILE_COLLISION | BHV_EVENT_TILE_ENTER,
   },
   platform: {
     flags: BHV_PLATFORM,
     flags2: BHV3_LOCK_DIR_H | BHV3_LOCK_DIR_V,
     collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
+    eventFlags: BHV_EVENT_STATE_CHANGE | BHV_EVENT_TILE_COLLISION | BHV_EVENT_TILE_ENTER,
   },
   wanderer: {
     flags: BHV_REFLECT_X | BHV_REFLECT_Y,
     flags2: BHV2_ANIM_IDLE,
     collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
+    eventFlags: BHV_EVENT_STATE_CHANGE | BHV_EVENT_TILE_COLLISION | BHV_EVENT_TILE_ENTER,
   },
   projectile: {
     flags: BHV2_NO_TILE_COLLISION,
     flags2: BHV3_LOCK_DIR_H | BHV3_LOCK_DIR_V,
     collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
+    eventFlags: BHV_EVENT_STATE_CHANGE | BHV_EVENT_TILE_COLLISION | BHV_EVENT_TILE_ENTER,
   },
 };
 
@@ -258,6 +271,27 @@ export const fields = [
     defaultValue: String(DYNAMIC_ACTOR_COLLISION_SINGLE_POINT),
   },
   {
+    key: "triggerStateChange",
+    label: "Trigger state change event",
+    description: "Allow this behavior to fire the state change event",
+    type: "checkbox",
+    defaultValue: true,
+  },
+  {
+    key: "triggerTileCollision",
+    label: "Trigger tile collision event",
+    description: "Allow this behavior to fire the tile collision event",
+    type: "checkbox",
+    defaultValue: true,
+  },
+  {
+    key: "triggerTileEnter",
+    label: "Trigger tile enter event",
+    description: "Allow this behavior to fire the tile enter event",
+    type: "checkbox",
+    defaultValue: true,
+  },
+  {
     key: "gravity",
     label: "Gravity",
     description: "Acceleration in subpixels per frame (position units: 16 subpixels = 1 pixel)",
@@ -308,6 +342,7 @@ export const compile = (input, helpers) => {
   let flags = 0;
   let flags2 = 0;
   let collisionType = DYNAMIC_ACTOR_COLLISION_SINGLE_POINT;
+  let eventFlags = BHV_EVENT_STATE_CHANGE | BHV_EVENT_TILE_COLLISION | BHV_EVENT_TILE_ENTER;
 
   if (input.preset && input.preset !== "custom" && PRESETS[input.preset]) {
     flags = PRESETS[input.preset].flags;
@@ -338,8 +373,19 @@ export const compile = (input, helpers) => {
     flags2 |= Number(input.lockDirectionAxes);
   }
 
-  _addComment(`Define Actor Behavior (flags: ${flags}, flags2: ${flags2}, collision: ${collisionType})`);
+  if (input.triggerStateChange !== undefined) {
+    eventFlags = input.triggerStateChange ? (eventFlags | BHV_EVENT_STATE_CHANGE) : (eventFlags & ~BHV_EVENT_STATE_CHANGE);
+  }
+  if (input.triggerTileCollision !== undefined) {
+    eventFlags = input.triggerTileCollision ? (eventFlags | BHV_EVENT_TILE_COLLISION) : (eventFlags & ~BHV_EVENT_TILE_COLLISION);
+  }
+  if (input.triggerTileEnter !== undefined) {
+    eventFlags = input.triggerTileEnter ? (eventFlags | BHV_EVENT_TILE_ENTER) : (eventFlags & ~BHV_EVENT_TILE_ENTER);
+  }
 
+  _addComment(`Define Actor Behavior (flags: ${flags}, flags2: ${flags2}, collision: ${collisionType}, eventFlags: ${eventFlags})`);
+
+  _stackPushConst(eventFlags);
   _stackPushConst(collisionType);
   _stackPushScriptValue(input.bounce || { type: "number", value: 128 });
   _stackPushScriptValue(input.maxFallVelocity || { type: "number", value: 64 });
@@ -349,5 +395,5 @@ export const compile = (input, helpers) => {
   _stackPushScriptValue(input.behaviorId);
 
   _callNative("vm_define_actor_behavior");
-  _stackPop(7);
+  _stackPop(8);
 };

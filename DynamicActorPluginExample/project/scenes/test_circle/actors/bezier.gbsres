@@ -26,7 +26,8 @@
           "type": "number",
           "value": 2
         },
-        "state": "1"
+        "state": "1",
+        "__comment": false
       },
       "id": "b62ae967-de6e-43bd-944b-66785d429f66"
     }
@@ -49,7 +50,8 @@
         "p2y": 32,
         "p3x": 64,
         "p3y": 0,
-        "__collapse": false
+        "__collapse": false,
+        "__comment": false
       },
       "id": "a2477ac8-67d4-420d-a99c-dc780fa372ba"
     },
@@ -70,7 +72,8 @@
         "p2y": 32,
         "p3x": 0,
         "p3y": 0,
-        "__collapse": false
+        "__collapse": false,
+        "__comment": false
       },
       "id": "e2776143-a67b-4a35-ae01-c613d2a5e69d"
     }

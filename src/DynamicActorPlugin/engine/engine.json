@@ -173,6 +173,46 @@
           "type": "checkbox",
           "cType": "define",
           "defaultValue": 1
+        },
+        {
+          "key": "dynamic_actor_event_actor_idx",
+          "label": "Event actor index",
+          "description": "Actor index for the current dynamic actor event.",
+          "group": "Dynamic actor",
+          "type": "number",
+          "cType": "UBYTE",
+          "defaultValue": 0,
+          "runtimeOnly": true
+        },
+        {
+          "key": "dynamic_actor_event_tile_idx",
+          "label": "Event tile collision",
+          "description": "Tile collision value for the current dynamic actor event.",
+          "group": "Dynamic actor",
+          "type": "number",
+          "cType": "UBYTE",
+          "defaultValue": 0,
+          "runtimeOnly": true
+        },
+        {
+          "key": "dynamic_actor_event_tile_x",
+          "label": "Event tile x",
+          "description": "Tile x coordinate for the current dynamic actor event.",
+          "group": "Dynamic actor",
+          "type": "number",
+          "cType": "UBYTE",
+          "defaultValue": 0,
+          "runtimeOnly": true
+        },
+        {
+          "key": "dynamic_actor_event_tile_y",
+          "label": "Event tile y",
+          "description": "Tile y coordinate for the current dynamic actor event.",
+          "group": "Dynamic actor",
+          "type": "number",
+          "cType": "UBYTE",
+          "defaultValue": 0,
+          "runtimeOnly": true
         }
     ]
 }

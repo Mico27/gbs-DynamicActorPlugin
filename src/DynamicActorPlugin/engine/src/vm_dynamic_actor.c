@@ -40,6 +40,7 @@ void vm_define_actor_behavior(SCRIPT_CTX * THIS) OLDCALL BANKED {
     UBYTE slot = *(uint8_t *)VM_REF_TO_PTR(FN_ARG0);
     if ((slot == 0) || (slot > DYNAMIC_ACTOR_MAX_BEHAVIORS)) return;
     behavior_def_t *def = &behavior_defs[slot];
+    def->event_flags  = *(uint8_t *)VM_REF_TO_PTR(FN_ARG7);
     def->collision_type = *(uint8_t *)VM_REF_TO_PTR(FN_ARG6);
     def->flags        = *(uint8_t *)VM_REF_TO_PTR(FN_ARG1);
     def->flags2       = *(uint8_t *)VM_REF_TO_PTR(FN_ARG2);

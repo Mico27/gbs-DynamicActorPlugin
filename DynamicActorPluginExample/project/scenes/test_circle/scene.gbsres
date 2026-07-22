@@ -35,6 +35,23 @@
           "value": 1
         },
         "preset": "custom",
+        "compGravityY": false,
+        "compGravityZ": true,
+        "compTileCollision": false,
+        "compActorCollision": false,
+        "compPlatform": false,
+        "compLedgeStop": false,
+        "compReflectX": false,
+        "compReflectY": false,
+        "compReflectZ": false,
+        "animJumpY": false,
+        "animJumpZ": false,
+        "lockPositionAxes": "0",
+        "lockDirectionAxes": "0",
+        "collisionType": "0",
+        "triggerStateChange": true,
+        "triggerTileCollision": false,
+        "triggerTileEnter": false,
         "gravity": {
           "type": "number",
           "value": 4
@@ -47,27 +64,10 @@
           "type": "number",
           "value": 140
         },
-        "compReflectX": false,
-        "compTileCollision": false,
-        "compGravity": false,
-        "animFace": true,
-        "animIdle": false,
-        "animJump": false,
-        "animFace4": false,
-        "compMoveY": true,
-        "compMoveX": true,
-        "compReflectY": false,
-        "compPlatform": false,
-        "compActorCollision": false,
-        "compLedgeStop": false,
         "__collapse": false,
-        "collisionType": "2",
-        "compGravityY": false,
-        "compReflectZ": true,
-        "compGravityZ": true,
-        "lockDirectionAxes": "0"
+        "__comment": false
       },
-      "id": "e8aceb48-4f2d-4095-ae20-aa3fe703dec5"
+      "id": "8e148a02-f2fa-44d5-9f63-6f5e7369eb65"
     },
     {
       "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
@@ -77,50 +77,51 @@
           "value": 2
         },
         "preset": "custom",
+        "compGravityY": false,
+        "compGravityZ": false,
+        "compTileCollision": false,
+        "compActorCollision": false,
+        "compPlatform": false,
+        "compLedgeStop": false,
+        "compReflectX": false,
+        "compReflectY": false,
+        "compReflectZ": false,
+        "animJumpY": false,
+        "animJumpZ": false,
+        "lockPositionAxes": "4",
+        "lockDirectionAxes": "16",
+        "collisionType": "0",
+        "triggerStateChange": false,
+        "triggerTileCollision": false,
+        "triggerTileEnter": false,
         "gravity": {
           "type": "number",
-          "value": 0
+          "value": 8
         },
         "maxFallVelocity": {
           "type": "number",
-          "value": 0
+          "value": 64
         },
         "bounce": {
           "type": "number",
+          "value": 128
+        },
+        "__collapse": true,
+        "__comment": false
+      },
+      "id": "a5e7cbb3-a41d-414e-8b19-b55c7b61112c"
+    },
+    {
+      "command": "EVENT_SET_VALUE",
+      "args": {
+        "variable": "0",
+        "value": {
+          "type": "number",
           "value": 0
         },
-        "compReflectX": false,
-        "compTileCollision": false,
-        "compGravity": false,
-        "animFace": true,
-        "animIdle": false,
-        "animJump": false,
-        "animFace4": false,
-        "compMoveY": true,
-        "compMoveX": true,
-        "compReflectY": false,
-        "compPlatform": false,
-        "compActorCollision": false,
-        "compLedgeStop": false,
-        "__collapse": false,
-        "collisionType": "2",
-        "compGravityY": false,
-        "compReflectZ": false,
-        "compGravityZ": false,
-        "lockPositionAxes": "4",
-        "lockDirectionAxes": "16"
+        "__collapse": true
       },
-      "id": "5d1fb330-52b2-4560-b72d-5dd316fc66c6"
-    },
-    {
-      "command": "EVENT_SCRIPT_UNLOCK",
-      "args": {},
-      "id": "9a46c13a-875f-4639-bb20-21e432978050"
-    },
-    {
-      "command": "EVENT_IDLE",
-      "args": {},
-      "id": "c3290737-8d34-48e1-9363-7768feaa6a42"
+      "id": "85b610e2-eaca-43e7-bed4-7a0bd1453ee0"
     },
     {
       "command": "EVENT_SET_ACTOR_Z_VELOCITY",
@@ -130,9 +131,84 @@
           "type": "number",
           "value": -64
         },
-        "__comment": false
+        "__comment": false,
+        "__collapse": true
       },
       "id": "2d59f324-9ee0-4a1c-86a1-b6263c0e07a3"
+    },
+    {
+      "command": "EVENT_DYNAMIC_ACTOR_STATE_CHANGE_SCRIPT",
+      "args": {
+        "eventSlot": "0",
+        "__scriptTabs": "scriptinput",
+        "__collapse": false
+      },
+      "children": {
+        "script": [
+          {
+            "command": "EVENT_IF",
+            "args": {
+              "condition": {
+                "type": "eq",
+                "valueA": {
+                  "type": "engineField",
+                  "value": "dynamic_actor_event_state"
+                },
+                "valueB": {
+                  "type": "number",
+                  "value": 1
+                }
+              },
+              "__collapseElse": true
+            },
+            "children": {
+              "true": [
+                {
+                  "command": "EVENT_SET_ACTOR_Z_VELOCITY",
+                  "args": {
+                    "actorId": "92d695d5-0dcc-4629-910a-e61ac8f72c9f",
+                    "zVelocity": {
+                      "type": "number",
+                      "value": -64
+                    },
+                    "__comment": false,
+                    "__collapse": true
+                  },
+                  "id": "90544bc0-c3dd-46bf-aa3c-2da119434a1a"
+                },
+                {
+                  "command": "EVENT_INC_VALUE",
+                  "args": {
+                    "variable": "6"
+                  },
+                  "id": "23674de6-1f4a-4d66-9858-d446bdfd6a66"
+                },
+                {
+                  "command": "EVENT_COMMENT",
+                  "args": {
+                    "text": "note: Draw text event gives a 1 frame idle lag, so if a state changes immediately on the next frame, the script wont be considered \"done\" yet so the state change call will be skipped. Be careful of waitable events if you dont want event calls to get trottled."
+                  },
+                  "id": "311d568c-7ceb-4577-ad2e-c0816c0bf1da"
+                },
+                {
+                  "command": "EVENT_TEXT_DRAW",
+                  "args": {
+                    "text": "Jump count: $06$",
+                    "x": 1,
+                    "y": 16,
+                    "location": "background",
+                    "__comment": false
+                  },
+                  "id": "bf8a5772-62d8-481d-8df1-b1d33b4bb8dd"
+                }
+              ],
+              "false": []
+            },
+            "id": "13403513-d5a8-4a57-b777-78da8bdce57c"
+          }
+        ]
+      },
+      "id": "11114149-12fb-4453-9546-aac5bc9495a2"
     }
   ],
   "autoFadeEventCollapse": true

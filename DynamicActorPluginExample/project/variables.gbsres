@@ -30,6 +30,16 @@
       "id": "5",
       "name": "CanAttack",
       "symbol": "var_canattack"
+    },
+    {
+      "id": "6",
+      "name": "JumpCount",
+      "symbol": "var_jumpcount"
+    },
+    {
+      "id": "7",
+      "name": "NewState",
+      "symbol": "var_newstate"
     }
   ],
   "constants": []

@@ -248,7 +248,6 @@ void actors_render(void) NONBANKED {
         } else {
             screen_x = SUBPX_TO_PX(actor->pos.x) - draw_scroll_x;
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
-            script_memory[0] = actor->pos_z;
             screen_y = SUBPX_TO_PX(actor->pos.y - actor->pos_z) - draw_scroll_y;
 #else
             screen_y = SUBPX_TO_PX(actor->pos.y) - draw_scroll_y;

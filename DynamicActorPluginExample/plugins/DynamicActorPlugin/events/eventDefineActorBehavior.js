@@ -13,8 +13,8 @@ const BHV_PLATFORM = 0x40;
 const BHV2_NO_TILE_COLLISION = 0x80;
 
 // Lock / animation flags
-const BHV2_ANIM_IDLE = 0x20;
-const BHV2_ANIM_JUMP = 0x40;
+const BHV2_ANIM_JUMP_Y = 0x20;
+const BHV2_ANIM_JUMP_Z = 0x40;
 const BHV2_ACTOR_COLLISION = 0x80;
 
 const BHV3_LOCK_POS_X = 0x01;
@@ -23,6 +23,13 @@ const BHV3_LOCK_POS_Z = 0x04;
 const BHV3_LOCK_DIR_H = 0x08;
 const BHV3_LOCK_DIR_V = 0x10;
 
+const BHV_EVENT_STATE_CHANGE = 0x01;
+const BHV_EVENT_TILE_COLLISION_TOP = 0x02;
+const BHV_EVENT_TILE_COLLISION_RIGHT = 0x04;
+const BHV_EVENT_TILE_COLLISION_BOTTOM = 0x08;
+const BHV_EVENT_TILE_COLLISION_LEFT = 0x10;
+const BHV_EVENT_TILE_ENTER = 0x20;
+
 const DYNAMIC_ACTOR_COLLISION_SINGLE_POINT = 0;
 const DYNAMIC_ACTOR_COLLISION_TRIANGLE = 1;
 const DYNAMIC_ACTOR_COLLISION_BOUNDING_BOX = 2;
@@ -30,12 +37,12 @@ const DYNAMIC_ACTOR_COLLISION_BOUNDING_BOX = 2;
 const PRESETS = {
   walker: {
     flags: BHV_GRAVITY_Y | BHV_REFLECT_X,
-    flags2: BHV3_LOCK_DIR_V | BHV2_ANIM_IDLE | BHV2_ANIM_JUMP,
+    flags2: BHV3_LOCK_DIR_V | BHV2_ANIM_JUMP_Y | BHV2_ANIM_JUMP_Z,
     collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
   },
   walker_ledge: {
     flags: BHV_GRAVITY_Y | BHV_REFLECT_X | BHV_LEDGE_STOP,
-    flags2: BHV3_LOCK_DIR_V | BHV2_ANIM_IDLE | BHV2_ANIM_JUMP,
+    flags2: BHV3_LOCK_DIR_V | BHV2_ANIM_JUMP_Y | BHV2_ANIM_JUMP_Z,
     collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
   },
   bouncing_ball: {
@@ -45,12 +52,12 @@ const PRESETS = {
   },
   faller: {
     flags: BHV_GRAVITY_Y,
-    flags2: BHV3_LOCK_POS_X | BHV3_LOCK_DIR_V | BHV2_ANIM_IDLE | BHV2_ANIM_JUMP,
+    flags2: BHV3_LOCK_POS_X | BHV3_LOCK_DIR_V | BHV2_ANIM_JUMP_Y | BHV2_ANIM_JUMP_Z,
     collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
   },
   slider: {
     flags: BHV_REFLECT_X,
-    flags2: BHV3_LOCK_DIR_V | BHV2_ANIM_IDLE,
+    flags2: BHV3_LOCK_DIR_V | BHV2_ANIM_JUMP_Y | BHV2_ANIM_JUMP_Z,
     collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
   },
   reflector: {
@@ -65,7 +72,7 @@ const PRESETS = {
   },
   wanderer: {
     flags: BHV_REFLECT_X | BHV_REFLECT_Y,
-    flags2: BHV2_ANIM_IDLE,
+    flags2: BHV2_ANIM_JUMP_Y | BHV2_ANIM_JUMP_Z,
     collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
   },
   projectile: {
@@ -200,17 +207,17 @@ export const fields = [
     conditions: [{ key: "preset", eq: "custom" }],
   },
   {
-    key: "animIdle",
-    label: "Idle when stopped",
-    description: "Play idle animation when horizontal velocity is zero",
+    key: "animJumpY",
+    label: "Jump animation in air on y axis",
+    description: "Play jump animation while airborne on y axis (for platformer characters)",
     type: "checkbox",
     defaultValue: true,
     conditions: [{ key: "preset", eq: "custom" }],
   },
   {
-    key: "animJump",
-    label: "Jump animation in air",
-    description: "Play jump animation while airborne",
+    key: "animJumpZ",
+    label: "Jump animation in air on z axis",
+    description: "Play jump animation while airborne on z axis (for topdown characters)",
     type: "checkbox",
     defaultValue: true,
     conditions: [{ key: "preset", eq: "custom" }],
@@ -256,6 +263,48 @@ export const fields = [
       [String(DYNAMIC_ACTOR_COLLISION_BOUNDING_BOX), "Bounding box"],
     ],
     defaultValue: String(DYNAMIC_ACTOR_COLLISION_SINGLE_POINT),
+  },
+  {
+    key: "triggerStateChange",
+    label: "Trigger state change event",
+    description: "Allow this behavior to fire the state change event",
+    type: "checkbox",
+    defaultValue: false,
+  },
+  {
+    key: "triggerTileCollisionTop",
+    label: "Trigger tile collision (top) event",
+    description: "Allow this behavior to fire the tile collision (top) event",
+    type: "checkbox",
+    defaultValue: false,
+  },
+  {
+    key: "triggerTileCollisionRight",
+    label: "Trigger tile collision (right) event",
+    description: "Allow this behavior to fire the tile collision (right) event",
+    type: "checkbox",
+    defaultValue: false,
+  },
+    {
+    key: "triggerTileCollisionBottom",
+    label: "Trigger tile collision (bottom) event",
+    description: "Allow this behavior to fire the tile collision (bottom) event",
+    type: "checkbox",
+    defaultValue: false,
+  },
+    {
+    key: "triggerTileCollisionLeft",
+    label: "Trigger tile collision (left) event",
+    description: "Allow this behavior to fire the tile collision (left) event",
+    type: "checkbox",
+    defaultValue: false,
+  },
+  {
+    key: "triggerTileEnter",
+    label: "Trigger tile enter event",
+    description: "Allow this behavior to fire the tile enter event",
+    type: "checkbox",
+    defaultValue: false,
   },
   {
     key: "gravity",
@@ -308,6 +357,7 @@ export const compile = (input, helpers) => {
   let flags = 0;
   let flags2 = 0;
   let collisionType = DYNAMIC_ACTOR_COLLISION_SINGLE_POINT;
+  let eventFlags = 0;
 
   if (input.preset && input.preset !== "custom" && PRESETS[input.preset]) {
     flags = PRESETS[input.preset].flags;
@@ -323,8 +373,8 @@ export const compile = (input, helpers) => {
     if (input.compPlatform) flags |= BHV_PLATFORM;
     if (input.compTileCollision === false) flags |= BHV2_NO_TILE_COLLISION;
     if (input.compActorCollision) flags2 |= BHV2_ACTOR_COLLISION;
-    if (input.animIdle) flags2 |= BHV2_ANIM_IDLE;
-    if (input.animJump) flags2 |= BHV2_ANIM_JUMP;
+    if (input.animJumpY) flags2 |= BHV2_ANIM_JUMP_Y;
+    if (input.animJumpZ) flags2 |= BHV2_ANIM_JUMP_Z;
   }
 
   if (input.collisionType !== undefined) {
@@ -338,8 +388,28 @@ export const compile = (input, helpers) => {
     flags2 |= Number(input.lockDirectionAxes);
   }
 
-  _addComment(`Define Actor Behavior (flags: ${flags}, flags2: ${flags2}, collision: ${collisionType})`);
+  if (input.triggerStateChange) {
+    eventFlags |= BHV_EVENT_STATE_CHANGE;
+  }
+  if (input.triggerTileCollisionTop) {
+    eventFlags |= BHV_EVENT_TILE_COLLISION_TOP;
+  }
+  if (input.triggerTileCollisionRight) {
+    eventFlags |= BHV_EVENT_TILE_COLLISION_RIGHT;
+  }
+  if (input.triggerTileCollisionBottom) {
+    eventFlags |= BHV_EVENT_TILE_COLLISION_BOTTOM;
+  }
+  if (input.triggerTileCollisionLeft) {
+    eventFlags |= BHV_EVENT_TILE_COLLISION_LEFT;
+  }
+  if (input.triggerTileEnter) {
+    eventFlags |= BHV_EVENT_TILE_ENTER;
+  }
 
+  _addComment(`Define Actor Behavior (flags: ${flags}, flags2: ${flags2}, collision: ${collisionType}, eventFlags: ${eventFlags})`);
+
+  _stackPushConst(eventFlags);
   _stackPushConst(collisionType);
   _stackPushScriptValue(input.bounce || { type: "number", value: 128 });
   _stackPushScriptValue(input.maxFallVelocity || { type: "number", value: 64 });
@@ -349,5 +419,5 @@ export const compile = (input, helpers) => {
   _stackPushScriptValue(input.behaviorId);
 
   _callNative("vm_define_actor_behavior");
-  _stackPop(7);
+  _stackPop(8);
 };

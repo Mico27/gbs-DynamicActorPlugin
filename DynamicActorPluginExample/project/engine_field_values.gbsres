@@ -52,6 +52,58 @@
     {
       "id": "DYNAMIC_ACTOR_ENABLE_MOVE_Z",
       "value": 1
+    },
+    {
+      "id": "DYNAMIC_ACTOR_ENABLE_MOVE_X",
+      "value": 1
+    },
+    {
+      "id": "DYNAMIC_ACTOR_ENABLE_GRAVITY",
+      "value": 1
+    },
+    {
+      "id": "DYNAMIC_ACTOR_ENABLE_LEDGE_STOP",
+      "value": 1
+    },
+    {
+      "id": "DYNAMIC_ACTOR_ENABLE_MOVE_Y",
+      "value": 1
+    },
+    {
+      "id": "DYNAMIC_ACTOR_ENABLE_REFLECT_X",
+      "value": 1
+    },
+    {
+      "id": "DYNAMIC_ACTOR_ENABLE_BOUNCE",
+      "value": 1
+    },
+    {
+      "id": "DYNAMIC_ACTOR_ENABLE_PARENT",
+      "value": 1
+    },
+    {
+      "id": "DYNAMIC_ACTOR_ENABLE_ACTOR_COLLISION",
+      "value": 1
+    },
+    {
+      "id": "DYNAMIC_ACTOR_ENABLE_VM_WAIT_FOR_COLLISION",
+      "value": 1
+    },
+    {
+      "id": "DYNAMIC_ACTOR_ENABLE_VM_MOTION_CHASE_ACTOR",
+      "value": 1
+    },
+    {
+      "id": "DYNAMIC_ACTOR_ENABLE_ANIMATION",
+      "value": 1
+    },
+    {
+      "id": "DYNAMIC_ACTOR_ENABLE_VM_MOTION_MOVE_TO_POS_BY_VELOCITY",
+      "value": 1
+    },
+    {
+      "id": "DYNAMIC_ACTOR_ENABLE_VM_MOTION_CRAWL_STEP",
+      "value": 1
     }
   ]
 }

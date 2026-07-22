@@ -40,6 +40,11 @@
                                       // the frame's movement is reverted and velocity
                                       // turns/bounces per the reflect settings
 
+// Behavior event trigger flags (event_flags)
+#define BHV_EVENT_STATE_CHANGE   0x01u  // allow state change events
+#define BHV_EVENT_TILE_COLLISION  0x02u  // allow tile collision events
+#define BHV_EVENT_TILE_ENTER      0x04u  // allow tile enter events
+
 // Actor behavior states (actor_state)
 #define BHV_STATE_PAUSED    0
 #define BHV_STATE_GROUNDED  1
@@ -54,6 +59,7 @@ typedef struct behavior_def_t {
     UBYTE gravity;       // subpixels/frame^2 added to y velocity
     BYTE max_fall_vel;  // max downward velocity in subpixels/frame
     UBYTE bounce;        // energy kept on bounce, 0..255 (255 = perfect reflect)
+    UBYTE event_flags;   // BHV_EVENT_* trigger permissions
 } behavior_def_t;
 
 extern behavior_def_t behavior_defs[DYNAMIC_ACTOR_MAX_BEHAVIORS + 1];
