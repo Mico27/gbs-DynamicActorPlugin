@@ -35,16 +35,46 @@
 
 behavior_def_t behavior_defs[DYNAMIC_ACTOR_MAX_BEHAVIORS + 1];
 
+typedef enum
+{
+    DYNAMIC_ACTOR_STATE_CHANGE = 0,
+    DYNAMIC_ACTOR_TILE_COLLISION = 1,
+    DYNAMIC_ACTOR_TILE_ENTERED = 2,    
+    DYNAMIC_ACTOR_CALLBACK_SIZE
+} dynamic_actor_event_e;
+
+script_event_t dynamic_actor_events[DYNAMIC_ACTOR_CALLBACK_SIZE];
+UBYTE da_event_actor_idx;
+UBYTE da_event_tile_idx;
+UBYTE da_event_tile_x;
+UBYTE da_event_tile_y;
+
 WORD new_actor_x;
 WORD new_actor_y;
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
+WORD new_actor_z;
+#endif
 UBYTE col_tx;
 UBYTE col_ty;
+
+#ifdef DYNAMIC_ACTOR_ENABLE_ANIMATION
+static void actor_set_dir_locked(actor_t *actor, direction_e dir, UBYTE moving, UBYTE lock_flags) {
+    if (((lock_flags & BHV3_LOCK_DIR_H) && ((dir == DIR_LEFT) || (dir == DIR_RIGHT))) ||
+        ((lock_flags & BHV3_LOCK_DIR_V) && ((dir == DIR_UP) || (dir == DIR_DOWN)))) {
+        return;
+    }
+    actor_set_dir(actor, dir, moving);
+}
+#endif
 
 #ifdef DYNAMIC_ACTOR_ENABLE_PARENT
 // Previous-frame player position, used to mirror the engine-controlled
 // player's movement into its velocity fields (see dynamic_actor_update).
 static UWORD player_prev_x;
 static UWORD player_prev_y;
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
+static UWORD player_prev_z;
+#endif
 #endif
 
 void dynamic_actor_init(void) BANKED {
@@ -52,6 +82,9 @@ void dynamic_actor_init(void) BANKED {
 #ifdef DYNAMIC_ACTOR_ENABLE_PARENT
     player_prev_x = PLAYER.pos.x;
     player_prev_y = PLAYER.pos.y;
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
+    player_prev_z = PLAYER.pos_z;
+#endif
 #endif
 }
 
@@ -522,6 +555,7 @@ void dynamic_actor_update(void) BANKED {
         UBYTE flags = def->flags;
 #if defined(DYNAMIC_ACTOR_ENABLE_MOVE_X) || defined(DYNAMIC_ACTOR_ENABLE_MOVE_Y) || defined(DYNAMIC_ACTOR_ENABLE_ANIMATION) || defined(DYNAMIC_ACTOR_ENABLE_PARENT) || defined(DYNAMIC_ACTOR_ENABLE_ACTOR_COLLISION)
         UBYTE flags2 = def->flags2;
+    UBYTE lock_flags = flags2;
 #endif
 
 #ifdef DYNAMIC_ACTOR_ENABLE_PARENT
@@ -544,14 +578,20 @@ void dynamic_actor_update(void) BANKED {
             // delta is added when the player is the parent.
             WORD parent_actor_delta_x = parent_actor->actor_vel_x;
             WORD parent_actor_delta_y = parent_actor->actor_vel_y;
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
+            WORD parent_actor_delta_z = parent_actor->actor_vel_z;
+#endif
             if (parent_actor == &PLAYER) {
                 parent_actor_delta_x += (WORD)(PLAYER.pos.x - player_prev_x);
                 parent_actor_delta_y += (WORD)(PLAYER.pos.y - player_prev_y);
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
+                parent_actor_delta_z += (WORD)(PLAYER.pos_z - player_prev_z);
+#endif
             }
-            if (parent_actor_delta_x) {
+            if (parent_actor_delta_x && !(lock_flags & BHV3_LOCK_POS_X)) {
                 new_actor_x = actor->pos.x + parent_actor_delta_x;
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_X
-                if (flags2 & BHV2_NO_TILE_COLLISION) {
+                if (flags & BHV2_NO_TILE_COLLISION) {
                     actor->pos.x = new_actor_x;
                 } else {
                     actor->pos.x = check_horizontal_collision_by_type(new_actor_x, actor->pos.y, actor, (parent_actor_delta_x > 0), collision_type);
@@ -560,10 +600,10 @@ void dynamic_actor_update(void) BANKED {
                 actor->pos.x = new_actor_x;
 #endif
             }
-            if (parent_actor_delta_y) {
+            if (parent_actor_delta_y && !(lock_flags & BHV3_LOCK_POS_Y)) {
                 new_actor_y = actor->pos.y + parent_actor_delta_y;
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Y
-                if (flags2 & BHV2_NO_TILE_COLLISION) {
+                if (flags & BHV2_NO_TILE_COLLISION) {
                     actor->pos.y = new_actor_y;
                 } else {
                     actor->pos.y = check_vertical_collision_by_type(actor->pos.x, new_actor_y, actor, (parent_actor_delta_y > 0), collision_type);
@@ -572,6 +612,16 @@ void dynamic_actor_update(void) BANKED {
                 actor->pos.y = new_actor_y;
 #endif
             }
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z            
+            if (parent_actor_delta_z && !(lock_flags & BHV3_LOCK_POS_Z)) {
+                new_actor_z = (WORD)actor->pos_z - parent_actor_delta_z;
+                if (new_actor_z < 0) {
+                    actor->pos_z = 0;
+                } else {
+                    actor->pos_z = (UWORD)new_actor_z;
+                }
+            }
+#endif
         }
 #endif
 
@@ -614,18 +664,64 @@ void dynamic_actor_update(void) BANKED {
 #endif
 
 #ifdef DYNAMIC_ACTOR_ENABLE_GRAVITY
-        if (flags & BHV_GRAVITY) {
-            actor->actor_vel_y += def->gravity;
-            if (actor->actor_vel_y > def->max_fall_vel) {
-                actor->actor_vel_y = def->max_fall_vel;
+        if (flags & (BHV_GRAVITY_Y | BHV_GRAVITY_Z)) {
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Y
+            if ((flags & BHV_GRAVITY_Y) && !(lock_flags & BHV3_LOCK_POS_Y)) {
+                actor->actor_vel_y += def->gravity;
+                if (actor->actor_vel_y > def->max_fall_vel) {
+                    actor->actor_vel_y = def->max_fall_vel;
+                }
+            }
+#endif
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
+            if ((flags & BHV_GRAVITY_Z) && !(lock_flags & BHV3_LOCK_POS_Z)) {
+                actor->actor_vel_z += def->gravity;
+                if (actor->actor_vel_z > def->max_fall_vel) {
+                    actor->actor_vel_z = def->max_fall_vel;
+                }
+            }
+#endif
+        }
+#endif
+
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
+        if (!(lock_flags & BHV3_LOCK_POS_Z)) {
+            new_actor_z = (WORD)actor->pos_z - actor->actor_vel_z;
+            if (new_actor_z > 0) {
+                actor->pos_z = new_actor_z;
+            } else {
+                actor->pos_z = 0;
+#ifdef DYNAMIC_ACTOR_ENABLE_BOUNCE
+                if (flags & BHV_REFLECT_Z) {
+                    if (def->bounce == 128) {
+                        actor->actor_vel_z = -actor->actor_vel_z;
+                    } else {
+                        actor->actor_vel_z = -(WORD)(((int16_t)actor->actor_vel_z * def->bounce) >> 7);
+                    }
+                    if (-actor->actor_vel_z <= def->gravity) {
+                        actor->actor_vel_z = 0;
+                    }
+                } else {
+                    actor->actor_vel_z = 0;
+                }
+#else
+                actor->actor_vel_z = 0;
+#endif
             }
         }
 #endif
 
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
+        if (actor->pos_z != 0) {
+            state = BHV_STATE_ARIBORNE_Z;
+            actor->actor_state = state;
+        }
+#endif
+
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_X
-        if (flags & BHV_MOVE_X) {
+    if (!(lock_flags & BHV3_LOCK_POS_X)) {
             new_actor_x = actor->pos.x + actor->actor_vel_x;
-            if (flags2 & BHV2_NO_TILE_COLLISION) {
+            if (flags & BHV2_NO_TILE_COLLISION) {
                 // Tile collision disabled: apply velocity directly
                 actor->pos.x = new_actor_x;
             } else {
@@ -655,14 +751,16 @@ void dynamic_actor_update(void) BANKED {
 #endif
 
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Y
-        if (flags & BHV_MOVE_Y) {
+    if (!(lock_flags & BHV3_LOCK_POS_Y)) {
             new_actor_y = actor->pos.y + actor->actor_vel_y;
-            if (flags2 & BHV2_NO_TILE_COLLISION) {
+            if (flags & BHV2_NO_TILE_COLLISION) {
                 // Tile collision disabled: apply velocity directly, never land
                 actor->pos.y = new_actor_y;
 #ifdef DYNAMIC_ACTOR_ENABLE_GRAVITY
-                if (flags & BHV_GRAVITY) {
-                    state = BHV_STATE_AIRBORNE;
+                if (flags & BHV_GRAVITY_Y) {
+                    if (state != BHV_STATE_ARIBORNE_Z) {
+                    state = BHV_STATE_AIBORNE_Y;
+                }
                 }
 #endif
                 actor->actor_state = state;
@@ -673,10 +771,10 @@ void dynamic_actor_update(void) BANKED {
                 // Hit floor (moving down) or ceiling (moving up)
 #ifdef DYNAMIC_ACTOR_ENABLE_BOUNCE
                 if (flags & BHV_REFLECT_Y) {
-                    if (def->bounce == 255) {
+                    if (def->bounce == 128) {
                         actor->actor_vel_y = -actor->actor_vel_y;
                     } else {
-                        actor->actor_vel_y = -(WORD)(((int16_t)actor->actor_vel_y * def->bounce) >> 8);
+                        actor->actor_vel_y = -(WORD)(((int16_t)actor->actor_vel_y * def->bounce) >> 7);
                     }
                     // Kill micro-bounces caused by gravity pumping while resting
                     if (moving_down && (-actor->actor_vel_y <= def->gravity)) {
@@ -690,17 +788,21 @@ void dynamic_actor_update(void) BANKED {
 #endif
                 if (moving_down && (actor->actor_vel_y == 0)) {
 #ifdef DYNAMIC_ACTOR_ENABLE_GRAVITY
-                    if (flags & BHV_GRAVITY){
+                    if (flags & BHV_GRAVITY_Y){
                         //apply force to stick on ground to prevent bliping between grounded and airborne states on slopes
                         actor->actor_vel_y = 64;
                     }
 #endif
+                    if (state != BHV_STATE_ARIBORNE_Z) {
                     state = BHV_STATE_GROUNDED;
+                }
                 }
             }
 #ifdef DYNAMIC_ACTOR_ENABLE_GRAVITY
-            else if (flags & BHV_GRAVITY) {
-                state = BHV_STATE_AIRBORNE;
+            else if (flags & BHV_GRAVITY_Y) {
+                if (state != BHV_STATE_ARIBORNE_Z) {
+                    state = BHV_STATE_AIBORNE_Y;
+                }
             }
 #endif
             actor->actor_state = state;
@@ -715,7 +817,7 @@ void dynamic_actor_update(void) BANKED {
         if (flags2 & BHV2_ACTOR_COLLISION) {
             actor_t *other = actors_active_tail;
             while (other) {
-                if ((other != actor) && (other != actors) &&
+                if ((other != actor) && (other != &PLAYER) &&
                     (other->flags & ACTOR_FLAG_COLLISION) &&
                     bb_intersects(&actor->bounds, &actor->pos, &other->bounds, &other->pos)) {
                     actor->pos.x = prev_x;
@@ -737,7 +839,7 @@ void dynamic_actor_update(void) BANKED {
                     {
 #ifdef DYNAMIC_ACTOR_ENABLE_GRAVITY
                         // Leave vertical velocity to gravity for side-view actors
-                        if (!(flags & BHV_GRAVITY))
+                        if (!(flags & BHV_GRAVITY_Y))
 #endif
                         {
                             actor->actor_vel_y = 0;
@@ -751,30 +853,25 @@ void dynamic_actor_update(void) BANKED {
 #endif
 
 #ifdef DYNAMIC_ACTOR_ENABLE_ANIMATION
-        if (flags2) {
-            if (flags2 & BHV2_ANIM_FACE_4DIR) {
-                // Face the dominant velocity axis (top down / adventure)
-                WORD abs_vx = actor->actor_vel_x;
-                if (abs_vx < 0) abs_vx = -abs_vx;
-                WORD abs_vy = actor->actor_vel_y;
-                if (abs_vy < 0) abs_vy = -abs_vy;
-                if (abs_vx || abs_vy) {
-                    if (abs_vy > abs_vx) {
-                        actor_set_dir(actor, (actor->actor_vel_y < 0) ? DIR_UP : DIR_DOWN, TRUE);
-                    } else {
-                        actor_set_dir(actor, (actor->actor_vel_x < 0) ? DIR_LEFT : DIR_RIGHT, TRUE);
-                    }
-                } else if (flags2 & BHV2_ANIM_IDLE) {
-                    actor_set_anim_idle(actor);
+        if (flags2 & (BHV3_LOCK_DIR_H | BHV3_LOCK_DIR_V | BHV2_ANIM_IDLE | BHV2_ANIM_JUMP)) {
+            WORD abs_vx = actor->actor_vel_x;
+            if (abs_vx < 0) abs_vx = -abs_vx;
+            WORD abs_vy = actor->actor_vel_y;
+            if (abs_vy < 0) abs_vy = -abs_vy;
+            if ((!(lock_flags & BHV3_LOCK_DIR_H) || !(lock_flags & BHV3_LOCK_DIR_V)) && (abs_vx || abs_vy)) {
+                if (lock_flags & BHV3_LOCK_DIR_H) {
+                    actor_set_dir_locked(actor, (actor->actor_vel_y < 0) ? DIR_UP : DIR_DOWN, TRUE, lock_flags);
+                } else if (lock_flags & BHV3_LOCK_DIR_V) {
+                    actor_set_dir_locked(actor, (actor->actor_vel_x < 0) ? DIR_LEFT : DIR_RIGHT, TRUE, lock_flags);
+                } else if (abs_vy > abs_vx) {
+                    actor_set_dir_locked(actor, (actor->actor_vel_y < 0) ? DIR_UP : DIR_DOWN, TRUE, lock_flags);
+                } else {
+                    actor_set_dir_locked(actor, (actor->actor_vel_x < 0) ? DIR_LEFT : DIR_RIGHT, TRUE, lock_flags);
                 }
-            } else if (actor->actor_vel_x < 0) {
-                if (flags2 & BHV2_ANIM_FACE) actor_set_dir(actor, DIR_LEFT, TRUE);
-            } else if (actor->actor_vel_x > 0) {
-                if (flags2 & BHV2_ANIM_FACE) actor_set_dir(actor, DIR_RIGHT, TRUE);
             } else if (flags2 & BHV2_ANIM_IDLE) {
                 actor_set_anim_idle(actor);
             }
-            if ((flags2 & BHV2_ANIM_JUMP) && (state == BHV_STATE_AIRBORNE)) {
+            if ((flags2 & BHV2_ANIM_JUMP) && ((state == BHV_STATE_AIBORNE_Y) || (state == BHV_STATE_ARIBORNE_Z))) {
                 if (actor->dir == DIR_LEFT) {
                     actor_set_anim(actor, ANIM_JUMP_LEFT);
                 } else {
@@ -795,6 +892,9 @@ void dynamic_actor_update(void) BANKED {
     // fields here.
     player_prev_x = PLAYER.pos.x;
     player_prev_y = PLAYER.pos.y;
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
+    player_prev_z = PLAYER.pos_z;
+#endif
 #endif
 }
 

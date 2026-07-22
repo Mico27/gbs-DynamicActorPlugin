@@ -48,6 +48,10 @@
     {
       "id": "DYNAMIC_ACTOR_ENABLE_COLLISION_BOUNDING_BOX",
       "value": 1
+    },
+    {
+      "id": "DYNAMIC_ACTOR_ENABLE_MOVE_Z",
+      "value": 1
     }
   ]
 }

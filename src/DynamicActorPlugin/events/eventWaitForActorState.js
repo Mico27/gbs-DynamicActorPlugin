@@ -24,7 +24,8 @@ export const fields = [
     type: "select",
     options: [
       [1, "Grounded (landed)"],
-      [2, "Airborne (in the air)"],
+      [2, "Airborne Y (in the air by Y movement)"],
+      [3, "Airborne Z (pos_z above ground)"],
       [0, "Paused"],
     ],
     defaultValue: 1,
@@ -55,7 +56,7 @@ export const compile = (input, helpers) => {
     getNextLabel,
   } = helpers;
 
-  const state = [0, 1, 2].includes(Number(input.state))
+  const state = [0, 1, 2, 3].includes(Number(input.state))
     ? Number(input.state)
     : 1;
   const invert = input.invert === true;

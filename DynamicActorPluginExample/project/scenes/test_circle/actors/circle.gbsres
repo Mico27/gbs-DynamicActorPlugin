@@ -52,7 +52,8 @@
         "arcDegrees": 360,
         "stepFrames": 4,
         "cycles": 1,
-        "stopAtEnd": true
+        "stopAtEnd": true,
+        "__comment": false
       },
       "id": "76f3ac78-b4a4-4cb2-90e3-9fad09fb6504"
     },
@@ -67,7 +68,8 @@
         "arcDegrees": 360,
         "stepFrames": 4,
         "cycles": 1,
-        "stopAtEnd": true
+        "stopAtEnd": true,
+        "__comment": false
       },
       "id": "a21e5d58-c371-4d30-8137-36f1580ac500"
     }

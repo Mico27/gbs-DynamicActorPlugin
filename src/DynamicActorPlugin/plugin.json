@@ -7,5 +7,91 @@
   "license": "MIT",
   "version": "4.3.0",
   "gbsVersion": ">=4.3.0",
-  "order": -6
+  "order": -7,
+  "engineAltRules": [
+    {
+      "when": {
+        "additionalPlugins": [
+          "Mico27/ContinuousScenePlugin",
+          "Mico27/MetaTilePlugin"
+        ]
+      },
+      "use": "ContinuousScenePlugin_MetaTilePlugin"
+    },
+    {
+      "when": {
+        "additionalPlugins": [
+          "ContinuousScenePlugin",
+          "MetaTilePlugin"
+        ]
+      },
+      "use": "ContinuousScenePlugin_MetaTilePlugin"
+    },
+    {
+      "when": {
+        "additionalPlugins": [
+          "Mico27/ScreenScrollPlugin",
+          "Mico27/MetaTilePlugin"
+        ]
+      },
+      "use": "ScreenScrollPlugin_MetaTilePlugin"
+    },
+    {
+      "when": {
+        "additionalPlugins": [
+          "ScreenScrollPlugin",
+          "MetaTilePlugin"
+        ]
+      },
+      "use": "ScreenScrollPlugin_MetaTilePlugin"
+    },
+    {
+      "when": {
+        "additionalPlugins": [
+          "Mico27/ContinuousScenePlugin"
+        ]
+      },
+      "use": "ContinuousScenePlugin"
+    },
+    {
+      "when": {
+        "additionalPlugins": [
+          "ContinuousScenePlugin"
+        ]
+      },
+      "use": "ContinuousScenePlugin"
+    },
+    {
+      "when": {
+        "additionalPlugins": [
+          "Mico27/MetaTilePlugin"
+        ]
+      },
+      "use": "MetaTilePlugin"
+    },
+    {
+      "when": {
+        "additionalPlugins": [
+          "MetaTilePlugin"
+        ]
+      },
+      "use": "MetaTilePlugin"
+    },
+    {
+      "when": {
+        "additionalPlugins": [
+          "Mico27/ScreenScrollPlugin"
+        ]
+      },
+      "use": "ScreenScrollPlugin"
+    },
+    {
+      "when": {
+        "additionalPlugins": [
+          "ScreenScrollPlugin"
+        ]
+      },
+      "use": "ScreenScrollPlugin"
+    }
+  ]
 }

@@ -2,22 +2,26 @@ export const id = "EVENT_DEFINE_ACTOR_BEHAVIOR";
 export const name = "Define Actor Behavior";
 export const groups = ["EVENT_GROUP_ACTOR"];
 
-// Physics component flags (must match dynamic_actor.h)
-const BHV_GRAVITY = 0x01;
-const BHV_MOVE_X = 0x02;
-const BHV_MOVE_Y = 0x04;
-const BHV_LEDGE_STOP = 0x08;
-const BHV_REFLECT_X = 0x10;
-const BHV_REFLECT_Y = 0x20;
+// Physics component flags (flags byte; must match dynamic_actor.h)
+const BHV_GRAVITY_Y = 0x01;
+const BHV_GRAVITY_Z = 0x02;
+const BHV_LEDGE_STOP = 0x04;
+const BHV_REFLECT_X = 0x08;
+const BHV_REFLECT_Y = 0x10;
+const BHV_REFLECT_Z = 0x20;
 const BHV_PLATFORM = 0x40;
+const BHV2_NO_TILE_COLLISION = 0x80;
 
-// Animation / option flags
-const BHV2_ANIM_FACE = 0x01;
-const BHV2_ANIM_IDLE = 0x02;
-const BHV2_ANIM_JUMP = 0x04;
-const BHV2_NO_TILE_COLLISION = 0x08;
-const BHV2_ANIM_FACE_4DIR = 0x10;
+// Lock / animation flags
+const BHV2_ANIM_IDLE = 0x20;
+const BHV2_ANIM_JUMP = 0x40;
 const BHV2_ACTOR_COLLISION = 0x80;
+
+const BHV3_LOCK_POS_X = 0x01;
+const BHV3_LOCK_POS_Y = 0x02;
+const BHV3_LOCK_POS_Z = 0x04;
+const BHV3_LOCK_DIR_H = 0x08;
+const BHV3_LOCK_DIR_V = 0x10;
 
 const DYNAMIC_ACTOR_COLLISION_SINGLE_POINT = 0;
 const DYNAMIC_ACTOR_COLLISION_TRIANGLE = 1;
@@ -25,48 +29,48 @@ const DYNAMIC_ACTOR_COLLISION_BOUNDING_BOX = 2;
 
 const PRESETS = {
   walker: {
-    flags: BHV_GRAVITY | BHV_MOVE_X | BHV_MOVE_Y | BHV_REFLECT_X,
-    flags2: BHV2_ANIM_FACE | BHV2_ANIM_IDLE | BHV2_ANIM_JUMP,
+    flags: BHV_GRAVITY_Y | BHV_REFLECT_X,
+    flags2: BHV3_LOCK_DIR_V | BHV2_ANIM_IDLE | BHV2_ANIM_JUMP,
     collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
   },
   walker_ledge: {
-    flags: BHV_GRAVITY | BHV_MOVE_X | BHV_MOVE_Y | BHV_REFLECT_X | BHV_LEDGE_STOP,
-    flags2: BHV2_ANIM_FACE | BHV2_ANIM_IDLE | BHV2_ANIM_JUMP,
+    flags: BHV_GRAVITY_Y | BHV_REFLECT_X | BHV_LEDGE_STOP,
+    flags2: BHV3_LOCK_DIR_V | BHV2_ANIM_IDLE | BHV2_ANIM_JUMP,
     collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
   },
   bouncing_ball: {
-    flags: BHV_GRAVITY | BHV_MOVE_X | BHV_MOVE_Y | BHV_REFLECT_X | BHV_REFLECT_Y,
-    flags2: BHV2_ANIM_FACE,
+    flags: BHV_GRAVITY_Y | BHV_REFLECT_X | BHV_REFLECT_Y,
+    flags2: BHV3_LOCK_DIR_V,
     collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
   },
   faller: {
-    flags: BHV_GRAVITY | BHV_MOVE_Y,
-    flags2: BHV2_ANIM_FACE | BHV2_ANIM_IDLE | BHV2_ANIM_JUMP,
+    flags: BHV_GRAVITY_Y,
+    flags2: BHV3_LOCK_POS_X | BHV3_LOCK_DIR_V | BHV2_ANIM_IDLE | BHV2_ANIM_JUMP,
     collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
   },
   slider: {
-    flags: BHV_MOVE_X | BHV_MOVE_Y | BHV_REFLECT_X,
-    flags2: BHV2_ANIM_FACE | BHV2_ANIM_IDLE,
+    flags: BHV_REFLECT_X,
+    flags2: BHV3_LOCK_DIR_V | BHV2_ANIM_IDLE,
     collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
   },
   reflector: {
-    flags: BHV_MOVE_X | BHV_MOVE_Y | BHV_REFLECT_X | BHV_REFLECT_Y,
-    flags2: BHV2_ANIM_FACE,
+    flags: BHV_REFLECT_X | BHV_REFLECT_Y,
+    flags2: BHV3_LOCK_DIR_V,
     collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
   },
   platform: {
-    flags: BHV_PLATFORM | BHV_MOVE_X | BHV_MOVE_Y,
-    flags2: 0,
+    flags: BHV_PLATFORM,
+    flags2: BHV3_LOCK_DIR_H | BHV3_LOCK_DIR_V,
     collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
   },
   wanderer: {
-    flags: BHV_MOVE_X | BHV_MOVE_Y | BHV_REFLECT_X | BHV_REFLECT_Y,
-    flags2: BHV2_ANIM_FACE_4DIR | BHV2_ANIM_IDLE,
+    flags: BHV_REFLECT_X | BHV_REFLECT_Y,
+    flags2: BHV2_ANIM_IDLE,
     collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
   },
   projectile: {
-    flags: BHV_MOVE_X | BHV_MOVE_Y,
-    flags2: BHV2_NO_TILE_COLLISION,
+    flags: BHV2_NO_TILE_COLLISION,
+    flags2: BHV3_LOCK_DIR_H | BHV3_LOCK_DIR_V,
     collisionType: DYNAMIC_ACTOR_COLLISION_SINGLE_POINT,
   },
 };
@@ -121,27 +125,19 @@ export const fields = [
     defaultValue: "walker",
   },
   {
-    key: "compGravity",
-    label: "Gravity",
-    description: "Apply gravity to the actor's vertical velocity each frame",
+    key: "compGravityY",
+    label: "Gravity Y",
+    description: "Apply gravity to Y velocity each frame",
     type: "checkbox",
     defaultValue: true,
     conditions: [{ key: "preset", eq: "custom" }],
   },
   {
-    key: "compMoveX",
-    label: "Move horizontally",
-    description: "Apply horizontal velocity with wall collision",
+    key: "compGravityZ",
+    label: "Gravity Z",
+    description: "Apply gravity to Z velocity each frame",
     type: "checkbox",
-    defaultValue: true,
-    conditions: [{ key: "preset", eq: "custom" }],
-  },
-  {
-    key: "compMoveY",
-    label: "Move vertically",
-    description: "Apply vertical velocity with floor/ceiling collision",
-    type: "checkbox",
-    defaultValue: true,
+    defaultValue: false,
     conditions: [{ key: "preset", eq: "custom" }],
   },
   {
@@ -196,18 +192,9 @@ export const fields = [
     conditions: [{ key: "preset", eq: "custom" }],
   },
   {
-    key: "animFace",
-    label: "Face move direction",
-    description: "Face left/right based on horizontal velocity",
-    type: "checkbox",
-    defaultValue: true,
-    conditions: [{ key: "preset", eq: "custom" }],
-  },
-  {
-    key: "animFace4",
-    label: "Face 4 directions (top down)",
-    description:
-      "Face up/down/left/right based on the dominant movement axis. Overrides 'Face move direction'.",
+    key: "compReflectZ",
+    label: "Bounce on z ground",
+    description: "Bounce z velocity when z position reaches ground level (otherwise stop)",
     type: "checkbox",
     defaultValue: false,
     conditions: [{ key: "preset", eq: "custom" }],
@@ -227,6 +214,36 @@ export const fields = [
     type: "checkbox",
     defaultValue: true,
     conditions: [{ key: "preset", eq: "custom" }],
+  },
+  {
+    key: "lockPositionAxes",
+    label: "Lock position axes",
+    description: "Freeze behavior-driven movement on selected position axes",
+    type: "select",
+    options: [
+      ["0", "None"],
+      [String(BHV3_LOCK_POS_X), "X"],
+      [String(BHV3_LOCK_POS_Y), "Y"],
+      [String(BHV3_LOCK_POS_Z), "Z"],
+      [String(BHV3_LOCK_POS_X | BHV3_LOCK_POS_Y), "X + Y"],
+      [String(BHV3_LOCK_POS_X | BHV3_LOCK_POS_Z), "X + Z"],
+      [String(BHV3_LOCK_POS_Y | BHV3_LOCK_POS_Z), "Y + Z"],
+      [String(BHV3_LOCK_POS_X | BHV3_LOCK_POS_Y | BHV3_LOCK_POS_Z), "X + Y + Z"],
+    ],
+    defaultValue: "0",
+  },
+  {
+    key: "lockDirectionAxes",
+    label: "Lock direction axes",
+    description: "Prevent behavior animation from changing horizontal and/or vertical facing",
+    type: "select",
+    options: [
+      ["0", "None"],
+      [String(BHV3_LOCK_DIR_H), "Horizontal"],
+      [String(BHV3_LOCK_DIR_V), "Vertical"],
+      [String(BHV3_LOCK_DIR_H | BHV3_LOCK_DIR_V), "Horizontal + Vertical"],
+    ],
+    defaultValue: "0",
   },
   {
     key: "collisionType",
@@ -297,17 +314,15 @@ export const compile = (input, helpers) => {
     flags2 = PRESETS[input.preset].flags2;
     collisionType = PRESETS[input.preset].collisionType;
   } else {
-    if (input.compGravity) flags |= BHV_GRAVITY;
-    if (input.compMoveX) flags |= BHV_MOVE_X;
-    if (input.compMoveY) flags |= BHV_MOVE_Y;
+    if (input.compGravityY || input.compGravity) flags |= BHV_GRAVITY_Y;
+    if (input.compGravityZ) flags |= BHV_GRAVITY_Z;
     if (input.compLedgeStop) flags |= BHV_LEDGE_STOP;
     if (input.compReflectX) flags |= BHV_REFLECT_X;
     if (input.compReflectY) flags |= BHV_REFLECT_Y;
+    if (input.compReflectZ) flags |= BHV_REFLECT_Z;
     if (input.compPlatform) flags |= BHV_PLATFORM;
-    if (input.compTileCollision === false) flags2 |= BHV2_NO_TILE_COLLISION;
+    if (input.compTileCollision === false) flags |= BHV2_NO_TILE_COLLISION;
     if (input.compActorCollision) flags2 |= BHV2_ACTOR_COLLISION;
-    if (input.animFace4) flags2 |= BHV2_ANIM_FACE_4DIR;
-    if (input.animFace) flags2 |= BHV2_ANIM_FACE;
     if (input.animIdle) flags2 |= BHV2_ANIM_IDLE;
     if (input.animJump) flags2 |= BHV2_ANIM_JUMP;
   }
@@ -316,7 +331,14 @@ export const compile = (input, helpers) => {
     collisionType = Number(input.collisionType);
   }
 
-  _addComment(`Define Actor Behavior (flags: ${flags}, anim: ${flags2}, collision: ${collisionType})`);
+  if (input.lockPositionAxes !== undefined) {
+    flags2 |= Number(input.lockPositionAxes);
+  }
+  if (input.lockDirectionAxes !== undefined) {
+    flags2 |= Number(input.lockDirectionAxes);
+  }
+
+  _addComment(`Define Actor Behavior (flags: ${flags}, flags2: ${flags2}, collision: ${collisionType})`);
 
   _stackPushConst(collisionType);
   _stackPushScriptValue(input.bounce || { type: "number", value: 128 });
