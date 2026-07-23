@@ -60,26 +60,6 @@ WORD new_actor_z;
 UBYTE col_tx;
 UBYTE col_ty;
 
-#ifdef DYNAMIC_ACTOR_ENABLE_ANIMATION
-static void actor_set_dir_locked(actor_t *actor, direction_e dir, UBYTE moving, UBYTE lock_flags) {
-    if (((lock_flags & BHV3_LOCK_DIR_H) && ((dir == DIR_LEFT) || (dir == DIR_RIGHT))) ||
-        ((lock_flags & BHV3_LOCK_DIR_V) && ((dir == DIR_UP) || (dir == DIR_DOWN)))) {
-        return;
-    }
-    actor_set_dir(actor, dir, moving);
-}
-#endif
-
-#ifdef DYNAMIC_ACTOR_ENABLE_PARENT
-// Previous-frame player position, used to mirror the engine-controlled
-// player's movement into its velocity fields (see dynamic_actor_update).
-static UWORD player_prev_x;
-static UWORD player_prev_y;
-#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
-static UWORD player_prev_z;
-#endif
-#endif
-
 static void dynamic_actor_execute_state_change(actor_t *actor) {
     script_event_t *event = &dynamic_actor_events[DYNAMIC_ACTOR_EVENT_STATE_CHANGE];
     if (!event->script_addr) {
@@ -163,11 +143,13 @@ void dynamic_actor_init(void) BANKED {
     dynamic_actor_event_tile_x = 0;
     dynamic_actor_event_tile_y = 0;
 #ifdef DYNAMIC_ACTOR_ENABLE_PARENT
-    player_prev_x = PLAYER.pos.x;
-    player_prev_y = PLAYER.pos.y;
+    UBYTE i;
+    for (i = 0; i != MAX_ACTORS; ++i) {
+    actors[i].prev_pos = actors[i].pos;
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
-    player_prev_z = PLAYER.pos_z;
+    actors[i].prev_pos_z = actors[i].pos_z;
 #endif
+    }
 #endif
 }
 
@@ -683,23 +665,14 @@ void dynamic_actor_update(void) BANKED {
             // The displacement is tile-collision checked: a parented actor
             // normally only checks collision when it moves itself, so
             // without this the parent actor's movement could push this
-            // actor through walls. Direction comes from the parent actor's
-            // velocity. Disabled by the behavior's 'no tile collision' option.
-            // The parent's velocity is its movement this frame; the engine-
-            // controlled player doesn't set velocity, so its live position
-            // delta is added when the player is the parent.
-            WORD parent_actor_delta_x = parent_actor->actor_vel_x;
-            WORD parent_actor_delta_y = parent_actor->actor_vel_y;
+            // actor through walls. Disabled by the behavior's
+            // 'no tile collision' option.
+            // Parenting now uses parent position delta between game loops.
+            WORD parent_actor_delta_x = (WORD)(parent_actor->pos.x - parent_actor->prev_pos.x);
+            WORD parent_actor_delta_y = (WORD)(parent_actor->pos.y - parent_actor->prev_pos.y);
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
-            WORD parent_actor_delta_z = parent_actor->actor_vel_z;
+            WORD parent_actor_delta_z = (WORD)(parent_actor->pos_z - parent_actor->prev_pos_z);
 #endif
-            if (parent_actor == &PLAYER) {
-                parent_actor_delta_x += (WORD)(PLAYER.pos.x - player_prev_x);
-                parent_actor_delta_y += (WORD)(PLAYER.pos.y - player_prev_y);
-#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
-                parent_actor_delta_z += (WORD)(PLAYER.pos_z - player_prev_z);
-#endif
-            }
             if (parent_actor_delta_x && !(flags2 & BHV3_LOCK_POS_X)) {
                 new_actor_x = actor->pos.x + parent_actor_delta_x;
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_X
@@ -726,7 +699,7 @@ void dynamic_actor_update(void) BANKED {
             }
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z            
             if (parent_actor_delta_z && !(flags2 & BHV3_LOCK_POS_Z)) {
-                new_actor_z = (WORD)actor->pos_z - parent_actor_delta_z;
+                new_actor_z = (WORD)actor->pos_z + parent_actor_delta_z;
                 if (new_actor_z < 0) {
                     actor->pos_z = 0;
                 } else {
@@ -1010,16 +983,16 @@ void dynamic_actor_update(void) BANKED {
     dynamic_actor_current_actor = NULL;
 
 #ifdef DYNAMIC_ACTOR_ENABLE_PARENT
-    // The scene-type movement code (platform, top down, adventure...) moves
-    // the player directly without touching the plugin's velocity fields, so
-    // actors parented to the player would see zero velocity and never follow.
-    // Mirror the player's position change since last frame into its velocity
-    // fields here.
-    player_prev_x = PLAYER.pos.x;
-    player_prev_y = PLAYER.pos.y;
+    {
+        actor = actors_active_tail;
+        while (actor) {
+            actor->prev_pos = actor->pos;
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
-    player_prev_z = PLAYER.pos_z;
+            actor->prev_pos_z = actor->pos_z;
 #endif
+            actor = actor->prev;
+        }
+    }
 #endif
 }
 

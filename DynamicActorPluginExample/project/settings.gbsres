@@ -99,7 +99,7 @@
   "customControlsSelect": [
     "Shift"
   ],
-  "colorMode": "mono",
+  "colorMode": "mixed",
   "colorCorrection": "default",
   "generateDebugFilesEnabled": true,
   "compilerPreset": 3000,

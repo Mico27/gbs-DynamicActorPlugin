@@ -30,15 +30,6 @@
         "__comment": false
       },
       "id": "d487764c-6582-410b-9631-b03e8de9b902"
-    },
-    {
-      "command": "EVENT_SET_ACTOR_LINKED_ACTOR",
-      "args": {
-        "actorId": "c199e0b3-b63f-4a7a-a740-eca730d4664f",
-        "linkedActorId": "92d695d5-0dcc-4629-910a-e61ac8f72c9f",
-        "__comment": false
-      },
-      "id": "a4b65c55-f2ac-4fef-801c-d56c26efd5ee"
     }
   ],
   "updateScript": [
@@ -81,5 +72,5 @@
   "coordinateType": "tiles",
   "x": 10,
   "y": 6,
-  "_index": 2
+  "_index": 5
 }

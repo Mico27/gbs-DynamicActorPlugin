@@ -66,11 +66,17 @@ typedef struct actor_t
     uint8_t actor_state;
     int8_t actor_vel_x;
     int8_t actor_vel_y;
+#ifdef DYNAMIC_ACTOR_ENABLE_PARENT
     struct actor_t *actor_parent;
+    upoint16_t prev_pos;
+#endif
 
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
     uint16_t pos_z;
     int8_t actor_vel_z;
+#ifdef DYNAMIC_ACTOR_ENABLE_PARENT
+    uint16_t prev_pos_z;
+#endif
 #endif
 
     // Linked list

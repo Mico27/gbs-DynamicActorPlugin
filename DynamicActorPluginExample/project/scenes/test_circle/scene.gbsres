@@ -90,7 +90,7 @@
         "animJumpY": false,
         "animJumpZ": false,
         "lockPositionAxes": "4",
-        "lockDirectionAxes": "16",
+        "lockDirectionAxes": "0",
         "collisionType": "0",
         "triggerStateChange": false,
         "triggerTileCollision": false,
@@ -107,7 +107,7 @@
           "type": "number",
           "value": 128
         },
-        "__collapse": true,
+        "__collapse": false,
         "__comment": false,
         "__label": "Swinging Behavior"
       },
@@ -148,9 +148,9 @@
         },
         "bounce": {
           "type": "number",
-          "value": 0
+          "value": 128
         },
-        "__collapse": true,
+        "__collapse": false,
         "__comment": false,
         "__label": "Shadow Behavior"
       },
@@ -186,7 +186,7 @@
       "args": {
         "eventSlot": "0",
         "__scriptTabs": "scriptinput",
-        "__collapse": false
+        "__collapse": true
       },
       "children": {
         "script": [
@@ -254,6 +254,30 @@
         ]
       },
       "id": "11114149-12fb-4453-9546-aac5bc9495a2"
+    },
+    {
+      "command": "EVENT_SCRIPT_UNLOCK",
+      "args": {},
+      "id": "44e07f2c-0b8e-41f8-b416-512920bf07a3"
+    },
+    {
+      "command": "EVENT_ACTOR_DEACTIVATE",
+      "args": {
+        "actorId": "04609af0-b2db-447e-b892-4fb4cbb8d889"
+      },
+      "id": "8b2e5619-de16-4cd0-8386-c4c4ddd14d40"
+    },
+    {
+      "command": "EVENT_IDLE",
+      "args": {},
+      "id": "f69a005b-a8fb-4f4e-ae43-1c82a5ded599"
+    },
+    {
+      "command": "EVENT_ACTOR_ACTIVATE",
+      "args": {
+        "actorId": "04609af0-b2db-447e-b892-4fb4cbb8d889"
+      },
+      "id": "b5c46ff4-194c-4ce6-ba3e-509433be5b45"
     }
   ],
   "autoFadeEventCollapse": true

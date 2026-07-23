@@ -1,6 +1,6 @@
 {
   "_resourceType": "actor",
-  "id": "a1bf50c6-41e5-418d-b4d5-8c76bbf67ddf",
+  "id": "abd47715-3799-4512-8c17-97d669f3fe27",
   "name": "Shadow",
   "frame": 0,
   "animate": false,
@@ -15,7 +15,7 @@
   "collisionGroup": "",
   "collisionExtraFlags": [],
   "prefabScriptOverrides": {},
-  "symbol": "actor_0",
+  "symbol": "actor_1",
   "script": [],
   "startScript": [
     {
@@ -26,17 +26,19 @@
           "type": "number",
           "value": 3
         },
-        "state": "1"
+        "state": "0",
+        "__comment": false
       },
-      "id": "9c1f4a10-d93c-4332-89b4-20331dfc9fbf"
+      "id": "32832fce-512a-4680-931a-a3a89fe84de7"
     },
     {
       "command": "EVENT_SET_ACTOR_LINKED_ACTOR",
       "args": {
         "actorId": "$self$",
-        "linkedActorId": "92d695d5-0dcc-4629-910a-e61ac8f72c9f"
+        "linkedActorId": "92d695d5-0dcc-4629-910a-e61ac8f72c9f",
+        "__comment": false
       },
-      "id": "55178b0b-e05b-4848-9a15-ce33848874f4"
+      "id": "4ace8026-2469-44f9-b299-d98ac33aeec3"
     }
   ],
   "updateScript": [],
