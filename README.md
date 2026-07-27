@@ -16,7 +16,7 @@ https://github.com/user-attachments/assets/e32d2233-d1c8-464a-ba14-fb5e5caad736
 
 1. **Define behaviors** in your scene's *On Init* script with the **Define Actor Behavior**
    event. Pick a preset or choose *Custom* and tick the components you want.
-   Each definition is stored in a numbered slot (1-8 by default).
+   Each definition is stored in a numbered slot (1-8 by default, up to 32).
 2. **Assign a slot to an actor** with **Set Actor Behavior**. Many actors can share one slot.
 3. **Give actors velocity** with **Set Actor Velocity** (or the X/Y variants) and let the
    engine handle the rest.
@@ -25,12 +25,16 @@ Behavior definitions live in working RAM and are cleared on every scene load —
 define them in each scene's init script (put the Define events in a custom script
 to share them between scenes).
 
+Units: positions and velocities are in **subpixels** — 16 subpixels = 1 pixel.
+A velocity of 16 moves the actor 1 pixel per frame. *Bounciness* is 0-255,
+where 128 keeps half the energy per bounce and 255 is a perfect bounce.
+
 ## Presets
 
 | Preset | Scene types | Components |
 |---|---|---|
 | Walker | Platformer | Gravity, moves, turns at walls, walk/idle/jump animations |
-| Walker (avoid ledges) | Platformer | Same, plus turns around at ledges instead of falling |
+| Walker (turns at ledges) | Platformer | Same, plus turns around at ledges instead of falling |
 | Bouncing ball | Platformer | Gravity, bounces off walls, floor and ceiling with damping |
 | Falling object | Platformer | Gravity, vertical movement only |
 | Moving platform | Any | Moves by velocity and carries every actor (or the player) that touches it — auto-parents on contact, releases on separation |
@@ -39,35 +43,46 @@ to share them between scenes).
 | Reflector | Any | No gravity, bounces off everything (set Bounciness 255) |
 | Projectile | Shmup / any | Moves by velocity straight through walls (no tile collision) |
 
-Chasing, fleeing and homing are **not presets** — they are waitable events that steer a
-behavior's velocity: use **Actor Chase Actor** (chase/flee at the actor's movement
-speed) or **Actor Motion: Home At Target** (smooth angular homing). Followers and
+Chasing, fleeing and homing are **not presets** — chase/flee is the waitable **Actor Chase
+Actor** event that steers a behavior's velocity toward or away from a target. Followers and
 attachments are done with **parent actors** (see below).
 
 ## Custom components
 
+Choosing the **Custom** preset exposes the component checkboxes below. There is no
+per-behavior "move on X/Y" toggle — an actor always moves by its velocity on both axes
+(subject to the engine's *Move horizontally / Move vertically* compile components).
+Use **Lock position axes** to freeze behavior-driven movement on an axis for a slot.
+
 | Component | Effect |
 |---|---|
-| Gravity | Adds *Gravity* to Y velocity each frame, clamped to *Max fall speed* |
-| Move horizontally | Applies X velocity with wall collision |
-| Move vertically | Applies Y velocity with floor/ceiling collision |
+| Gravity Y | Adds *Gravity* to Y velocity each frame, clamped to *Max fall speed* |
+| Gravity Z | Adds *Gravity* to Z velocity instead (topdown jump/height — needs *Topdown Z axis*) |
 | Tile collision | On by default. Untick to move through walls/floors (ghosts, flying pickups); turning, bouncing, ledge stop and landing are skipped too — gravity actors fall forever |
 | Collide with other actors | Off by default. On contact with another collidable actor (player excluded — the engine already handles it) the frame's movement is blocked and the actor turns/bounces per its *Turn at walls* / *Bounce* settings. Costs one overlap check per on-screen actor each frame |
-| Moving platform | Claims every actor this actor touches as a child (they inherit its movement) and releases them when they stop touching. Skips actors that already have a different parent and — if this actor has a collision group set — actors in a different group. Combine with Move horizontally/vertically so the platform itself moves |
+| Moving platform | Claims every actor this actor touches as a child (they inherit its movement) and releases them when they stop touching. Skips actors that already have a different parent and — if this actor has a collision group set — actors in a different group. Combine movement so the platform itself moves |
 | Turn at ledges | While grounded, ledges act like walls (smart ledge detection) |
 | Turn at walls | Wall hit reverses X velocity (unticked: stops instead) |
 | Bounce on floor/ceiling | Floor/ceiling hit reflects Y velocity scaled by *Bounciness* (unticked: stops) |
-| Face move direction / Idle when stopped / Jump animation in air | Automatic animation handling |
-| Face 4 directions | Face up/down/left/right based on the dominant movement axis — for top down / adventure actors |
+| Bounce on z ground | Z hit against ground level reflects Z velocity scaled by *Bounciness* (topdown) |
+| Jump animation in air (y / z axis) | Play the jump animation while airborne on the Y axis (platformer) or Z axis (topdown) |
 
-Each behavior also picks its own **Tile collision type**: *Origin point (fastest)*,
-*Triangle* or *Bounding box*. Different slots can use different models — give the
-fast model to swarms and the accurate one to the few actors that need it. (Only the
-models enabled in engine settings are compiled into the ROM — see below.)
+These options are shown for **every** behavior (preset or custom):
 
-Units: positions and velocities are in **subpixels** — 16 subpixels = 1 pixel.
-A velocity of 16 moves the actor 1 pixel per frame. *Bounciness* is 0-255,
-where 128 keeps half the energy per bounce and 255 is a perfect bounce.
+| Option | Effect |
+|---|---|
+| Lock position axes | Freeze behavior-driven movement on any of X / Y / Z (or combinations) — e.g. a rail that only slides horizontally |
+| Lock direction axes | Stop the automatic animation from changing the horizontal and/or vertical facing |
+| Tile collision type | Collision model for this slot: *Origin point (fastest)*, *Triangle*, or *Bounding box* |
+| Gravity | Acceleration in subpixels/frame added while airborne (default 8) |
+| Max fall speed | Terminal velocity in subpixels/frame (default 64) |
+| Bounciness | Energy kept per bounce, 0-255 (used with the Bounce components) |
+| Trigger … event flags | Enable the actor-event callbacks — see [Actor event callbacks](#actor-event-callbacks) |
+| Trigger other actors' On Hit / Activate triggers | Let the actor hurt actors or fire triggers — see [Triggering other actors and triggers](#triggering-other-actors-and-triggers) |
+
+Different slots can use different collision models — give the fast *Origin point* model to
+swarms and the accurate *Bounding box* to the few actors that need it. Only the models
+enabled in engine settings are compiled into the ROM (see below).
 
 ## Parent actors (followers / moving platforms)
 
@@ -128,6 +143,40 @@ Details (velocity/delta modes):
   At most *Max moving platforms* (engine setting, default 2) platforms can claim
   riders in a scene.
 
+## Topdown Z axis
+
+Enable the **Topdown Z axis** engine setting to give actors a **Z position and Z velocity**
+(height above the ground) in top-down / adventure scenes. With it on:
+
+- Gravity can be applied to **Z instead of Y** (use the *Gravity Z* component), so an
+  actor can hop straight up and fall back to the floor without moving on the map.
+- *Bounce on z ground* and *Jump animation in air on z axis* handle the landing bounce
+  and the airborne pose.
+- Read and write height with **Get/Set actor z position** and **Get/Set actor z velocity**.
+
+This is how you build a top-down jump (hopping slime, thrown pot, Zelda-style leap)
+without a platformer scene. The Z fields cost 3 bytes of RAM per actor and are only
+compiled when the setting is on.
+
+## Actor event callbacks
+
+A behavior can run a **script of your own** when certain engine events happen to the
+actor — a state change, a tile collision on any side, or entering a new tile. Wire it up
+in two places:
+
+1. In **Define Actor Behavior**, tick the matching *Trigger … event* flag for the slot
+   (*Trigger state change event*, *Trigger tile collision (top / right / bottom / left)
+   event*, *Trigger tile enter event*).
+2. **Attach a Script to a Dynamic Actor Event** to register the script that runs when that
+   event fires, and **Remove a Script from a Dynamic Actor Event** to clear it. Slots:
+   *State change*, *Tile collision (Top / Right / Bottom / Left / Any)*, *Tile enter*.
+
+Before the callback runs, the plugin fills in engine fields describing what happened, so
+the script can branch on them: **Event actor index** (`dynamic_actor_event_actor_idx`),
+**Event behavior index**, **Event state**, **Event tile collision** value, and **Event
+tile x / y**. Use these for footstep sounds on tile-enter, damage/landing reactions on a
+specific-side collision, or state-driven animation swaps — all without polling per frame.
+
 ## Triggering other actors and triggers
 
 By default only the **player** can set off an actor's On Hit script or a scene trigger.
@@ -165,24 +214,28 @@ actors resume that behavior. The example project's Platform Movers cannon uses b
 
 | Event | Purpose |
 |---|---|
-| Define Actor Behavior | Create/overwrite a behavior slot (preset or custom components + physics params + tile collision type) |
+| Define Actor Behavior | Create/overwrite a behavior slot (preset or custom components + physics params + tile collision type + trigger flags) |
 | Set Actor Behavior | Assign a slot to an actor and set its initial state (grounded / airborne / paused / keep) |
+| Get Actor Behavior | Read an actor's current slot into a variable |
 | Set Actor Velocity | Set X and Y velocity together |
-| Set Actor X/Y Velocity | Set one axis |
+| Set Actor X / Y Velocity | Set one axis |
+| Set Actor Velocity By Angle | Set both velocities from an angle (0 = up, 90 = right) and speed |
+| Set / Get Actor State | 0 = paused, 1 = grounded, 2 = airborne (auto-managed by gravity behaviors) |
+| Set / Get Actor Z Position, Set / Get Actor Z Velocity | Read/write actor height (needs *Topdown Z axis*) |
 | Set Actor Parent Actor | Parent this actor to another (it inherits the parent's movement each frame) |
 | Clear Actor Parent Actor | Detach the actor from its parent |
-| Set/Get Actor State | 0 = paused, 1 = grounded, 2 = airborne (auto-managed by gravity behaviors) |
-| Get Actor Behavior | Read an actor's current slot into a variable |
 | Get Tile Collision | Read the collision tile value at a tile coordinate into a variable |
 | Get Actor Collision | Find the first collidable actor at a pixel position (index, or -1 for none) |
+| Attach a Script to a Dynamic Actor Event | Register a script to run when a behavior's state-change / tile-collision / tile-enter event fires |
+| Remove a Script from a Dynamic Actor Event | Clear an attached script slot |
 
 All numeric event inputs accept variables and expressions, so behavior parameters and
 velocities can be driven by game state at runtime.
 
-The Set/Get Behavior, Velocity, State, Parent and Wait For Actor Collision events also
-have a **By Index** variant that takes a raw actor index (script value) instead of an
-actor picker, for addressing actors dynamically (e.g. pool actors spawned via
-`gbs-SpawnPoolActorPlugin`).
+Many events also have a **By Index** variant that takes a raw actor index (script value)
+instead of an actor picker, for addressing actors dynamically (e.g. pool actors spawned
+via `gbs-SpawnPoolActorPlugin`): *Set/Get Behavior*, *Set Velocity*, *Set X/Y Velocity*,
+*Set/Get State*, *Set Parent Actor*, and *Wait For Actor Collision*.
 
 ## Motion library events
 
@@ -190,11 +243,12 @@ A library of ready-made movement patterns built on top of the behavior system. E
 event drives an actor's velocity over time (with waits in between), so they are meant
 to run in a script that is allowed to wait: an actor's **update script**, a scene
 **On Init** thread, or any looping script. Except where noted, one event = **one cycle
-of the pattern** — put it inside a *Loop* event to repeat it forever, or chain
-different motion events after another to build custom sequential movement (e.g.
-*accelerate → zig zag → swoop*). The actor still needs a behavior with the matching
-move components assigned (the events only steer velocities; the behavior applies them
-with collision, gravity, animation etc.).
+of the pattern** — put it inside a *Loop* event to repeat it forever, or chain different
+motion events after another to build custom sequential movement. The actor still needs a
+behavior assigned; these events only steer velocities, and the behavior applies them with
+collision, gravity and animation. "Move X / Y" in the table means the actor is free to
+move on that axis (the default — the engine move component is compiled and the axis isn't
+locked by the behavior).
 
 All velocities are in subpixels per frame, **32 subpixels = 1 pixel/frame**, engine
 range **±127** (≈4 px/frame). The wave events automatically scale their pattern down
@@ -206,53 +260,38 @@ to the fastest wave that fits that range.
 | Actor Move To Position By Velocity | Waitable move to a destination driven by behavior velocity — like *Actor Move To*, but with physics. Axis order or diagonal, optional *Direct to point* angle steering for smooth non-45° diagonals, *Relative* targets with unit snapping, *Cancel on collision* to give up when blocked | Move X / Move Y |
 | Actor Motion: Sine Wave | Smooth oscillation on one axis (floaters, wavy flyers). Set the other axis' velocity separately for a serpentine course | Move X / Move Y |
 | Actor Motion: Circle / Arc | Full circles or partial arcs (orbiters, loop-the-loop, u-turns) | Move X + Move Y (usually tile collision off) |
-| Actor Motion: Zig Zag | Straight legs alternating direction on one or both axes | Move X + Move Y |
 | Actor Motion: Bezier | Follow a quadratic (3-point) or cubic (4-point) Bezier curve baked into the script at compile time — control points in pixels relative to the start. *Cycles* and *Stop at end* like the wave events | Move X + Move Y |
-| Actor Motion: Bezier (Variable) | As Bezier, but runtime-driven: control points/step are script values, and the actor traces the curve at its **own movement speed**, waiting for the actor to catch up to each curve sample (so tile collision can slow or block it) | Move X + Move Y |
 | Actor Motion: Swoop | Eased dive-then-climb on Y (bat/keese dive; combine with an X velocity to swoop while flying) | Move Y, no gravity |
-| Actor Motion: Accelerate / Decelerate | Ramp one axis' velocity to a target at a given acceleration (0 = brake to a stop) | Move X / Move Y |
-| Actor Motion: Hop | Jump with horizontal travel (fixed direction or toward/away from an actor), wait for landing, rest | Gravity + Move X + Move Y |
-| Actor Motion: Thwomp Slam | Watch for a target overhead-crusher style: slam down to the floor, pause, rise back to the ceiling | Move Y, no gravity |
 | Actor Motion: Charge At Target | Wait until row/column-aligned with a target, dash at it, stop on impact (optionally at ledges / other actors) | Move on the dash axis |
-| Actor Motion: Random Wander Step | Pick a random 4-way direction, walk, pause (top-down NPC wander with full script control) | Move X + Move Y |
-| Set Actor Velocity By Angle | One-shot: set both velocities from an angle (0 = up, 90 = right) and speed | Move X + Move Y |
-| Wait For Actor In Range | Block until another actor is inside (or outside) an X/Y pixel range — the generic proximity trigger | any |
-| Wait For Actor State | Block until grounded / airborne / paused (e.g. wait for landing) | Gravity behaviors for grounded/airborne |
-| Wait For Actor Collision | Block until the actor hits a wall, floor/ceiling, pit or another actor | matching move components |
 | Actor Motion: Wall Crawl | Crawl along walls/ceilings/floors and wrap around corners, Zelda-Spark style (right- or left-hand wall follower, runs forever). Backed by the `vm_actor_crawl_step` engine native; fully solid tiles count as wall, map borders included | Move X + Move Y, tile collision off |
-| Actor Motion: Sine Wave (Variable) | As Sine Wave, but amplitude/period/duration are script values (variables, expressions), driven at runtime by the engine sine table | Move X / Move Y |
-| Actor Motion: Circle (Variable) | As Circle, but radius/duration are script values and the actor orbits at its **own movement speed**. Runs entirely in the `vm_actor_motion_circle_variable` engine native: each update it re-derives the orbital angle from the actor's actual position around the circle center (atan2) and steers toward a point ahead on the circle — the orbit self-corrects, so walls or pushes bend the path instead of displacing the whole circle | Move X + Move Y |
-| Actor Motion: Home At Target | True angular homing: constant flight speed, heading turns toward the target at a limited turn rate (256ths of a turn per update) for smooth curved pursuit. Speed/turn rate/duration are script values | Move X + Move Y (tile collision off for missiles) |
+
+Blocking helpers (pair them with a matching behavior or they wait forever):
+
+| Event | Blocks until |
+|---|---|
+| Wait For Actor In Range | Another actor is inside (or outside) an X/Y pixel range — the generic proximity trigger |
+| Wait For Actor State | The actor is grounded / airborne / paused (e.g. wait for landing — needs a gravity behavior) |
+| Wait For Actor Collision | The actor hits a wall, floor/ceiling, pit or another actor (needs matching move components) |
 
 Notes:
 
-- **Sine / Circle / Swoop / Zig Zag / Bezier** bake a quantized velocity table into the
-  script at compile time, so their shape fields (amplitude, period, radius, control
-  points…) are fixed numbers, not variables. The tables are drift-corrected: a full
-  cycle displaces the actor by exactly zero, so they can loop forever without wandering
-  off. Script size grows with `period / update interval` (capped at 64 velocity steps
-  per cycle).
-- **Sine / Circle / Zig Zag / Bezier** have a *Cycles* field (0 = repeat forever inside
-  the event) and a *Stop at end* checkbox — untick it to chain seamlessly into the next
-  motion event without a velocity hiccup.
-- The runtime events (**Chase, Move To Position, Ramp, Hop, Thwomp, Charge, Wander,
-  the Waits**) poll each frame with `idle`, so they cost one native call per frame per
-  waiting actor at most.
-- The waits never time out on their own; pair them with sensible behaviors (e.g. *Wait
-  For Actor State: grounded* needs a gravity behavior or it waits forever).
+- **Sine / Circle / Swoop / Bezier** bake a quantized velocity table into the script at
+  compile time, so their shape fields (amplitude, period, radius, control points…) are
+  fixed numbers, not variables. The tables are drift-corrected: a full cycle displaces
+  the actor by exactly zero, so they can loop forever without wandering off. Script size
+  grows with `period / update interval` (capped at 64 velocity steps per cycle).
+- **Sine / Circle / Bezier** have a *Cycles* field (0 = repeat forever inside the event)
+  and a *Stop at end* checkbox — untick it to chain seamlessly into the next motion event
+  without a velocity hiccup.
+- The runtime events (**Chase, Move To Position, Charge**, the **Waits**) poll each frame
+  with `idle`, so they cost one native call per frame per waiting actor at most.
 - **Wall Crawl** moves in 8px cell steps; its speed is snapped to 1/2/4/8/16/32/64 so
   turn decisions always happen exactly on cell boundaries. Place the crawler on an
   8px-aligned tile next to a wall (tile coordinates in the editor are always aligned).
   With no wall in reach it walks in a small circle until it finds one.
-- **Chase**, **Move To Position By Velocity**, **Circle (Variable)** and **Bezier
-  (Variable)** move at the actor's **movement speed** (the standard actor speed
-  setting) — change it with the stock *Actor Set Movement Speed* event.
-- The **Variable** wave events and **Home At Target** evaluate their script-value
-  fields when the event starts and support a *Duration* (0 = forever).
-  Amplitude/radius accepts 1-160 px; the Sine Wave (Variable) speed is capped at
-  ±127 subpx/frame at runtime.
-- **Home At Target** with *Aim at target on start* off launches at the fixed angle and
-  curves in from there — launch away from the player for a boomerang-style pass.
+- **Chase** and **Move To Position By Velocity** move at the actor's **movement speed**
+  (the standard actor speed setting) — change it with the stock *Actor Set Movement
+  Speed* event.
 
 Recipe examples (update script of the enemy, everything inside a Loop event):
 
@@ -261,26 +300,16 @@ Recipe examples (update script of the enemy, everything inside a Loop event):
   (or just use walker behavior + *Turn at walls* for the no-pause version).
 - **Ground chaser / fleer**: behavior = walker (gravity) or slider (top down);
   update script = *Actor Chase Actor* with stop range 0.
-- **Thwomp**: behavior = Move Y only; loop *Thwomp Slam*.
 - **Keese / crow swoop**: behavior = Move X + Move Y, tile collision off; loop
-  { Wait For Actor In Range → Accelerate X toward player → Swoop → Accelerate X to 0 }.
-- **Hopping slime**: behavior = walker (gravity); loop { Hop toward player }.
+  { Wait For Actor In Range → Set X Velocity toward player → Swoop → Set X Velocity 0 }.
 - **Spiked-beetle charger**: behavior = Move X (+ ledge stop); loop
   { Charge At Target (horizontal) → Wait 60 }.
-- **Podoboo / lava jump**: behavior = gravity + Move Y, tile collision off; loop
-  { Set Y Velocity -160 → Wait For Actor State: grounded... } or gravity + collision
-  and { Set Y Velocity → Hop in place }.
 - **Sinusoidal shmup enemy**: behavior = projectile preset; Set X Velocity -24, then
   Sine Wave on Y, cycles 0.
 - **Spark / wall hugger (Zelda dungeons)**: behavior = Move X + Move Y, tile collision
   off; update script = just the Wall Crawl event.
-- **Homing missile**: behavior = projectile preset (tile collision off); spawn via
-  `gbs-SpawnPoolActorPlugin`, update script = Home At Target with duration ~180 and low
-  turn rate, then Deactivate.
-- **Swooping curved dive**: Bezier (Variable) with P1/P2 shaping the arc — the control
-  points are script values, so the same event can dive at the player's current position.
-- **Difficulty-scaled flyer**: store amplitude/period in variables, use Sine Wave
-  (Variable) — one event serves every difficulty setting.
+- **Top-down hop**: enable *Topdown Z axis*; behavior = Gravity Z + Bounce on z ground;
+  loop { Set Z Velocity (up) → Wait For Actor State: grounded → Wait }.
 
 ## Engine settings (Settings → Engine fields)
 
@@ -294,6 +323,7 @@ Group **Dynamic actor**:
 | Enable slope collision | Off | Slope tile support (needs slope collision tiles) |
 | Max behavior slots | 8 | Slider (1-32). Each slot costs 8 bytes of RAM |
 | Max moving platforms | 2 | Slider (1-8). How many *Moving platform* actors can claim/release riders per scene; each costs 12 bytes of RAM. Platforms past the limit still move but never pick up riders |
+| Topdown Z axis | Off | Enable actor Z position/velocity fields and apply gravity to Z instead of Y (topdown jump/height). See [Topdown Z axis](#topdown-z-axis) |
 | Platforms attach the player only | Off | When on, a *Moving platform* only auto-attaches the player on contact; other actors are ignored (they can still be parented explicitly). Also skips the per-frame claim test on every non-player actor. Only shown when *Parent actors* is enabled |
 | Parenting mode | Apply all parents positions delta | How a parented actor follows its parent (see [Parenting mode](#parenting-mode-engine-setting)): *Static parenting* (rigid offset, no physics, fastest), *Inherit first parent velocity* (carried by direct parent's velocity, runs own physics), or *Apply all parents positions delta* (summed chain delta, follows any parent incl. the player, runs own physics). Only shown when *Parent actors* is enabled |
 
@@ -304,10 +334,10 @@ compiled into the ROM. Uncheck the models none of your behaviors use to save ROM
 ### Modular components
 
 Every physics/animation part of the engine is an independently compiled component.
-**All are enabled by default.** Uncheck the ones your game never uses to strip that
-code out of the ROM entirely (`#ifdef`-guarded at compile time). For example, a game
-that only needs falling objects can keep *Gravity* + *Move vertically* and disable the
-rest.
+**All are enabled by default** (except *Topdown Z axis* and *Slope collision*). Uncheck
+the ones your game never uses to strip that code out of the ROM entirely
+(`#ifdef`-guarded at compile time). For example, a game that only needs falling objects
+can keep *Gravity* + *Move vertically* and disable the rest.
 
 | Component setting | Removes when unchecked |
 |---|---|
@@ -340,6 +370,13 @@ Notes:
   still used in a script *will* fail at link time — remove the events first.
 - Gravity is only visible together with *Move vertically*.
 - *Turn at ledges* requires *Move horizontally*; *Bounce* requires *Move vertically*.
+
+## Compatibility with other plugins
+
+The plugin ships `engineAlt` variants so it can coexist with other engine-file plugins.
+GBS auto-selects the matching variant when you also have any combination of
+**ContinuousScenePlugin**, **ScreenScrollPlugin**, **MetaTilePlugin** and
+**SceneStackExPlugin** installed — no manual step needed.
 
 ## Performance notes
 
