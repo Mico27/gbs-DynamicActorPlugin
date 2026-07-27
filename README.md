@@ -372,9 +372,38 @@ Notes:
 - Scenes that never define a *Moving platform* behavior and never set a parent skip the
   entire end-of-frame parenting pass (claiming + position snapshots) — the parent
   component then costs one flag test per frame.
-- RAM: 8 bytes × (slots + 1) for the behavior table (72 bytes at default), 12 bytes ×
-  *Max moving platforms* (+1) for the platform cache (25 bytes at default), plus
-  per-actor velocity/behavior/state/parent fields (more with the Z axis enabled).
-  The per-actor position snapshot (4 bytes, +2 with the Z axis) is only compiled in
-  the *Apply all parents positions delta* parenting mode — the static and velocity
-  modes don't keep it, saving that RAM on every actor.
+
+## RAM (WRAM) usage
+
+All of the plugin's state lives in WRAM. How much it consumes depends on which
+components are enabled and on the two slider settings. Per-actor costs are multiplied by
+`MAX_ACTORS` (**21**, the engine's fixed actor-array size — active *and* inactive slots).
+
+| What | Size | Present when |
+|---|---|---|
+| Behavior table | 8 B × (behavior slots + 1) → **72 B** (8 slots) … **264 B** (32 slots) | always |
+| Core globals (event fields, callback table, scratch) | **44 B** | always |
+| Per actor: behavior id + state + X/Y velocity | 4 B × 21 = **84 B** | always |
+| Per actor: parent pointer | 2 B × 21 = **42 B** | *Parent actors* |
+| Platform cache | 12 B × *Max moving platforms* → **24 B** (2) … **96 B** (8) | *Parent actors* |
+| Parent flag + counter | **2 B** | *Parent actors* |
+| Per actor: position snapshot | 4 B × 21 = **84 B** (+2 B × 21 = **42 B** with Z axis) | *Parent actors* **and** parenting mode = *Apply all parents positions delta* |
+| Player position snapshot | 4 B (+2 B with Z axis) | *Parent actors* **and** parenting mode = *Inherit first parent velocity* |
+| Per actor: Z position + Z velocity | 3 B × 21 = **63 B** | *Topdown Z axis* |
+| Z scratch | **2 B** | *Topdown Z axis* |
+| Slope scratch | **1 B** | *Slope collision* (with triangle/bounding-box model) |
+| Per actor: last-trigger index | 1 B × 21 = **21 B** | *Actors activate triggers* |
+
+**Totals:**
+
+- **Default configuration** (Parent actors on, *delta* parenting mode, Z axis off, slope
+  off, triggers on, 8 behavior slots, 2 platforms): **≈ 373 B**.
+- **Everything enabled** (all components on, *delta* mode, Z axis on, slope on, 32
+  behavior slots, 8 platforms): **≈ 745 B** — the plugin's maximum WRAM footprint.
+- **Leanest** (all optional components off, 8 slots): **≈ 200 B**.
+
+For reference, a stock GB Studio 4.3.0 project has roughly **850 B** of WRAM free, so even
+the maximum configuration fits, though it leaves little headroom — trim behavior slots,
+platforms, and unused components to reclaim space. Choosing the *static* or *velocity*
+parenting mode instead of *delta* also drops the per-actor position snapshot (84 B, or
+126 B with the Z axis).
