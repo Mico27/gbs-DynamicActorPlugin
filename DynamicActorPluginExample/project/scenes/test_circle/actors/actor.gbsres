@@ -12,113 +12,59 @@
   "paletteId": "",
   "isPinned": false,
   "persistent": true,
-  "collisionGroup": "",
+  "collisionGroup": "1",
   "collisionExtraFlags": [],
   "prefabScriptOverrides": {},
   "symbol": "actor_0",
   "script": [],
-  "startScript": [
+  "startScript": [],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": [
     {
-      "command": "EVENT_SET_ACTOR_BEHAVIOR",
+      "command": "EVENT_TEXT",
       "args": {
-        "actorId": "$self$",
-        "behaviorId": {
-          "type": "number",
-          "value": 2
-        },
-        "state": "1"
+        "text": [
+          "Circle actor hit \nplatform actor"
+        ],
+        "__section": "text",
+        "avatarId": "",
+        "minHeight": 4,
+        "maxHeight": 7,
+        "textX": 1,
+        "textY": 1,
+        "textHeight": 5,
+        "position": "bottom",
+        "clearPrevious": true,
+        "showFrame": "true",
+        "speedIn": -1,
+        "speedOut": -1,
+        "closeWhen": "key",
+        "closeButton": "a",
+        "closeDelayTime": 0.5,
+        "closeDelayFrames": 30
       },
-      "id": "be740d9b-9eaf-4b63-a5b6-e774559aa27c"
-    }
-  ],
-  "updateScript": [
-    {
-      "command": "EVENT_ACTOR_MOVE_TO_POSITION_BY_VELOCITY",
-      "args": {
-        "__section": "options",
-        "actorId": "$self$",
-        "targetX": {
-          "type": "number",
-          "value": 17
-        },
-        "targetY": {
-          "type": "number",
-          "value": 5
-        },
-        "cancelOnCollision": false,
-        "relative": false,
-        "directToPoint": true,
-        "moveType": "horizontal"
-      },
-      "id": "ac28d589-e740-4d29-92dd-99c7fe2fe936"
+      "id": "4dc8380d-eaa7-4ae4-ac8c-fad7a8632dc8"
     },
     {
-      "command": "EVENT_ACTOR_MOVE_TO_POSITION_BY_VELOCITY",
+      "command": "EVENT_WAIT",
       "args": {
-        "__section": "options",
-        "actorId": "$self$",
-        "targetX": {
+        "time": {
           "type": "number",
-          "value": 3
+          "value": 0.5
         },
-        "targetY": {
-          "type": "number",
-          "value": 2
-        },
-        "cancelOnCollision": false,
-        "relative": false,
-        "directToPoint": true,
-        "moveType": "horizontal"
-      },
-      "id": "8dbf67ca-9b4e-48df-bdac-e9de300d6ac0"
-    },
-    {
-      "command": "EVENT_ACTOR_MOVE_TO_POSITION_BY_VELOCITY",
-      "args": {
-        "__section": "options",
-        "actorId": "$self$",
-        "targetX": {
-          "type": "number",
-          "value": 2
-        },
-        "targetY": {
-          "type": "number",
-          "value": 6
-        },
-        "cancelOnCollision": false,
-        "relative": false,
-        "directToPoint": true,
-        "moveType": "horizontal"
-      },
-      "id": "e1bf2768-a6f4-435c-8fa6-ffd96c908981"
-    },
-    {
-      "command": "EVENT_ACTOR_MOVE_TO_POSITION_BY_VELOCITY",
-      "args": {
-        "__section": "options",
-        "actorId": "$self$",
-        "targetX": {
-          "type": "number",
-          "value": 2
-        },
-        "targetY": {
+        "frames": {
           "type": "number",
           "value": 16
         },
-        "cancelOnCollision": false,
-        "relative": false,
-        "directToPoint": true,
-        "moveType": "horizontal",
-        "__collapse": false
+        "units": "frames"
       },
-      "id": "c43b0031-e4a1-4080-825c-be4eb440a402"
+      "id": "4096772e-1216-4c99-80e5-6ab0918072bc"
     }
   ],
-  "hit1Script": [],
-  "hit2Script": [],
-  "hit3Script": [],
   "coordinateType": "tiles",
-  "x": 2,
-  "y": 16,
+  "x": 15,
+  "y": 10,
   "_index": 2
 }

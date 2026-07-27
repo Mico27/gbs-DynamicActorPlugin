@@ -29,6 +29,8 @@ const BHV_EVENT_TILE_COLLISION_RIGHT = 0x04;
 const BHV_EVENT_TILE_COLLISION_BOTTOM = 0x08;
 const BHV_EVENT_TILE_COLLISION_LEFT = 0x10;
 const BHV_EVENT_TILE_ENTER = 0x20;
+const BHV_EVENT_HIT_ACTORS = 0x40;
+const BHV_EVENT_ACTIVATE_TRIGGERS = 0x80;
 
 const DYNAMIC_ACTOR_COLLISION_SINGLE_POINT = 0;
 const DYNAMIC_ACTOR_COLLISION_TRIANGLE = 1;
@@ -307,6 +309,22 @@ export const fields = [
     defaultValue: false,
   },
   {
+    key: "triggerHitActors",
+    label: "Trigger other actors' On Hit on collision",
+    description:
+      "When an actor with this behavior collides with another collidable actor, run that actor's On Hit script, passing this actor's collision group (so the On Hit script can branch on who hit it, exactly like the player's hit script). This actor must have a collision group set to deal hits. The engine normally only does this for the player. Requires the 'Trigger other actors' On Hit' engine component.",
+    type: "checkbox",
+    defaultValue: false,
+  },
+  {
+    key: "activateTriggers",
+    label: "Activate triggers on enter/leave",
+    description:
+      "Let an actor with this behavior fire a trigger's On Enter / On Leave scripts as it moves in and out of the trigger (the engine normally only does this for the player). Requires the 'Actors activate triggers' engine component.",
+    type: "checkbox",
+    defaultValue: false,
+  },
+  {
     key: "gravity",
     label: "Gravity",
     description: "Acceleration in subpixels per frame (position units: 16 subpixels = 1 pixel)",
@@ -405,6 +423,12 @@ export const compile = (input, helpers) => {
   }
   if (input.triggerTileEnter) {
     eventFlags |= BHV_EVENT_TILE_ENTER;
+  }
+  if (input.triggerHitActors) {
+    eventFlags |= BHV_EVENT_HIT_ACTORS;
+  }
+  if (input.activateTriggers) {
+    eventFlags |= BHV_EVENT_ACTIVATE_TRIGGERS;
   }
 
   _addComment(`Define Actor Behavior (flags: ${flags}, flags2: ${flags2}, collision: ${collisionType}, eventFlags: ${eventFlags})`);

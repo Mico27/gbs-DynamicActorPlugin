@@ -64,9 +64,11 @@
           "type": "number",
           "value": 140
         },
-        "__collapse": true,
+        "__collapse": false,
         "__comment": false,
-        "__label": "Circling Behavior"
+        "__label": "Circling Behavior",
+        "triggerHitActors": true,
+        "activateTriggers": true
       },
       "id": "8e148a02-f2fa-44d5-9f63-6f5e7369eb65"
     },

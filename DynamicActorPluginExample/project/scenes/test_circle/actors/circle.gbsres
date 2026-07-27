@@ -12,7 +12,7 @@
   "paletteId": "",
   "isPinned": false,
   "persistent": true,
-  "collisionGroup": "1",
+  "collisionGroup": "3",
   "collisionExtraFlags": [],
   "prefabScriptOverrides": {},
   "symbol": "actor_8",

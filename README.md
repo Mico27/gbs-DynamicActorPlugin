@@ -144,6 +144,31 @@ Details (velocity/delta modes):
   At most *Max moving platforms* (engine setting, default 2) platforms can claim
   riders in a scene.
 
+## Triggering other actors and triggers
+
+By default only the **player** can set off an actor's On Hit script or a scene trigger.
+Two per-behavior options in **Define Actor Behavior** let a dynamic actor do it too.
+
+In both cases the triggering actor's index is written to the **Event actor index**
+engine field (`dynamic_actor_event_actor_idx`) right before the script runs, so the
+fired On Hit / trigger script can read it to find out which actor set it off. The field
+is reset to 0 at the start of every frame.
+
+- **Trigger other actors' On Hit on collision** — when an actor with this behavior
+  overlaps another collidable actor, it runs that actor's **On Hit** script, passing
+  **this actor's collision group** so the On Hit script can branch on who hit it — the
+  same way the engine passes an attacker's group to the player's hit script. The actor
+  must have a collision group set to deal hits (a group-less actor deals none). Only the
+  **first** overlapping actor is hit per frame, and that target won't be re-triggered
+  until its previous On Hit script finishes. The player is skipped (the engine already
+  handles player contact). Good for enemy-on-enemy damage, thrown objects, or projectiles
+  that share the actor pool. Requires the *Trigger other actors' On Hit* engine component.
+- **Activate triggers on enter/leave** — an actor with this behavior fires a trigger's
+  **On Enter** / **On Leave** scripts as it moves in and out of the trigger, just like
+  the player does. Each actor tracks its own current trigger (one byte of RAM per actor),
+  independent of the player. The player is skipped here (the engine drives its own
+  trigger activation). Requires the *Actors activate triggers* engine component.
+
 ## Spawning actors
 
 Runtime actor spawning (pooled bullets, cannons, random off-screen spawns) lives in the
@@ -310,6 +335,8 @@ rest.
 | Component: Bounce on floor/ceiling | Bounce physics |
 | Component: Parent actors / moving platforms | Parent-actor inheritance **and** the Moving platform component |
 | Component: Collide with other actors | Actor-vs-actor collision blocking |
+| Component: Trigger other actors' On Hit | Firing a collided actor's On Hit script on contact |
+| Component: Actors activate triggers | Actor-driven trigger On Enter/On Leave (also frees 1 byte/actor of RAM) |
 | Component: Animation handling | Automatic face/idle/jump animation |
 
 The scripting natives are toggleable the same way — uncheck the ones no script in

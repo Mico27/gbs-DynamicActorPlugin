@@ -104,6 +104,10 @@
     {
       "id": "DYNAMIC_ACTOR_ENABLE_VM_MOTION_CRAWL_STEP",
       "value": 1
+    },
+    {
+      "id": "DYNAMIC_ACTOR_PLATFORM_PLAYER_ONLY",
+      "value": 0
     }
   ]
 }

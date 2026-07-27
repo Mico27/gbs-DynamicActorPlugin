@@ -1,0 +1,187 @@
+{
+  "_resourceType": "trigger",
+  "id": "d1d3510f-5bdb-42eb-8b7c-77341056ddd3",
+  "name": "",
+  "prefabId": "",
+  "x": 2,
+  "y": 1,
+  "symbol": "trigger_0",
+  "prefabScriptOverrides": {},
+  "width": 4,
+  "height": 5,
+  "script": [
+    {
+      "command": "EVENT_IF",
+      "args": {
+        "condition": {
+          "type": "ne",
+          "valueA": {
+            "type": "engineField",
+            "value": "dynamic_actor_event_actor_idx"
+          },
+          "valueB": {
+            "type": "number",
+            "value": 0
+          }
+        },
+        "__collapseElse": false
+      },
+      "children": {
+        "true": [
+          {
+            "command": "EVENT_SET_VALUE",
+            "args": {
+              "variable": "L0",
+              "value": {
+                "type": "engineField",
+                "value": "dynamic_actor_event_actor_idx"
+              }
+            },
+            "id": "8204bf79-47f1-44fa-ba73-88b3e313c320"
+          },
+          {
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": [
+                "actor $L0$\nEntered trigger"
+              ],
+              "__section": "text",
+              "avatarId": "",
+              "minHeight": 4,
+              "maxHeight": 7,
+              "textX": 1,
+              "textY": 1,
+              "textHeight": 5,
+              "position": "bottom",
+              "clearPrevious": true,
+              "showFrame": "true",
+              "speedIn": -1,
+              "speedOut": -1,
+              "closeWhen": "key",
+              "closeButton": "a",
+              "closeDelayTime": 0.5,
+              "closeDelayFrames": 30
+            },
+            "id": "28b33c2e-602c-46f3-8970-f2db591adb8f"
+          }
+        ],
+        "false": [
+          {
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": [
+                "Player actor\nEntered trigger"
+              ],
+              "__section": "text",
+              "avatarId": "",
+              "minHeight": 4,
+              "maxHeight": 7,
+              "textX": 1,
+              "textY": 1,
+              "textHeight": 5,
+              "position": "bottom",
+              "clearPrevious": true,
+              "showFrame": "true",
+              "speedIn": -1,
+              "speedOut": -1,
+              "closeWhen": "key",
+              "closeButton": "a",
+              "closeDelayTime": 0.5,
+              "closeDelayFrames": 30
+            },
+            "id": "b0795874-e8a2-433e-92ca-9876cd44cae6"
+          }
+        ]
+      },
+      "id": "de2b8e1f-ac12-436e-9b08-c726d3dfb127"
+    }
+  ],
+  "leaveScript": [
+    {
+      "command": "EVENT_IF",
+      "args": {
+        "condition": {
+          "type": "ne",
+          "valueA": {
+            "type": "engineField",
+            "value": "dynamic_actor_event_actor_idx"
+          },
+          "valueB": {
+            "type": "number",
+            "value": 0
+          }
+        },
+        "__collapseElse": false
+      },
+      "children": {
+        "true": [
+          {
+            "command": "EVENT_SET_VALUE",
+            "args": {
+              "variable": "L0",
+              "value": {
+                "type": "engineField",
+                "value": "dynamic_actor_event_actor_idx"
+              }
+            },
+            "id": "e55117ce-dbd3-43ff-97b2-2e6ec201ef61"
+          },
+          {
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": [
+                "actor $L0$\nExited trigger"
+              ],
+              "__section": "text",
+              "avatarId": "",
+              "minHeight": 4,
+              "maxHeight": 7,
+              "textX": 1,
+              "textY": 1,
+              "textHeight": 5,
+              "position": "bottom",
+              "clearPrevious": true,
+              "showFrame": "true",
+              "speedIn": -1,
+              "speedOut": -1,
+              "closeWhen": "key",
+              "closeButton": "a",
+              "closeDelayTime": 0.5,
+              "closeDelayFrames": 30
+            },
+            "id": "79dd17d2-5f3b-4226-8114-b3afdd666695"
+          }
+        ],
+        "false": [
+          {
+            "command": "EVENT_TEXT",
+            "args": {
+              "text": [
+                "Player actor\nExited trigger"
+              ],
+              "__section": "text",
+              "avatarId": "",
+              "minHeight": 4,
+              "maxHeight": 7,
+              "textX": 1,
+              "textY": 1,
+              "textHeight": 5,
+              "position": "bottom",
+              "clearPrevious": true,
+              "showFrame": "true",
+              "speedIn": -1,
+              "speedOut": -1,
+              "closeWhen": "key",
+              "closeButton": "a",
+              "closeDelayTime": 0.5,
+              "closeDelayFrames": 30
+            },
+            "id": "4a5b9229-863d-471e-b685-f8ef8f77b62c"
+          }
+        ]
+      },
+      "id": "5efbc31c-e9d9-4f94-b6da-f611ee01c351"
+    }
+  ],
+  "_index": 0
+}

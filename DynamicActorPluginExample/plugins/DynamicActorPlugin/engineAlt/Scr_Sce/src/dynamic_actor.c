@@ -12,6 +12,9 @@
 #include "collision.h"
 #include "events.h"
 #include "macro.h"
+#ifdef DYNAMIC_ACTOR_ENABLE_ACTOR_TRIGGERS
+#include "trigger.h"
+#endif
 
 #define DYNAMIC_ACTOR_COLLISION_SINGLE_POINT 0
 #define DYNAMIC_ACTOR_COLLISION_TRIANGLE 1
@@ -172,6 +175,9 @@ void dynamic_actor_init(void) BANKED {
     dynamic_actor_event_tile_idx = 0;
     dynamic_actor_event_tile_x = 0;
     dynamic_actor_event_tile_y = 0;
+#ifdef DYNAMIC_ACTOR_ENABLE_ACTOR_TRIGGERS
+    memset(actor_last_trigger, NO_TRIGGER_COLLISON, sizeof(actor_last_trigger));
+#endif
 #ifdef DYNAMIC_ACTOR_ENABLE_PARENT
     dynamic_actor_parenting_used = FALSE;
     platform_count = 0;
@@ -711,7 +717,10 @@ static UBYTE platform_cache_test(platform_cache_t *p, actor_t *other) {
 #endif
 
 void dynamic_actor_update(void) BANKED {
-
+    dynamic_actor_event_actor_idx = 0;
+    dynamic_actor_event_tile_idx = 0;
+    dynamic_actor_event_tile_x = 0;
+    dynamic_actor_event_tile_y = 0;
     actor_t *actor = actors_active_tail;
 #ifdef DYNAMIC_ACTOR_ENABLE_PARENT
     platform_count = 0;
@@ -1066,6 +1075,14 @@ void dynamic_actor_update(void) BANKED {
         }
 #endif
 
+#ifdef DYNAMIC_ACTOR_ENABLE_HIT_ACTORS
+        // On collision, run the collided actor's onHit script (in vm_dynamic_actor.c
+        // to keep this bank under the 16KB limit).
+        if (CHK_FLAG(event_flags, BHV_EVENT_HIT_ACTORS)) {
+            dynamic_actor_hit_actors(actor);
+        }
+#endif
+
 #ifdef DYNAMIC_ACTOR_ENABLE_ANIMATION
         BYTE abs_vx = actor->actor_vel_x;
         if (abs_vx < 0) abs_vx = -abs_vx;
@@ -1112,6 +1129,14 @@ void dynamic_actor_update(void) BANKED {
                 dynamic_actor_execute_tile_enter(actor, end_tile_x, end_tile_y);
             }
         }
+
+#ifdef DYNAMIC_ACTOR_ENABLE_ACTOR_TRIGGERS
+        // Let this actor activate scene triggers (onEnter/onLeave). The player
+        // is skipped - the engine already drives its trigger activation.
+        if (CHK_FLAG(event_flags, BHV_EVENT_ACTIVATE_TRIGGERS) && (actor != &PLAYER)) {
+            dynamic_actor_activate_triggers(actor);
+        }
+#endif
 
 #ifdef DYNAMIC_ACTOR_ENABLE_PARENT
         // Moving platform: cache this platform's final box for the

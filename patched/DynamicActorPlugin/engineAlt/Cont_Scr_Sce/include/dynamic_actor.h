@@ -92,6 +92,10 @@
 #define BHV_EVENT_TILE_COLLISION_BOTTOM  0x08u  // allow tile collision events
 #define BHV_EVENT_TILE_COLLISION_LEFT    0x10u  // allow tile collision events
 #define BHV_EVENT_TILE_ENTER      0x20u  // allow tile enter events
+#define BHV_EVENT_HIT_ACTORS      0x40u  // on collision, run the collided actor's onHit script
+                                         // (the engine normally only does this for the player)
+#define BHV_EVENT_ACTIVATE_TRIGGERS 0x80u // fire trigger onEnter/onLeave scripts as this actor
+                                          // moves in/out of a trigger (player-style activation)
 
 // Actor behavior states (actor_state)
 #define BHV_STATE_PAUSED    0
@@ -143,6 +147,22 @@ void dynamic_actor_mark_parenting_used(void) BANKED;
 
 void dynamic_actor_init(void) BANKED;
 void dynamic_actor_update(void) BANKED;
+
+#ifdef DYNAMIC_ACTOR_ENABLE_HIT_ACTORS
+// On collision, run the collided actor's onHit script - the same script the
+// engine fires when the player touches that actor, but driven by this actor.
+// Lives in vm_dynamic_actor.c to keep dynamic_actor.c under the 16KB bank limit.
+void dynamic_actor_hit_actors(actor_t *actor) BANKED;
+#endif
+
+#ifdef DYNAMIC_ACTOR_ENABLE_ACTOR_TRIGGERS
+// Per-actor "last trigger index" so an actor can drive trigger onEnter/onLeave
+// scripts independently of the engine's single player-only last_trigger. Kept in
+// the plugin (not actor_t) so gbs_types.h is untouched. NO_TRIGGER_COLLISON = none.
+extern UBYTE actor_last_trigger[MAX_ACTORS];
+// Player-style trigger activation for an arbitrary actor. In vm_dynamic_actor.c.
+void dynamic_actor_activate_triggers(actor_t *actor) BANKED;
+#endif
 
 #endif
 

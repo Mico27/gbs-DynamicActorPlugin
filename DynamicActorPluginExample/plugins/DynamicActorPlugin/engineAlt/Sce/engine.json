@@ -176,6 +176,24 @@
           "defaultValue": 1
         },
         {
+          "key": "DYNAMIC_ACTOR_ENABLE_HIT_ACTORS",
+          "label": "Component: Trigger other actors' On Hit",
+          "description": "Compile the 'trigger other actors On Hit on collision' behavior option: an actor with it set runs the On Hit script of every collidable actor it overlaps (the engine normally does this only for the player). Uncheck to save ROM if no behavior uses it.",
+          "group": "Dynamic actor",
+          "type": "checkbox",
+          "cType": "define",
+          "defaultValue": 1
+        },
+        {
+          "key": "DYNAMIC_ACTOR_ENABLE_ACTOR_TRIGGERS",
+          "label": "Component: Actors activate triggers",
+          "description": "Compile the 'activate triggers on enter/leave' behavior option: an actor with it set fires trigger On Enter / On Leave scripts as it moves in and out of triggers (the engine normally does this only for the player). Uses one byte of RAM per actor to track each actor's current trigger. Uncheck to save ROM/RAM if no behavior uses it.",
+          "group": "Dynamic actor",
+          "type": "checkbox",
+          "cType": "define",
+          "defaultValue": 1
+        },
+        {
           "key": "DYNAMIC_ACTOR_ENABLE_ANIMATION",
           "label": "Component: Animation handling",
           "description": "Compile automatic animation (face direction, idle, jump). Uncheck if you handle animations yourself.",

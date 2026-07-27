@@ -15,8 +15,68 @@
 #include "collision.h"
 #include "events.h"
 #include "macro.h"
+#ifdef DYNAMIC_ACTOR_ENABLE_ACTOR_TRIGGERS
+#include "trigger.h"
+#endif
 
 extern behavior_def_t behavior_defs[DYNAMIC_ACTOR_MAX_BEHAVIORS + 1];
+
+#ifdef DYNAMIC_ACTOR_ENABLE_HIT_ACTORS
+// On collision, run every overlapping collidable actor's onHit script - the same
+// script the engine fires when the player touches that actor, but driven by this
+// actor. This actor's own collision group is passed to the hit actor's onHit
+// script (as the engine passes an attacker's group to the player's hit script),
+// so the hit script can branch on who hit it. Only an actor that is itself in a
+// collision group deals hits (matches the engine's player-collision gating).
+// Skips self and the player (the engine already handles player contact). Each
+// target is re-triggered only once its previous onHit thread has finished
+// (hscript_hit debounce). Called from dynamic_actor_update for flagged actors.
+void dynamic_actor_hit_actors(actor_t *actor) BANKED {
+    UBYTE group = actor->collision_group & COLLISION_GROUP_MASK;
+    if (!group) {
+        return;
+    }
+    actor_t *other = actors_active_tail;
+    while (other) {
+        if ((other != actor) && (other != &PLAYER) &&
+            (other->flags & ACTOR_FLAG_COLLISION) &&
+            (other->script.bank) &&
+            ((other->hscript_hit == 0) || (other->hscript_hit & SCRIPT_TERMINATED)) &&
+            bb_intersects(&actor->bounds, &actor->pos, &other->bounds, &other->pos)) {
+            dynamic_actor_event_actor_idx = (UBYTE)(actor - actors);
+            script_execute(other->script.bank, other->script.ptr, &other->hscript_hit, 1, group);
+            return;
+        }
+        other = other->prev;
+    }
+}
+#endif
+
+#ifdef DYNAMIC_ACTOR_ENABLE_ACTOR_TRIGGERS
+UBYTE actor_last_trigger[MAX_ACTORS];
+
+// Player-style trigger activation for an arbitrary actor, using its own
+// last-trigger slot: run the leave script of the trigger it left and the enter
+// script of the trigger it entered when the intersected trigger changes.
+void dynamic_actor_activate_triggers(actor_t *actor) BANKED {
+    UBYTE idx = (UBYTE)(actor - actors);
+    UBYTE hit = trigger_at_intersection(&actor->bounds, &actor->pos);
+    UBYTE prev = actor_last_trigger[idx];
+    if (hit != prev) {
+        if ((prev != NO_TRIGGER_COLLISON) &&
+            (triggers[prev].script_flags & TRIGGER_HAS_LEAVE_SCRIPT)) {
+            dynamic_actor_event_actor_idx = (UBYTE)(actor - actors);
+            script_execute(triggers[prev].script.bank, triggers[prev].script.ptr, 0, 1, 2);
+        }
+        if ((hit != NO_TRIGGER_COLLISON) &&
+            (triggers[hit].script_flags & TRIGGER_HAS_ENTER_SCRIPT)) {
+            dynamic_actor_event_actor_idx = (UBYTE)(actor - actors);
+            script_execute(triggers[hit].script.bank, triggers[hit].script.ptr, 0, 1, 1);
+        }
+        actor_last_trigger[idx] = hit;
+    }
+}
+#endif
 
 #ifndef ACTOR_ATTR_H_FIRST
 #define ACTOR_ATTR_H_FIRST            0x01
