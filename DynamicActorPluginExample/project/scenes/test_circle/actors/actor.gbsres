@@ -17,8 +17,82 @@
   "prefabScriptOverrides": {},
   "symbol": "actor_0",
   "script": [],
-  "startScript": [],
-  "updateScript": [],
+  "startScript": [
+    {
+      "command": "EVENT_SET_ACTOR_BEHAVIOR",
+      "args": {
+        "actorId": "$self$",
+        "behaviorId": {
+          "type": "number",
+          "value": 2
+        },
+        "state": "1"
+      },
+      "id": "4960d6d0-58b5-4812-965c-7e71e2c543b2"
+    }
+  ],
+  "updateScript": [
+    {
+      "command": "EVENT_ACTOR_MOVE_TO_POSITION_BY_VELOCITY",
+      "args": {
+        "__section": "options",
+        "actorId": "$self$",
+        "targetX": {
+          "type": "number",
+          "value": 15
+        },
+        "targetY": {
+          "type": "number",
+          "value": 10
+        },
+        "cancelOnCollision": false,
+        "relative": false,
+        "directToPoint": true,
+        "moveType": "horizontal"
+      },
+      "id": "9bc5d7f0-d1e5-4c8b-85ab-f4ef867a89b6"
+    },
+    {
+      "command": "EVENT_ACTOR_MOVE_TO_POSITION_BY_VELOCITY",
+      "args": {
+        "__section": "options",
+        "actorId": "$self$",
+        "targetX": {
+          "type": "number",
+          "value": 4
+        },
+        "targetY": {
+          "type": "number",
+          "value": 3
+        },
+        "cancelOnCollision": false,
+        "relative": false,
+        "directToPoint": true,
+        "moveType": "horizontal"
+      },
+      "id": "36a72b1c-6744-4921-8f36-67d492e52fa6"
+    },
+    {
+      "command": "EVENT_ACTOR_MOVE_TO_POSITION_BY_VELOCITY",
+      "args": {
+        "__section": "options",
+        "actorId": "$self$",
+        "targetX": {
+          "type": "number",
+          "value": 2
+        },
+        "targetY": {
+          "type": "number",
+          "value": 16
+        },
+        "cancelOnCollision": false,
+        "relative": false,
+        "directToPoint": true,
+        "moveType": "horizontal"
+      },
+      "id": "b537efbe-f596-42a2-a1c3-7e67f1cf758e"
+    }
+  ],
   "hit1Script": [],
   "hit2Script": [],
   "hit3Script": [
@@ -64,7 +138,7 @@
     }
   ],
   "coordinateType": "tiles",
-  "x": 15,
-  "y": 10,
+  "x": 2,
+  "y": 16,
   "_index": 2
 }

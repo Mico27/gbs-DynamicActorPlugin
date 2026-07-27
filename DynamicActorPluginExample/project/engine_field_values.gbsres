@@ -108,6 +108,10 @@
     {
       "id": "DYNAMIC_ACTOR_PLATFORM_PLAYER_ONLY",
       "value": 0
+    },
+    {
+      "id": "DYNAMIC_ACTOR_PARENT_MODE",
+      "value": "2"
     }
   ]
 }

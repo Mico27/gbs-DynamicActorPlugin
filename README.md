@@ -107,7 +107,7 @@ globally for the whole game. Pick the cheapest one that does what you need:
 |---|---|---|
 | **Static parenting (Fast)** | The child is pinned at a fixed pixel offset from the parent every frame and runs **no other behavior code**. The offset is the child's own X/Y velocity read as a pixel offset (set it with *Set Actor X/Y Velocity*). Use for HUD pieces, a rigidly attached sparkle, a health bar over a boss | Cheapest — no physics, no tile collision |
 | **Inherit first parent velocity (Slower)** | The child is carried by its **direct parent's velocity** (tile-collision checked), then still runs its own behavior physics. Only tracks a parent that has a dynamic velocity — with one exception: **the player is followed by its position delta** (the plugin keeps a player-position snapshot), since the engine-controlled player has no velocity field. Any *other* non-dynamic parent won't be followed | One velocity read per child (a player parent adds a per-frame player snapshot) |
-| **Apply all parents positions delta (Slowest)** | The child is displaced by the **summed position change of its whole parent chain** since last frame (tile-collision checked), then still runs its own behavior physics. Follows **any** parent — including engine-moved ones like the player — and keeps up with a chain of parents (parent → grandparent → …) in a single frame with no per-level lag | Walks the parent chain + an end-of-frame position snapshot per actor |
+| **Apply all parents positions delta (Slowest)** | The child is displaced by the **summed position change of its whole parent chain** since last frame (tile-collision checked), then still runs its own behavior physics. Follows **any** parent — including engine-moved ones like the player *and* dynamic moving platforms — because the carry is applied at the end of the frame (order-independent) | Walks the parent chain + an end-of-frame carry and position-snapshot pass per actor |
 
 The default is **Apply all parents positions delta**, the most general (it is what the
 example project and the notes below assume).
@@ -131,7 +131,8 @@ Details (velocity/delta modes):
   behavior's *Tile collision* option to carry through walls instead.
 - A *Moving platform* never steals children: actors that already have a different
   parent are skipped, and if the platform has a collision group set it only claims
-  actors in the same group.
+  actors in the same group. **The player is the exception — a platform always picks
+  the player up regardless of its collision group.**
 - Enable **Platforms attach the player only** (engine setting) to restrict platform
   auto-attach to the player — every other actor is ignored by platforms (but can still
   be parented explicitly with *Set Actor Parent Actor*). Handy for a platformer where
@@ -406,7 +407,7 @@ components are enabled and on the two slider settings. Per-actor costs are multi
 | Core globals (event fields, callback table, scratch) | **44 B** | always |
 | Per actor: behavior id + state + X/Y velocity | 4 B × 21 = **84 B** | always |
 | Per actor: parent pointer | 2 B × 21 = **42 B** | *Parent actors* |
-| Platform cache | 12 B × *Max moving platforms* → **24 B** (2) … **96 B** (8) | *Parent actors* |
+| Platform cache | 11 B × *Max moving platforms* → **22 B** (2) … **88 B** (8) | *Parent actors* |
 | Parent flag + counter | **2 B** | *Parent actors* |
 | Per actor: position snapshot | 4 B × 21 = **84 B** (+2 B × 21 = **42 B** with Z axis) | *Parent actors* **and** parenting mode = *Apply all parents positions delta* |
 | Player position snapshot | 4 B (+2 B with Z axis) | *Parent actors* **and** parenting mode = *Inherit first parent velocity* |
@@ -418,9 +419,9 @@ components are enabled and on the two slider settings. Per-actor costs are multi
 **Totals:**
 
 - **Default configuration** (Parent actors on, *delta* parenting mode, Z axis off, slope
-  off, triggers on, 8 behavior slots, 2 platforms): **≈ 373 B**.
+  off, triggers on, 8 behavior slots, 2 platforms): **≈ 371 B**.
 - **Everything enabled** (all components on, *delta* mode, Z axis on, slope on, 32
-  behavior slots, 8 platforms): **≈ 745 B** — the plugin's maximum WRAM footprint.
+  behavior slots, 8 platforms): **≈ 737 B** — the plugin's maximum WRAM footprint.
 - **Leanest** (all optional components off, 8 slots): **≈ 200 B**.
 
 For reference, a stock GB Studio 4.3.0 project has roughly **850 B** of WRAM free, so even

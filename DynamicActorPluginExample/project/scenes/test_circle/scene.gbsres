@@ -11,7 +11,7 @@
   "colorModeOverride": "none",
   "paletteIds": [],
   "spritePaletteIds": [],
-  "collisions": "00165+0f3+",
+  "collisions": "0f15+0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0010+0f3+",
   "autoFadeSpeed": null,
   "symbol": "scene_8",
   "x": 88,
@@ -64,10 +64,10 @@
           "type": "number",
           "value": 140
         },
-        "__collapse": false,
+        "__collapse": true,
         "__comment": false,
         "__label": "Circling Behavior",
-        "triggerHitActors": true,
+        "triggerHitActors": false,
         "activateTriggers": true
       },
       "id": "8e148a02-f2fa-44d5-9f63-6f5e7369eb65"
@@ -93,7 +93,7 @@
         "animJumpZ": false,
         "lockPositionAxes": "0",
         "lockDirectionAxes": "0",
-        "collisionType": "0",
+        "collisionType": "2",
         "triggerStateChange": false,
         "triggerTileCollision": false,
         "triggerTileEnter": false,
@@ -109,7 +109,7 @@
           "type": "number",
           "value": 128
         },
-        "__collapse": false,
+        "__collapse": true,
         "__comment": false,
         "__label": "Platform Behavior"
       },
@@ -152,11 +152,56 @@
           "type": "number",
           "value": 128
         },
-        "__collapse": false,
+        "__collapse": true,
         "__comment": false,
         "__label": "Shadow Behavior"
       },
       "id": "d10c4e04-de5b-40e0-9678-edb6705a11b1"
+    },
+    {
+      "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
+      "args": {
+        "behaviorId": {
+          "type": "number",
+          "value": 4
+        },
+        "preset": "reflector",
+        "compGravityY": true,
+        "compGravityZ": false,
+        "compTileCollision": true,
+        "compActorCollision": false,
+        "compPlatform": false,
+        "compLedgeStop": false,
+        "compReflectX": true,
+        "compReflectY": false,
+        "compReflectZ": false,
+        "animJumpY": true,
+        "animJumpZ": true,
+        "lockPositionAxes": "0",
+        "lockDirectionAxes": "0",
+        "collisionType": "0",
+        "triggerStateChange": false,
+        "triggerTileCollisionTop": false,
+        "triggerTileCollisionRight": false,
+        "triggerTileCollisionBottom": false,
+        "triggerTileCollisionLeft": false,
+        "triggerTileEnter": false,
+        "triggerHitActors": false,
+        "activateTriggers": false,
+        "gravity": {
+          "type": "number",
+          "value": 8
+        },
+        "maxFallVelocity": {
+          "type": "number",
+          "value": 64
+        },
+        "bounce": {
+          "type": "number",
+          "value": 128
+        }
+      },
+      "id": "c44c66e9-3491-4c1d-8e9f-40a9c0a6b34d"
     },
     {
       "command": "EVENT_SET_VALUE",
