@@ -13,6 +13,7 @@
 #include "sincos.h"
 #include "data/states_defines.h"
 #include "collision.h"
+#include "events.h"
 #include "macro.h"
 
 extern behavior_def_t behavior_defs[DYNAMIC_ACTOR_MAX_BEHAVIORS + 1];
@@ -40,12 +41,18 @@ void vm_define_actor_behavior(SCRIPT_CTX * THIS) OLDCALL BANKED {
     UBYTE slot = *(uint8_t *)VM_REF_TO_PTR(FN_ARG0);
     if ((slot == 0) || (slot > DYNAMIC_ACTOR_MAX_BEHAVIORS)) return;
     behavior_def_t *def = &behavior_defs[slot];
+    def->event_flags  = *(uint8_t *)VM_REF_TO_PTR(FN_ARG7);
     def->collision_type = *(uint8_t *)VM_REF_TO_PTR(FN_ARG6);
     def->flags        = *(uint8_t *)VM_REF_TO_PTR(FN_ARG1);
     def->flags2       = *(uint8_t *)VM_REF_TO_PTR(FN_ARG2);
     def->gravity      = *(uint8_t *)VM_REF_TO_PTR(FN_ARG3);
     def->max_fall_vel = *(uint8_t *)VM_REF_TO_PTR(FN_ARG4);
     def->bounce       = *(uint8_t *)VM_REF_TO_PTR(FN_ARG5);
+#ifdef DYNAMIC_ACTOR_ENABLE_PARENT
+    if (CHK_FLAG(def->flags, BHV_PLATFORM)) {
+        dynamic_actor_mark_parenting_used();
+    }
+#endif
 }
 
 void vm_set_actor_behavior(SCRIPT_CTX * THIS) OLDCALL BANKED {
@@ -78,6 +85,44 @@ void vm_get_actor_state(SCRIPT_CTX * THIS) OLDCALL BANKED {
     int16_t * A;
     if (idx < 0) A = THIS->stack_ptr + idx - 2; else A = script_memory + idx;
     *A = actor->actor_state;
+}
+
+void vm_assign_dynamic_actor_event_script(SCRIPT_CTX * THIS) OLDCALL BANKED {
+    (void)THIS;
+    UBYTE slot = *(uint8_t *)VM_REF_TO_PTR(FN_ARG2);
+    UBYTE *bank = VM_REF_TO_PTR(FN_ARG1);
+    UBYTE **ptr = VM_REF_TO_PTR(FN_ARG0);
+    if (slot == 10){ //Any collision
+        dynamic_actor_events[DYNAMIC_ACTOR_EVENT_TILE_COLLISION_TOP].script_bank = *bank;
+        dynamic_actor_events[DYNAMIC_ACTOR_EVENT_TILE_COLLISION_TOP].script_addr = *ptr;
+        dynamic_actor_events[DYNAMIC_ACTOR_EVENT_TILE_COLLISION_RIGHT].script_bank = *bank;
+        dynamic_actor_events[DYNAMIC_ACTOR_EVENT_TILE_COLLISION_RIGHT].script_addr = *ptr;
+        dynamic_actor_events[DYNAMIC_ACTOR_EVENT_TILE_COLLISION_BOTTOM].script_bank = *bank;
+        dynamic_actor_events[DYNAMIC_ACTOR_EVENT_TILE_COLLISION_BOTTOM].script_addr = *ptr;
+        dynamic_actor_events[DYNAMIC_ACTOR_EVENT_TILE_COLLISION_LEFT].script_bank = *bank;
+        dynamic_actor_events[DYNAMIC_ACTOR_EVENT_TILE_COLLISION_LEFT].script_addr = *ptr;
+    } else {
+        dynamic_actor_events[slot].script_bank = *bank;
+        dynamic_actor_events[slot].script_addr = *ptr;
+    }
+}
+
+void vm_clear_dynamic_actor_event_script(SCRIPT_CTX * THIS) OLDCALL BANKED {
+    (void)THIS;
+    UBYTE slot = *(uint8_t *)VM_REF_TO_PTR(FN_ARG0);
+    if (slot == 10){ //Any collision
+        dynamic_actor_events[DYNAMIC_ACTOR_EVENT_TILE_COLLISION_TOP].script_bank = 0;
+        dynamic_actor_events[DYNAMIC_ACTOR_EVENT_TILE_COLLISION_TOP].script_addr = NULL;
+        dynamic_actor_events[DYNAMIC_ACTOR_EVENT_TILE_COLLISION_RIGHT].script_bank = 0;
+        dynamic_actor_events[DYNAMIC_ACTOR_EVENT_TILE_COLLISION_RIGHT].script_addr = NULL;
+        dynamic_actor_events[DYNAMIC_ACTOR_EVENT_TILE_COLLISION_BOTTOM].script_bank = 0;
+        dynamic_actor_events[DYNAMIC_ACTOR_EVENT_TILE_COLLISION_BOTTOM].script_addr = NULL;
+        dynamic_actor_events[DYNAMIC_ACTOR_EVENT_TILE_COLLISION_LEFT].script_bank = 0;
+        dynamic_actor_events[DYNAMIC_ACTOR_EVENT_TILE_COLLISION_LEFT].script_addr = NULL;
+    } else {
+        dynamic_actor_events[slot].script_bank = 0;
+        dynamic_actor_events[slot].script_addr = NULL;
+    }
 }
 
 void vm_set_actor_velocity(SCRIPT_CTX * THIS) OLDCALL BANKED {
@@ -154,6 +199,7 @@ void vm_set_actor_parent(SCRIPT_CTX * THIS) OLDCALL BANKED {
         actor->actor_parent = NULL;
     } else {
         actor->actor_parent = actors + parent_actor_idx;
+        dynamic_actor_mark_parenting_used();
     }
 }
 

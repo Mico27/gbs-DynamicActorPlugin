@@ -82,14 +82,14 @@
         "compGravityZ": false,
         "compTileCollision": false,
         "compActorCollision": false,
-        "compPlatform": false,
+        "compPlatform": true,
         "compLedgeStop": false,
         "compReflectX": false,
         "compReflectY": false,
         "compReflectZ": false,
         "animJumpY": false,
         "animJumpZ": false,
-        "lockPositionAxes": "4",
+        "lockPositionAxes": "0",
         "lockDirectionAxes": "0",
         "collisionType": "0",
         "triggerStateChange": false,
@@ -109,7 +109,7 @@
         },
         "__collapse": false,
         "__comment": false,
-        "__label": "Swinging Behavior"
+        "__label": "Platform Behavior"
       },
       "id": "a5e7cbb3-a41d-414e-8b19-b55c7b61112c"
     },

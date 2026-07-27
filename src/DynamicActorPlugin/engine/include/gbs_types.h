@@ -68,14 +68,22 @@ typedef struct actor_t
     int8_t actor_vel_y;
 #ifdef DYNAMIC_ACTOR_ENABLE_PARENT
     struct actor_t *actor_parent;
+    // prev_pos is only used by the "Apply all parents positions delta" parenting
+    // mode (DYNAMIC_ACTOR_PARENT_MODE == 2). The static and velocity modes drop
+    // it to save 4 bytes per actor. Kept in sync with DYNAMIC_ACTOR_USES_PREV_POS
+    // in dynamic_actor.h; the default (undefined) is delta.
+#if !defined(DYNAMIC_ACTOR_PARENT_MODE) || (DYNAMIC_ACTOR_PARENT_MODE == 2)
     upoint16_t prev_pos;
+#endif
 #endif
 
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
     uint16_t pos_z;
     int8_t actor_vel_z;
 #ifdef DYNAMIC_ACTOR_ENABLE_PARENT
+#if !defined(DYNAMIC_ACTOR_PARENT_MODE) || (DYNAMIC_ACTOR_PARENT_MODE == 2)
     uint16_t prev_pos_z;
+#endif
 #endif
 #endif
 

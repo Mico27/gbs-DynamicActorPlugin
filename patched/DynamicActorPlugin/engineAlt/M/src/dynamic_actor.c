@@ -52,6 +52,36 @@ UBYTE dynamic_actor_event_tile_y;
 script_event_t dynamic_actor_events[DYNAMIC_ACTOR_CALLBACK_SIZE];
 static actor_t *dynamic_actor_current_actor;
 
+#ifdef DYNAMIC_ACTOR_ENABLE_PARENT
+UBYTE dynamic_actor_parenting_used;
+
+// Per-frame cache of BHV_PLATFORM actors: box edges and claim parameters are
+// computed once per platform in the main update loop, then the end-of-frame
+// walk claims/releases riders against these instead of each platform walking
+// the whole actor list itself.
+typedef struct platform_cache_t {
+    actor_t *actor;
+    UWORD left;
+    UWORD right;
+    UWORD top;
+    UWORD bottom;
+    UBYTE collision_type;
+    UBYTE group;
+} platform_cache_t;
+static platform_cache_t platform_cache[DYNAMIC_ACTOR_MAX_PLATFORMS];
+static UBYTE platform_count;
+#endif
+
+#ifdef DYNAMIC_ACTOR_USES_PLAYER_PREV_POS
+// Player position at the end of the previous update, so the velocity parenting
+// mode can follow the engine-controlled player (which has no velocity field) by
+// position delta. Snapshotted once per frame in dynamic_actor_update.
+static upoint16_t player_prev_pos;
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
+static uint16_t player_prev_pos_z;
+#endif
+#endif
+
 WORD new_actor_x;
 WORD new_actor_y;
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
@@ -143,15 +173,56 @@ void dynamic_actor_init(void) BANKED {
     dynamic_actor_event_tile_x = 0;
     dynamic_actor_event_tile_y = 0;
 #ifdef DYNAMIC_ACTOR_ENABLE_PARENT
+    dynamic_actor_parenting_used = FALSE;
+    platform_count = 0;
+#ifdef DYNAMIC_ACTOR_USES_PLAYER_PREV_POS
+    player_prev_pos = PLAYER.pos;
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
+    player_prev_pos_z = PLAYER.pos_z;
+#endif
+#endif
     UBYTE i;
     for (i = 0; i != MAX_ACTORS; ++i) {
-    actors[i].prev_pos = actors[i].pos;
+        actors[i].actor_parent = NULL;
+#ifdef DYNAMIC_ACTOR_USES_PREV_POS
+        actors[i].prev_pos = actors[i].pos;
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
-    actors[i].prev_pos_z = actors[i].pos_z;
+        actors[i].prev_pos_z = actors[i].pos_z;
+#endif
 #endif
     }
 #endif
 }
+
+#ifdef DYNAMIC_ACTOR_ENABLE_PARENT
+void dynamic_actor_mark_parenting_used(void) BANKED {
+    if (dynamic_actor_parenting_used) {
+        return;
+    }
+    dynamic_actor_parenting_used = TRUE;
+#ifdef DYNAMIC_ACTOR_USES_PLAYER_PREV_POS
+    // Refresh the player snapshot too, so a child parented to the player doesn't
+    // inherit a delta spanning every frame since scene load.
+    player_prev_pos = PLAYER.pos;
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
+    player_prev_pos_z = PLAYER.pos_z;
+#endif
+#endif
+#ifdef DYNAMIC_ACTOR_USES_PREV_POS
+    // Refresh the snapshots: they haven't been maintained while the flag was
+    // off, so without this the first parent delta would span every frame
+    // since scene load.
+    actor_t *actor = actors_active_tail;
+    while (actor) {
+        actor->prev_pos = actor->pos;
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
+        actor->prev_pos_z = actor->pos_z;
+#endif
+        actor = actor->prev;
+    }
+#endif
+}
+#endif
 
 #ifdef DYNAMIC_ACTOR_ENABLE_COLLISION_SINGLE_POINT
 
@@ -609,27 +680,30 @@ static UWORD check_pit_by_type(UWORD start_x, UWORD start_y, actor_t *actor, UBY
 #endif
 
 #ifdef DYNAMIC_ACTOR_ENABLE_PARENT
-static UBYTE actor_intersects_platform(actor_t *actor, actor_t *platform) {
-    UBYTE collision_type = ACTOR_COLLISION_TYPE(platform);
-    switch (collision_type) {
+// Claim/release intersection test between a cached platform box and a
+// candidate rider. The candidate's shape follows the platform's collision
+// model: bottom-center point (triangle), full box (bounding box) or origin
+// point (single point). The platform side is always its precomputed box.
+static UBYTE platform_cache_test(platform_cache_t *p, actor_t *other) {
+    switch (p->collision_type) {
 #ifdef DYNAMIC_ACTOR_ENABLE_COLLISION_TRIANGLE
         case DYNAMIC_ACTOR_COLLISION_TRIANGLE: {
-            UWORD point_x = actor->pos.x + actor->bounds.left + ((actor->bounds.right - actor->bounds.left) >> 1);
-            UWORD point_y = actor->pos.y + actor->bounds.bottom;
-            UWORD left = platform->pos.x + platform->bounds.left;
-            UWORD right = platform->pos.x + platform->bounds.right;
-            UWORD top = platform->pos.y + platform->bounds.top;
-            UWORD bottom = platform->pos.y + platform->bounds.bottom;
-            return (point_x >= left) && (point_x <= right) && (point_y >= top) && (point_y <= bottom);
+            UWORD point_x = other->pos.x + other->bounds.left + ((other->bounds.right - other->bounds.left) >> 1);
+            UWORD point_y = other->pos.y + other->bounds.bottom;
+            return (point_x >= p->left) && (point_x <= p->right) && (point_y >= p->top) && (point_y <= p->bottom);
         }
 #endif
 #ifdef DYNAMIC_ACTOR_ENABLE_COLLISION_BOUNDING_BOX
         case DYNAMIC_ACTOR_COLLISION_BOUNDING_BOX:
-            return bb_intersects(&actor->bounds, &actor->pos, &platform->bounds, &platform->pos);
+            return ((other->pos.x + other->bounds.left) <= p->right) &&
+                   ((other->pos.x + other->bounds.right) >= p->left) &&
+                   ((other->pos.y + other->bounds.top) <= p->bottom) &&
+                   ((other->pos.y + other->bounds.bottom) >= p->top);
 #endif
 #ifdef DYNAMIC_ACTOR_ENABLE_COLLISION_SINGLE_POINT
         case DYNAMIC_ACTOR_COLLISION_SINGLE_POINT:
-            return bb_contains(&platform->bounds, &platform->pos, &actor->pos);
+            return (other->pos.x >= p->left) && (other->pos.x <= p->right) &&
+                   (other->pos.y >= p->top) && (other->pos.y <= p->bottom);
 #endif
     }
     return FALSE;
@@ -639,18 +713,34 @@ static UBYTE actor_intersects_platform(actor_t *actor, actor_t *platform) {
 void dynamic_actor_update(void) BANKED {
 
     actor_t *actor = actors_active_tail;
+#ifdef DYNAMIC_ACTOR_ENABLE_PARENT
+    platform_count = 0;
+#endif
     while (actor) {
         UBYTE behavior_id = actor->actor_behavior_id;
-        UBYTE old_state = actor->actor_state;
-        UBYTE start_tile_x = SUBPX_TO_TILE(actor->pos.x);
-        UBYTE start_tile_y = SUBPX_TO_TILE(actor->pos.y);
-        UBYTE end_tile_x;
-        UBYTE end_tile_y;
-        dynamic_actor_current_actor = actor;
+        // Cheap early-out before loading anything else: plain actors (no
+        // behavior, no parent) pay only these tests per frame.
+#ifdef DYNAMIC_ACTOR_ENABLE_PARENT
+        if ((actor->actor_parent == NULL) &&
+            ((behavior_id == 0) || (actor->actor_state == BHV_STATE_PAUSED))) {
+#else
+        if ((behavior_id == 0) || (actor->actor_state == BHV_STATE_PAUSED)) {
+#endif
+            actor = actor->prev;
+            continue;
+        }
         behavior_def_t *def = &behavior_defs[behavior_id];
         UBYTE collision_type = def->collision_type;
         UBYTE flags = def->flags;
         UBYTE flags2 = def->flags2;
+        UBYTE event_flags = def->event_flags;
+        UBYTE start_tile_x = 0;
+        UBYTE start_tile_y = 0;
+        dynamic_actor_current_actor = actor;
+        if (CHK_FLAG(event_flags, BHV_EVENT_TILE_ENTER)) {
+            start_tile_x = SUBPX_TO_TILE(actor->pos.x);
+            start_tile_y = SUBPX_TO_TILE(actor->pos.y);
+        }
 
 #ifdef DYNAMIC_ACTOR_ENABLE_PARENT
         // Parenting is not a behavior: every actor with a defined parent
@@ -662,16 +752,79 @@ void dynamic_actor_update(void) BANKED {
         // Actor events, or automatically via a BHV_PLATFORM actor.
         if (actor->actor_parent) {
             actor_t *parent_actor = actor->actor_parent;
+
+#if DYNAMIC_ACTOR_PARENT_MODE == DYNAMIC_ACTOR_PARENT_MODE_STATIC
+            // Static parenting (Fast): the actor is rigidly pinned at a fixed
+            // pixel offset (its own velocity, read as a pixel offset) from the
+            // parent position. It runs no other behavior code - the parent
+            // position plus offset is its whole update.
+            if (!(flags2 & BHV3_LOCK_POS_X)) {
+                actor->pos.x = parent_actor->pos.x + PX_TO_SUBPX(actor->actor_vel_x);
+            }
+            if (!(flags2 & BHV3_LOCK_POS_Y)) {
+                actor->pos.y = parent_actor->pos.y + PX_TO_SUBPX(actor->actor_vel_y);
+            }
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
+            if (!(flags2 & BHV3_LOCK_POS_Z)) {
+                actor->pos_z = parent_actor->pos_z + PX_TO_SUBPX(actor->actor_vel_z);
+            }
+#endif
+            actor = actor->prev;
+            continue;
+#else
             // The displacement is tile-collision checked: a parented actor
             // normally only checks collision when it moves itself, so
             // without this the parent actor's movement could push this
             // actor through walls. Disabled by the behavior's
             // 'no tile collision' option.
-            // Parenting now uses parent position delta between game loops.
-            WORD parent_actor_delta_x = (WORD)(parent_actor->pos.x - parent_actor->prev_pos.x);
-            WORD parent_actor_delta_y = (WORD)(parent_actor->pos.y - parent_actor->prev_pos.y);
+#if DYNAMIC_ACTOR_PARENT_MODE == DYNAMIC_ACTOR_PARENT_MODE_VELOCITY
+            // Inherit first parent velocity (Slower): the actor is carried by
+            // its direct parent's current velocity, then runs its own behavior.
+            WORD parent_actor_delta_x;
+            WORD parent_actor_delta_y;
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
-            WORD parent_actor_delta_z = (WORD)(parent_actor->pos_z - parent_actor->prev_pos_z);
+            WORD parent_actor_delta_z;
+#endif
+            if (parent_actor == &PLAYER) {
+                // The engine-controlled player never populates a velocity field,
+                // so track it by its position delta since last frame instead.
+                parent_actor_delta_x = (WORD)(PLAYER.pos.x - player_prev_pos.x);
+                parent_actor_delta_y = (WORD)(PLAYER.pos.y - player_prev_pos.y);
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
+                parent_actor_delta_z = (WORD)(PLAYER.pos_z - player_prev_pos_z);
+#endif
+            } else {
+                parent_actor_delta_x = (WORD)parent_actor->actor_vel_x;
+                parent_actor_delta_y = (WORD)parent_actor->actor_vel_y;
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
+                parent_actor_delta_z = (WORD)parent_actor->actor_vel_z;
+#endif
+            }
+#else
+            // Apply all parents positions delta (Slowest): walk the whole
+            // parent chain and sum each ancestor's position delta since last
+            // frame, so a parented actor keeps up with a chain of movers in a
+            // single frame (no per-level lag) and follows engine-moved parents
+            // (like the player) that never populate a velocity field. Then run
+            // its own behavior physics.
+            WORD parent_actor_delta_x = 0;
+            WORD parent_actor_delta_y = 0;
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
+            WORD parent_actor_delta_z = 0;
+#endif
+            {
+                actor_t *chain_actor = parent_actor;
+                UBYTE chain_guard = MAX_ACTORS;
+                while (chain_actor && chain_guard) {
+                    parent_actor_delta_x += (WORD)(chain_actor->pos.x - chain_actor->prev_pos.x);
+                    parent_actor_delta_y += (WORD)(chain_actor->pos.y - chain_actor->prev_pos.y);
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
+                    parent_actor_delta_z += (WORD)(chain_actor->pos_z - chain_actor->prev_pos_z);
+#endif
+                    chain_actor = chain_actor->actor_parent;
+                    chain_guard--;
+                }
+            }
 #endif
             if (parent_actor_delta_x && !(flags2 & BHV3_LOCK_POS_X)) {
                 new_actor_x = actor->pos.x + parent_actor_delta_x;
@@ -697,7 +850,7 @@ void dynamic_actor_update(void) BANKED {
                 actor->pos.y = new_actor_y;
 #endif
             }
-#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z            
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
             if (parent_actor_delta_z && !(flags2 & BHV3_LOCK_POS_Z)) {
                 new_actor_z = (WORD)actor->pos_z + parent_actor_delta_z;
                 if (new_actor_z < 0) {
@@ -707,39 +860,19 @@ void dynamic_actor_update(void) BANKED {
                 }
             }
 #endif
+#endif /* DYNAMIC_ACTOR_PARENT_MODE != STATIC */
         }
 #endif
 
+#ifdef DYNAMIC_ACTOR_ENABLE_PARENT
+        // Parent-only actors are done after inheriting the parent movement.
         if ((behavior_id == 0) || (actor->actor_state == BHV_STATE_PAUSED)) {
             actor = actor->prev;
             continue;
         }
-
-#ifdef DYNAMIC_ACTOR_ENABLE_PARENT
-        // Moving platform: claim every intersecting actor as a child (it then
-        // inherits this platform's movement via the parenting above), unless
-        // that actor already has a different parent, or this platform has a
-        // collision group and the actor's group differs (a group-less platform
-        // carries everything, including the player). Release actors that are
-        // no longer intersecting.
-        if (CHK_FLAG(flags, BHV_PLATFORM)) {
-            actor_t *platform_actor = actor;
-            UBYTE platform_group = actor->collision_group & COLLISION_GROUP_MASK;
-            actor_t *other = actors_active_tail;
-            while (other) {
-                if (other != actor) {
-                    if (actor_intersects_platform(other, actor)) {
-                        if (!other->actor_parent) {
-                            other->actor_parent = platform_actor;
-                        }
-                    } else if (other->actor_parent == platform_actor) {
-                        other->actor_parent = NULL;
-                    }
-                }
-                other = other->prev;
-            }
-        }
 #endif
+
+        UBYTE old_state = actor->actor_state;
 
 #ifdef DYNAMIC_ACTOR_ENABLE_ACTOR_COLLISION
         // Position before this frame's own movement (after any parent carry),
@@ -938,20 +1071,27 @@ void dynamic_actor_update(void) BANKED {
         if (abs_vx < 0) abs_vx = -abs_vx;
         BYTE abs_vy = actor->actor_vel_y;
         if (abs_vy < 0) abs_vy = -abs_vy;
+        // actor_set_anim is a header inline whose actor_set_frames call
+        // dedupes internally, so setting the animation directly here avoids
+        // the BANKED actor_set_dir/actor_set_anim_moving trampoline calls
+        // that used to run once per animated actor per frame.
         if (abs_vx || abs_vy) {
-            if ((flags2 & (BHV3_LOCK_DIR_H | BHV3_LOCK_DIR_V)) == (BHV3_LOCK_DIR_H | BHV3_LOCK_DIR_V)) {
-                actor_set_anim_moving(actor);
-            } else if (CHK_FLAG(flags2, BHV3_LOCK_DIR_H)) {
-                actor_set_dir(actor, (actor->actor_vel_y < 0) ? DIR_UP : DIR_DOWN, TRUE);
-            } else if (CHK_FLAG(flags2, BHV3_LOCK_DIR_V)) {
-                actor_set_dir(actor, (actor->actor_vel_x < 0) ? DIR_LEFT : DIR_RIGHT, TRUE);
-            } else if (abs_vy > abs_vx) {
-                actor_set_dir(actor, (actor->actor_vel_y < 0) ? DIR_UP : DIR_DOWN, TRUE);
-            } else {
-                actor_set_dir(actor, (actor->actor_vel_x < 0) ? DIR_LEFT : DIR_RIGHT, TRUE);
+            UBYTE anim_dir = actor->dir;
+            if ((flags2 & (BHV3_LOCK_DIR_H | BHV3_LOCK_DIR_V)) != (BHV3_LOCK_DIR_H | BHV3_LOCK_DIR_V)) {
+                if (CHK_FLAG(flags2, BHV3_LOCK_DIR_H)) {
+                    anim_dir = (actor->actor_vel_y < 0) ? DIR_UP : DIR_DOWN;
+                } else if (CHK_FLAG(flags2, BHV3_LOCK_DIR_V)) {
+                    anim_dir = (actor->actor_vel_x < 0) ? DIR_LEFT : DIR_RIGHT;
+                } else if (abs_vy > abs_vx) {
+                    anim_dir = (actor->actor_vel_y < 0) ? DIR_UP : DIR_DOWN;
+                } else {
+                    anim_dir = (actor->actor_vel_x < 0) ? DIR_LEFT : DIR_RIGHT;
+                }
+                actor->dir = anim_dir;
             }
+            actor_set_anim(actor, anim_dir + N_DIRECTIONS);
         } else {
-            actor_set_anim_idle(actor);
+            actor_set_anim(actor, actor->dir);
         }
         if (((CHK_FLAG(flags2, BHV2_ANIM_JUMP_Y)) && (actor->actor_state == BHV_STATE_AIRBORNE_Y)) || ((CHK_FLAG(flags2, BHV2_ANIM_JUMP_Z)) && (actor->actor_state == BHV_STATE_AIRBORNE_Z))) {
             if (actor->dir == DIR_LEFT) {
@@ -962,20 +1102,33 @@ void dynamic_actor_update(void) BANKED {
         }
 #endif
 
-        if (CHK_FLAG(def->event_flags, BHV_EVENT_STATE_CHANGE) && old_state != actor->actor_state) {
-            
+        if (CHK_FLAG(event_flags, BHV_EVENT_STATE_CHANGE) && old_state != actor->actor_state) {
             dynamic_actor_execute_state_change(actor);
         }
-        if (CHK_FLAG(def->event_flags, BHV_EVENT_TILE_ENTER)) {
-            end_tile_x = SUBPX_TO_TILE(actor->pos.x);
-            end_tile_y = SUBPX_TO_TILE(actor->pos.y);
-            
+        if (CHK_FLAG(event_flags, BHV_EVENT_TILE_ENTER)) {
+            UBYTE end_tile_x = SUBPX_TO_TILE(actor->pos.x);
+            UBYTE end_tile_y = SUBPX_TO_TILE(actor->pos.y);
             if ((start_tile_x != end_tile_x) || (start_tile_y != end_tile_y)) {
-                
                 dynamic_actor_execute_tile_enter(actor, end_tile_x, end_tile_y);
             }
         }
 
+#ifdef DYNAMIC_ACTOR_ENABLE_PARENT
+        // Moving platform: cache this platform's final box for the
+        // end-of-frame claim/release pass. Platforms past the cache limit
+        // still move but never claim or release riders.
+        if (CHK_FLAG(flags, BHV_PLATFORM) && (platform_count != DYNAMIC_ACTOR_MAX_PLATFORMS)) {
+            platform_cache_t *p = &platform_cache[platform_count];
+            platform_count++;
+            p->actor = actor;
+            p->left = actor->pos.x + actor->bounds.left;
+            p->right = actor->pos.x + actor->bounds.right;
+            p->top = actor->pos.y + actor->bounds.top;
+            p->bottom = actor->pos.y + actor->bounds.bottom;
+            p->collision_type = collision_type;
+            p->group = actor->collision_group & COLLISION_GROUP_MASK;
+        }
+#endif
 
         actor = actor->prev;
     }
@@ -983,15 +1136,68 @@ void dynamic_actor_update(void) BANKED {
     dynamic_actor_current_actor = NULL;
 
 #ifdef DYNAMIC_ACTOR_ENABLE_PARENT
-    {
+    // End-of-frame pass, skipped entirely until parenting is first used:
+    // claim/release riders against the cached platform boxes, then snapshot
+    // every active actor's position for next frame's parent deltas.
+    if (dynamic_actor_parenting_used) {
         actor = actors_active_tail;
         while (actor) {
+            if (actor->actor_parent == NULL
+#ifdef DYNAMIC_ACTOR_PLATFORM_PLAYER_ONLY
+                // Platforms only auto-attach the player; other actors are never
+                // claimed (they can still be parented explicitly).
+                && (actor == &PLAYER)
+#endif
+            ) {
+                // Unparented: the first intersecting platform claims it,
+                // unless the platform has a collision group and this actor's
+                // group differs (a group-less platform claims everything,
+                // including the player).
+                platform_cache_t *p = platform_cache;
+                UBYTE i = platform_count;
+                while (i) {
+                    if ((p->actor != actor) &&
+                        ((p->group == COLLISION_GROUP_NONE) ||
+                         (p->group == (actor->collision_group & COLLISION_GROUP_MASK))) &&
+                        platform_cache_test(p, actor)) {
+                        actor->actor_parent = p->actor;
+                        break;
+                    }
+                    p++;
+                    i--;
+                }
+            } else if (actor->actor_parent) {
+                // Parented: only test against its own parent, and only when
+                // that parent is a platform that ran this frame - explicitly
+                // set parents and paused platforms never auto-release.
+                platform_cache_t *p = platform_cache;
+                UBYTE i = platform_count;
+                while (i) {
+                    if (p->actor == actor->actor_parent) {
+                        if (!platform_cache_test(p, actor)) {
+                            actor->actor_parent = NULL;
+                        }
+                        break;
+                    }
+                    p++;
+                    i--;
+                }
+            }
+#ifdef DYNAMIC_ACTOR_USES_PREV_POS
             actor->prev_pos = actor->pos;
 #ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
             actor->prev_pos_z = actor->pos_z;
 #endif
+#endif
             actor = actor->prev;
         }
+#ifdef DYNAMIC_ACTOR_USES_PLAYER_PREV_POS
+        // Snapshot the player for next frame's player-parent position delta.
+        player_prev_pos = PLAYER.pos;
+#ifdef DYNAMIC_ACTOR_ENABLE_MOVE_Z
+        player_prev_pos_z = PLAYER.pos_z;
+#endif
+#endif
     }
 #endif
 }
@@ -1078,7 +1284,9 @@ UBYTE vm_wait_for_collision(void * THIS, UBYTE start, UWORD * stack_frame) OLDCA
 }
 #endif
 
-#ifdef DYNAMIC_ACTOR_ENABLE_VM_MOTION_CRAWL_STEP
+// The crawl step steers on both axes through the MOVE_X/MOVE_Y collision
+// helpers, so it also needs both movement components compiled.
+#if defined(DYNAMIC_ACTOR_ENABLE_VM_MOTION_CRAWL_STEP) && defined(DYNAMIC_ACTOR_ENABLE_MOVE_X) && defined(DYNAMIC_ACTOR_ENABLE_MOVE_Y)
 #define CRAWL_SOLID(tx, ty) ((tile_at((tx), (ty)) & COLLISION_ALL) == COLLISION_ALL)
 
 #define DIR_XMOD(value, dir) (((dir) & 1) ? ((dir) == 1 ? (value) : -(value)) : 0)

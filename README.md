@@ -99,15 +99,33 @@ runs its own behavior physics (gravity/move/collision) on top. Two ways to set i
   leave, so actors — or the player — can step onto it, be carried along, and still
   walk/fall/collide normally on top of it. Works in every scene type.
 
-Details:
+### Parenting mode (engine setting)
+
+The **Parenting mode** engine setting picks *how* a parented actor follows its parent,
+globally for the whole game. Pick the cheapest one that does what you need:
+
+| Mode | What it does | Cost |
+|---|---|---|
+| **Static parenting (Fast)** | The child is pinned at a fixed pixel offset from the parent every frame and runs **no other behavior code**. The offset is the child's own X/Y velocity read as a pixel offset (set it with *Set Actor X/Y Velocity*). Use for HUD pieces, a rigidly attached sparkle, a health bar over a boss | Cheapest — no physics, no tile collision |
+| **Inherit first parent velocity (Slower)** | The child is carried by its **direct parent's velocity** (tile-collision checked), then still runs its own behavior physics. Only tracks a parent that has a dynamic velocity — with one exception: **the player is followed by its position delta** (the plugin keeps a player-position snapshot), since the engine-controlled player has no velocity field. Any *other* non-dynamic parent won't be followed | One velocity read per child (a player parent adds a per-frame player snapshot) |
+| **Apply all parents positions delta (Slowest)** | The child is displaced by the **summed position change of its whole parent chain** since last frame (tile-collision checked), then still runs its own behavior physics. Follows **any** parent — including engine-moved ones like the player — and keeps up with a chain of parents (parent → grandparent → …) in a single frame with no per-level lag | Walks the parent chain + an end-of-frame position snapshot per actor |
+
+The default is **Apply all parents positions delta**, the most general (it is what the
+example project and the notes below assume).
+
+Details (velocity/delta modes):
 
 - **The player works on both sides.** The engine-controlled player can ride a moving
-  platform, and can also *be* a parent: the plugin uses the player's real per-frame
-  movement, so a parented actor follows the player with no extra scripting (the
-  Point n Click sparkle does exactly this).
-- Other non-dynamic parents move their children through their **velocity**, so a
-  scripted parent must move via a dynamic behavior (or have its velocity set) for
-  children to follow.
+  platform, and can also *be* a parent: a parented actor follows the player with no
+  extra scripting (the Point n Click sparkle does exactly this). This works in **both**
+  *delta* mode (via the player's per-frame position delta) and *velocity* mode (which
+  special-cases a player parent to a position delta, since the player has no velocity
+  field). In *delta* mode any parent works this way; in *velocity* mode only the player
+  gets the position-delta treatment.
+- In *velocity* mode a non-dynamic parent *other than the player* moves its children
+  through its **velocity**, so such a scripted parent must move via a dynamic behavior
+  (or have its velocity set) for children to follow. *Delta* mode has no such
+  requirement — it tracks position change for every parent.
 - The inherited displacement is **tile-collision checked** in the parent's movement
   direction: a moving platform cannot shove a rider or the player through walls —
   the rider is blocked and the platform slides on without it. Untick the child
@@ -115,6 +133,16 @@ Details:
 - A *Moving platform* never steals children: actors that already have a different
   parent are skipped, and if the platform has a collision group set it only claims
   actors in the same group.
+- Enable **Platforms attach the player only** (engine setting) to restrict platform
+  auto-attach to the player — every other actor is ignored by platforms (but can still
+  be parented explicitly with *Set Actor Parent Actor*). Handy for a platformer where
+  only the player should ride platforms, and it skips the claim test on all other
+  actors.
+- Claiming/releasing happens once per frame after all actors have moved, using the
+  platform's final position, and a newly claimed rider starts inheriting movement the
+  next frame. Only paused platforms and explicitly set parents never auto-release.
+  At most *Max moving platforms* (engine setting, default 2) platforms can claim
+  riders in a scene.
 
 ## Spawning actors
 
@@ -255,7 +283,10 @@ Group **Dynamic actor**:
 | Collision model: Triangle | On | Compile the triangle collision model |
 | Collision model: Bounding box | On | Compile the bounding-box collision model |
 | Enable slope collision | Off | Slope tile support (needs slope collision tiles) |
-| Max behavior slots | 8 | Slider (1-32). Each slot costs 6 bytes of RAM |
+| Max behavior slots | 8 | Slider (1-32). Each slot costs 8 bytes of RAM |
+| Max moving platforms | 2 | Slider (1-8). How many *Moving platform* actors can claim/release riders per scene; each costs 12 bytes of RAM. Platforms past the limit still move but never pick up riders |
+| Platforms attach the player only | Off | When on, a *Moving platform* only auto-attaches the player on contact; other actors are ignored (they can still be parented explicitly). Also skips the per-frame claim test on every non-player actor. Only shown when *Parent actors* is enabled |
+| Parenting mode | Apply all parents positions delta | How a parented actor follows its parent (see [Parenting mode](#parenting-mode-engine-setting)): *Static parenting* (rigid offset, no physics, fastest), *Inherit first parent velocity* (carried by direct parent's velocity, runs own physics), or *Apply all parents positions delta* (summed chain delta, follows any parent incl. the player, runs own physics). Only shown when *Parent actors* is enabled |
 
 The collision model each behavior uses is picked **per behavior slot** in the Define
 Actor Behavior event; the three checkboxes above only control which models are
@@ -289,9 +320,7 @@ your game uses:
 | VM: Wait for collision | `vm_wait_for_collision` (Wait For Actor Collision events) |
 | VM motion: Chase actor | `vm_actor_chase_actor` (Actor Chase Actor events) |
 | VM motion: Move to position by velocity | `vm_actor_move_to_pos_by_velocity` (Actor Move To Position By Velocity) |
-| VM motion: Circle variable | `vm_actor_motion_circle_variable` (Actor Motion: Circle (Variable)) |
-| VM motion: Bezier to | `vm_actor_move_bezier_to` (Actor Motion: Bezier (Variable)) |
-| VM motion: Crawl step | `vm_actor_crawl_step` (Actor Motion: Wall Crawl) |
+| VM motion: Crawl step | `vm_actor_crawl_step` (Actor Motion: Wall Crawl). Also requires *Move horizontally* + *Move vertically* |
 
 Notes:
 - Disabling a component only removes its **code**. Behavior flags that reference a
@@ -305,8 +334,20 @@ Notes:
 
 - One flag-driven update pass over the **active** actor list only (off-screen actors are
   already excluded by the engine's activation system).
-- Actors with no behavior or in the paused state cost a couple of comparisons per frame.
+- Actors with no behavior and no parent cost two byte-compares and a pointer test per
+  frame — everything else (behavior lookup, tile math, flags) is only loaded after that
+  early-out.
 - Collision cost scales with the behavior's collision type: origin point does 1-2
   collision tile reads per moving actor per frame.
-- RAM: 6 bytes × (slots + 1) for the behavior table (54 bytes at default), plus 6 bytes
-  per actor for velocity/behavior/state/parent.
+- Moving platforms don't scan the actor list themselves: each platform caches its box
+  once per frame, and a single end-of-frame pass claims/releases riders against those
+  cached boxes (parented actors are only tested against their own parent's box).
+- Scenes that never define a *Moving platform* behavior and never set a parent skip the
+  entire end-of-frame parenting pass (claiming + position snapshots) — the parent
+  component then costs one flag test per frame.
+- RAM: 8 bytes × (slots + 1) for the behavior table (72 bytes at default), 12 bytes ×
+  *Max moving platforms* (+1) for the platform cache (25 bytes at default), plus
+  per-actor velocity/behavior/state/parent fields (more with the Z axis enabled).
+  The per-actor position snapshot (4 bytes, +2 with the Z axis) is only compiled in
+  the *Apply all parents positions delta* parenting mode — the static and velocity
+  modes don't keep it, saving that RAM on every actor.

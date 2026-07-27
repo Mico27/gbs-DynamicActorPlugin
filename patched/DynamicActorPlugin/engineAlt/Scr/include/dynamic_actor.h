@@ -11,6 +11,50 @@
 #define DYNAMIC_ACTOR_MAX_BEHAVIORS 8
 #endif
 
+// Max moving-platform (BHV_PLATFORM) actors cached per frame for rider
+// claiming/releasing. Platforms beyond this limit still move but never
+// claim or release riders.
+#ifndef DYNAMIC_ACTOR_MAX_PLATFORMS
+#define DYNAMIC_ACTOR_MAX_PLATFORMS 2
+#endif
+
+// Parenting mode (DYNAMIC_ACTOR_PARENT_MODE engine setting) - how a parented
+// actor follows its parent. Selected globally for the whole game.
+//   STATIC   : the actor is rigidly pinned at a fixed pixel offset (its own
+//              velocity, read as a pixel offset) from the parent position and
+//              runs no other behavior code. Cheapest.
+//   VELOCITY : the actor is displaced by its direct parent's velocity every
+//              frame, then still runs its own behavior physics if it has one.
+//   DELTA    : the actor is displaced by the summed position delta of its whole
+//              parent chain (parent, grandparent, ...) since last frame, then
+//              still runs its own behavior physics. Works with any parent
+//              (including engine-moved actors like the player). Slowest.
+#define DYNAMIC_ACTOR_PARENT_MODE_STATIC   0
+#define DYNAMIC_ACTOR_PARENT_MODE_VELOCITY 1
+#define DYNAMIC_ACTOR_PARENT_MODE_DELTA    2
+#ifndef DYNAMIC_ACTOR_PARENT_MODE
+#define DYNAMIC_ACTOR_PARENT_MODE DYNAMIC_ACTOR_PARENT_MODE_DELTA
+#endif
+
+// The per-actor prev_pos / prev_pos_z position snapshots only exist and are only
+// maintained in DELTA parenting mode (it derives the parent movement from the
+// position change between frames). The static and velocity modes don't need
+// them, so they are compiled out of the actor struct (gbs_types.h) and every
+// snapshot site below. gbs_types.h uses the raw numeric mode test since it can't
+// see the DYNAMIC_ACTOR_PARENT_MODE_* names - keep them in sync.
+#if defined(DYNAMIC_ACTOR_ENABLE_PARENT) && (DYNAMIC_ACTOR_PARENT_MODE == DYNAMIC_ACTOR_PARENT_MODE_DELTA)
+#define DYNAMIC_ACTOR_USES_PREV_POS
+#endif
+
+// The velocity parenting mode carries a child by its direct parent's velocity,
+// but the engine-controlled player never populates a velocity field. So when the
+// parent is the player, that mode falls back to tracking the player by position
+// delta, using a single player-position snapshot kept in dynamic_actor.c. That
+// snapshot is only compiled in the velocity mode.
+#if defined(DYNAMIC_ACTOR_ENABLE_PARENT) && (DYNAMIC_ACTOR_PARENT_MODE == DYNAMIC_ACTOR_PARENT_MODE_VELOCITY)
+#define DYNAMIC_ACTOR_USES_PLAYER_PREV_POS
+#endif
+
 // Physics component flags (flags)
 #define BHV_GRAVITY_Y   0x01u  // apply gravity to y velocity, clamped to max_fall_vel
 #define BHV_GRAVITY_Z   0x02u  // apply gravity to z velocity, clamped to max_fall_vel
@@ -74,6 +118,9 @@ typedef struct behavior_def_t {
     BYTE max_fall_vel;  // max downward velocity in subpixels/frame
     UBYTE bounce;        // energy kept on bounce, 0..255 (255 = perfect reflect)
     UBYTE event_flags;   // BHV_EVENT_* trigger permissions
+    UBYTE reserved;      // pads the slot to 8 bytes so behavior_defs indexing
+                         // compiles to a shift instead of a multiply; free for
+                         // a future field
 } behavior_def_t;
 
 extern script_event_t dynamic_actor_events[DYNAMIC_ACTOR_CALLBACK_SIZE];
@@ -83,6 +130,16 @@ extern UBYTE dynamic_actor_event_tile_x;
 extern UBYTE dynamic_actor_event_tile_y;
 
 extern behavior_def_t behavior_defs[DYNAMIC_ACTOR_MAX_BEHAVIORS + 1];
+
+#ifdef DYNAMIC_ACTOR_ENABLE_PARENT
+// Nonzero once anything in the scene can use parenting (a parent was set, or
+// a behavior with BHV_PLATFORM was defined). While zero, dynamic_actor_update
+// skips the whole end-of-frame claim/snapshot pass.
+extern UBYTE dynamic_actor_parenting_used;
+// Flips the flag on and refreshes every active actor's prev_pos so the first
+// parent delta after enabling doesn't span the whole scene lifetime.
+void dynamic_actor_mark_parenting_used(void) BANKED;
+#endif
 
 void dynamic_actor_init(void) BANKED;
 void dynamic_actor_update(void) BANKED;

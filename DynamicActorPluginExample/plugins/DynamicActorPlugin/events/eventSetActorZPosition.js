@@ -31,6 +31,23 @@ export const fields = [
 ];
 
 export const compile = (input, helpers) => {
+  const __engineFieldOn = (key) => {
+    const fv =
+      helpers.engineFieldValues &&
+      helpers.engineFieldValues.find((s) => s.id === key);
+    if (fv && fv.value !== undefined && fv.value !== null) return !!fv.value;
+    const def = helpers.engineFields && helpers.engineFields[key];
+    return def ? !!def.defaultValue : true;
+  };
+  const __requireEngineField = (key, label) => {
+    if (!__engineFieldOn(key)) {
+      throw new Error(
+        `This event requires the "${label}" engine setting to be enabled (Settings → Engine fields → Dynamic actor).`
+      );
+    }
+  };
+  __requireEngineField("DYNAMIC_ACTOR_ENABLE_MOVE_Z", "Topdown Z axis");
+
   const {
     _callNative,
     _stackPush,

@@ -69,6 +69,23 @@ export const fields = [
 ];
 
 export const compile = (input, helpers) => {
+  const __engineFieldOn = (key) => {
+    const fv =
+      helpers.engineFieldValues &&
+      helpers.engineFieldValues.find((s) => s.id === key);
+    if (fv && fv.value !== undefined && fv.value !== null) return !!fv.value;
+    const def = helpers.engineFields && helpers.engineFields[key];
+    return def ? !!def.defaultValue : true;
+  };
+  const __requireEngineField = (key, label) => {
+    if (!__engineFieldOn(key)) {
+      throw new Error(
+        `This event requires the "${label}" engine setting to be enabled (Settings → Engine fields → Dynamic actor).`
+      );
+    }
+  };
+  __requireEngineField("DYNAMIC_ACTOR_ENABLE_VM_MOTION_CHASE_ACTOR", "VM motion: Chase actor");
+
   const { _invoke, _stackPush, _stackPushConst, _stackPushScriptValue, _addComment, _declareLocal, setActorId } = helpers;
 
   const actorRef = _declareLocal("actorRef", 1, true);

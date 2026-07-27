@@ -39,6 +39,18 @@
         "__comment": false
       },
       "id": "4ace8026-2469-44f9-b299-d98ac33aeec3"
+    },
+    {
+      "command": "EVENT_SET_ACTOR_Y_VELOCITY",
+      "args": {
+        "actorId": "$self$",
+        "yVelocity": {
+          "type": "number",
+          "value": 8
+        },
+        "__comment": true
+      },
+      "id": "78929b6a-e7ae-41c6-97e3-b0509e3067b3"
     }
   ],
   "updateScript": [],

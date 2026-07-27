@@ -48,12 +48,16 @@ void vm_define_actor_behavior(SCRIPT_CTX * THIS) OLDCALL BANKED {
     def->gravity      = *(uint8_t *)VM_REF_TO_PTR(FN_ARG3);
     def->max_fall_vel = *(uint8_t *)VM_REF_TO_PTR(FN_ARG4);
     def->bounce       = *(uint8_t *)VM_REF_TO_PTR(FN_ARG5);
+#ifdef DYNAMIC_ACTOR_ENABLE_PARENT
+    if (CHK_FLAG(def->flags, BHV_PLATFORM)) {
+        dynamic_actor_mark_parenting_used();
+    }
+#endif
 }
 
 void vm_set_actor_behavior(SCRIPT_CTX * THIS) OLDCALL BANKED {
     (void)THIS;
     actor_t * actor = actors + *(uint8_t *)VM_REF_TO_PTR(FN_ARG0);
-    UBYTE old_state = actor->actor_state;
     actor->actor_behavior_id = *(uint8_t *)VM_REF_TO_PTR(FN_ARG1);
     UBYTE state = *(uint8_t *)VM_REF_TO_PTR(FN_ARG2);
     if (state != BHV_STATE_KEEP) {
@@ -72,7 +76,6 @@ void vm_get_actor_behavior(SCRIPT_CTX * THIS) OLDCALL BANKED {
 void vm_set_actor_state(SCRIPT_CTX * THIS) OLDCALL BANKED {
     (void)THIS;
     actor_t * actor = actors + *(uint8_t *)VM_REF_TO_PTR(FN_ARG0);
-    UBYTE old_state = actor->actor_state;
     actor->actor_state = *(uint8_t *)VM_REF_TO_PTR(FN_ARG1);
 }
 
@@ -196,6 +199,7 @@ void vm_set_actor_parent(SCRIPT_CTX * THIS) OLDCALL BANKED {
         actor->actor_parent = NULL;
     } else {
         actor->actor_parent = actors + parent_actor_idx;
+        dynamic_actor_mark_parenting_used();
     }
 }
 
