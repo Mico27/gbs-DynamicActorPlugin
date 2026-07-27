@@ -12,22 +12,6 @@ Shoot 'Em Up, and Point and Click**. (Logo scenes have no actors and are not hoo
 
 https://github.com/user-attachments/assets/e32d2233-d1c8-464a-ba14-fb5e5caad736
 
-
-## Example project
-
-`DynamicActorPluginExample/` is a behavior test suite. **Press START to cycle scenes**:
-
-| Scene | Type | Tests |
-|---|---|---|
-| Scene 1 | Platformer | Walker, walker avoiding ledges, falling/sliding platform, attach on interact (parenting), jump impulse (B) |
-| Platform Movers | Platformer | Ground chaser (*Actor Chase Actor*), damped bouncing ball, ground ferry that drags the carried player, pooled cannon (`gbs-SpawnPoolActorPlugin`) |
-| Top Down | Top Down | Wanderer, two bumpers colliding actor-vs-actor with 4-direction facing |
-| Adventure Movers | Adventure | Moving ferry carrying the player (walk onto it), chasers/fleers via *Actor Chase Actor*, parented followers |
-| Shmup | Shoot 'Em Up | Straight projectile and homing projectile passing through walls, perfect-bounce debris |
-| Point n Click | Point and Click | Sparkle parented to the player, bouncing ball |
-| Test Crawler | — | Wall Crawl motion testbed |
-| Test Circle | — | Bezier (Variable) motion testbed |
-
 ## How it works
 
 1. **Define behaviors** in your scene's *On Init* script with the **Define Actor Behavior**
