@@ -1,0 +1,100 @@
+{
+  "_resourceType": "actor",
+  "id": "57fb7637-7be5-4235-bcc7-b9f270d0b824",
+  "name": "Thwomp",
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "581d34d0-9591-4e6e-a609-1d94f203b0cd",
+  "prefabId": "",
+  "direction": "down",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "paletteId": "",
+  "isPinned": false,
+  "persistent": true,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "symbol": "actor_3",
+  "script": [],
+  "startScript": [
+    {
+      "command": "EVENT_SET_ACTOR_BEHAVIOR",
+      "args": {
+        "actorId": "$self$",
+        "behaviorId": {
+          "type": "number",
+          "value": 4
+        },
+        "state": "1"
+      },
+      "id": "3fffc7ca-a293-491c-8a1c-7b13e67ff691"
+    }
+  ],
+  "updateScript": [
+    {
+      "command": "EVENT_WAIT_FOR_ACTOR_IN_RANGE",
+      "args": {
+        "actorId": "$self$",
+        "targetActorId": "player",
+        "until": "inside",
+        "checkX": true,
+        "rangeX": 32,
+        "checkY": false,
+        "rangeY": 32
+      },
+      "id": "4bd0a6d9-400b-439e-a9d5-de0c73ebf457"
+    },
+    {
+      "command": "EVENT_SET_ACTOR_Y_VELOCITY",
+      "args": {
+        "actorId": "$self$",
+        "yVelocity": {
+          "type": "number",
+          "value": 64
+        }
+      },
+      "id": "f4e21edc-93ae-4149-896e-6cd35ab84ebb"
+    },
+    {
+      "command": "EVENT_WAIT_FOR_ACTOR_COLLISION",
+      "args": {
+        "actorId": "$self$",
+        "waitHorizontal": false,
+        "waitVertical": true,
+        "waitPit": false,
+        "waitActor": false
+      },
+      "id": "0ed0824c-a70a-435f-b01a-c719a5850afd"
+    },
+    {
+      "command": "EVENT_SET_ACTOR_Y_VELOCITY",
+      "args": {
+        "actorId": "$self$",
+        "yVelocity": {
+          "type": "number",
+          "value": -32
+        }
+      },
+      "id": "56e38aa8-e6d4-4c2b-bf06-475492a69207"
+    },
+    {
+      "command": "EVENT_WAIT_FOR_ACTOR_COLLISION",
+      "args": {
+        "actorId": "$self$",
+        "waitHorizontal": false,
+        "waitVertical": true,
+        "waitPit": false,
+        "waitActor": false
+      },
+      "id": "e6f1f9c9-3ff1-4e46-8ca0-f05e2f35f516"
+    }
+  ],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": [],
+  "coordinateType": "tiles",
+  "x": 15,
+  "y": 2,
+  "_index": 4
+}

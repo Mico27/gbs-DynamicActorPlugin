@@ -165,18 +165,18 @@
           "type": "number",
           "value": 4
         },
-        "preset": "reflector",
-        "compGravityY": true,
+        "preset": "custom",
+        "compGravityY": false,
         "compGravityZ": false,
         "compTileCollision": true,
         "compActorCollision": false,
         "compPlatform": false,
         "compLedgeStop": false,
-        "compReflectX": true,
+        "compReflectX": false,
         "compReflectY": false,
         "compReflectZ": false,
-        "animJumpY": true,
-        "animJumpZ": true,
+        "animJumpY": false,
+        "animJumpZ": false,
         "lockPositionAxes": "0",
         "lockDirectionAxes": "0",
         "collisionType": "0",
@@ -200,7 +200,7 @@
           "type": "number",
           "value": 128
         },
-        "__collapse": true
+        "__collapse": false
       },
       "id": "c44c66e9-3491-4c1d-8e9f-40a9c0a6b34d"
     },
