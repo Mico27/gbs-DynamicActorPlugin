@@ -362,6 +362,8 @@ your game uses:
 | VM setting | Removes when unchecked |
 |---|---|
 | VM: Wait for collision | `vm_wait_for_collision` (Wait For Actor Collision events) |
+| VM: Wait for actor in range | `vm_wait_for_actor_in_range` (Wait For Actor In Range events) |
+| VM: Wait for actor state | `vm_wait_for_actor_state` (Wait For Actor State events) |
 | VM motion: Chase actor | `vm_actor_chase_actor` (Actor Chase Actor events) |
 | VM motion: Move to position by velocity | `vm_actor_move_to_pos_by_velocity` (Actor Move To Position By Velocity) |
 | VM motion: Crawl step | `vm_actor_crawl_step` (Actor Motion: Wall Crawl). Also requires *Move horizontally* + *Move vertically* |

@@ -40,20 +40,33 @@ export const fields = [
 ];
 
 export const compile = (input, helpers) => {
+  const __engineFieldOn = (key) => {
+    const fv =
+      helpers.engineFieldValues &&
+      helpers.engineFieldValues.find((s) => s.id === key);
+    if (fv && fv.value !== undefined && fv.value !== null) return !!fv.value;
+    const def = helpers.engineFields && helpers.engineFields[key];
+    return def ? !!def.defaultValue : true;
+  };
+  const __requireEngineField = (key, label) => {
+    if (!__engineFieldOn(key)) {
+      throw new Error(
+        `This event requires the "${label}" engine setting to be enabled (Settings → Engine fields → Dynamic actor).`
+      );
+    }
+  };
+  __requireEngineField(
+    "DYNAMIC_ACTOR_ENABLE_VM_WAIT_FOR_STATE",
+    "VM: Wait for actor state"
+  );
+
   const {
-    _callNative,
     _stackPush,
     _stackPushConst,
-    _stackPop,
     _addComment,
-    _addNL,
     _declareLocal,
     setActorId,
-    _idle,
-    _label,
-    _jump,
-    _ifConst,
-    getNextLabel,
+    _invoke,
   } = helpers;
 
   const state = [0, 1, 2, 3].includes(Number(input.state))
@@ -61,24 +74,13 @@ export const compile = (input, helpers) => {
     : 1;
   const invert = input.invert === true;
 
-  const actorRef = _declareLocal("tmp0", 1, true);
-  const stateRef = _declareLocal("bhv_state", 1, true);
+  const actorRef = _declareLocal("actorRef", 1, true);
 
   setActorId(actorRef, input.actorId);
 
   _addComment(`Wait For Actor State ${invert ? "!=" : "=="} ${state}`);
-
-  const loopLabel = getNextLabel();
-  const doneLabel = getNextLabel();
-  _label(loopLabel);
-  _stackPushConst(stateRef);
   _stackPush(actorRef);
-  _callNative("vm_get_actor_state");
-  _stackPop(2);
-  _ifConst(invert ? ".NE" : ".EQ", stateRef, state, doneLabel, 0);
-  _idle();
-  _jump(loopLabel);
-  _label(doneLabel);
-
-  _addNL();
+  _stackPushConst(state);
+  _stackPushConst(invert ? 1 : 0);
+  _invoke("vm_wait_for_actor_state", 3, ".ARG2");
 };
