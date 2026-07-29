@@ -28,9 +28,9 @@ Behavior definitions live in working RAM and are cleared on every scene load —
 define them in each scene's init script (put the Define events in a custom script
 to share them between scenes).
 
-Units: positions and velocities are in **subpixels** — 16 subpixels = 1 pixel.
-A velocity of 16 moves the actor 1 pixel per frame. *Bounciness* is 0-255,
-where 128 keeps half the energy per bounce and 255 is a perfect bounce.
+Units: positions and velocities are in **subpixels** — 32 subpixels = 1 pixel.
+A velocity of 32 moves the actor 1 pixel per frame. *Bounciness* is 0-255,
+where 128 keeps reflects the full velocity and 255 reflects x2 the velocity.
 
 ## Presets
 
