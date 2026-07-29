@@ -73,7 +73,7 @@ These options are shown for **every** behavior (preset or custom):
 |---|---|
 | Lock position axes | Freeze behavior-driven movement on any of X / Y / Z (or combinations) — e.g. a rail that only slides horizontally |
 | Lock direction axes | Stop the automatic animation from changing the horizontal and/or vertical facing |
-| Tile collision type | Collision model for this slot: *Origin point (fastest)*, *Triangle*, or *Bounding box* |
+| Tile collision type | Collision model for this slot: *Origin point (fastest)* or *Bounding box* |
 | Gravity | Acceleration in subpixels/frame added while airborne (default 8) |
 | Max fall speed | Terminal velocity in subpixels/frame (default 64) |
 | Bounciness | Energy kept per bounce, 0-255 (used with the Bounce components) |
@@ -319,7 +319,6 @@ Group **Dynamic actor**:
 | Setting | Default | Notes |
 |---|---|---|
 | Collision model: Origin point | On | Compile the single-point (fastest) collision model |
-| Collision model: Triangle | On | Compile the triangle collision model |
 | Collision model: Bounding box | On | Compile the bounding-box collision model |
 | Enable slope collision | Off | Slope tile support (needs slope collision tiles) |
 | Max behavior slots | 8 | Slider (1-32). Each slot costs 8 bytes of RAM |
@@ -413,7 +412,7 @@ components are enabled and on the two slider settings. Per-actor costs are multi
 | Player position snapshot | 4 B (+2 B with Z axis) | *Parent actors* **and** parenting mode = *Inherit first parent velocity* |
 | Per actor: Z position + Z velocity | 3 B × 21 = **63 B** | *Topdown Z axis* |
 | Z scratch | **2 B** | *Topdown Z axis* |
-| Slope scratch | **1 B** | *Slope collision* (with triangle/bounding-box model) |
+| Slope scratch | **1 B** | *Slope collision* (with bounding-box model) |
 | Per actor: last-trigger index | 1 B × 21 = **21 B** | *Actors activate triggers* |
 
 **Totals:**

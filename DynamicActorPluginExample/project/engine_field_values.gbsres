@@ -42,10 +42,6 @@
       "value": 1
     },
     {
-      "id": "DYNAMIC_ACTOR_ENABLE_COLLISION_TRIANGLE",
-      "value": 1
-    },
-    {
       "id": "DYNAMIC_ACTOR_ENABLE_COLLISION_BOUNDING_BOX",
       "value": 1
     },
