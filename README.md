@@ -269,7 +269,7 @@ to the fastest wave that fits that range.
 | Actor Motion: Charge At Target | Wait until row/column-aligned with a target, dash at it, stop on impact (optionally at ledges / other actors) | Move on the dash axis |
 | Actor Motion: Wall Crawl | Crawl along walls/ceilings/floors and wrap around corners, Zelda-Spark style (right- or left-hand wall follower, runs forever). Backed by the `vm_actor_crawl_step` engine native; fully solid tiles count as wall, map borders included | Move X + Move Y, tile collision off |
 
-Blocking helpers (pair them with a matching behavior or they wait forever):
+## Wait events:
 
 | Event | Blocks until |
 |---|---|
