@@ -76,7 +76,7 @@ These options are shown for **every** behavior (preset or custom):
 |---|---|
 | Lock position axes | Freeze behavior-driven movement on any of X / Y / Z (or combinations) — e.g. a rail that only slides horizontally |
 | Lock direction axes | Stop the automatic animation from changing the horizontal and/or vertical facing |
-| Tile collision type | Collision model for this slot: *Origin point (fastest)* or *Bounding box* |
+| Tile collision type | Collision model for this slot: *Origin point (fastest)*, *Triangle*, or *Bounding box* |
 | Gravity | Acceleration in subpixels/frame added while airborne (default 8) |
 | Max fall speed | Terminal velocity in subpixels/frame (default 64) |
 | Bounciness | Energy kept per bounce, 0-255 (used with the Bounce components) |
@@ -322,6 +322,7 @@ Group **Dynamic actor**:
 | Setting | Default | Notes |
 |---|---|---|
 | Collision model: Origin point | On | Compile the single-point (fastest) collision model |
+| Collision model: Triangle | On | Compile the triangle collision model |
 | Collision model: Bounding box | On | Compile the bounding-box collision model |
 | Enable slope collision | Off | Slope tile support (needs slope collision tiles) |
 | Max behavior slots | 8 | Slider (1-32). Each slot costs 8 bytes of RAM |
@@ -332,7 +333,9 @@ Group **Dynamic actor**:
 
 The collision model each behavior uses is picked **per behavior slot** in the Define
 Actor Behavior event; the three checkboxes above only control which models are
-compiled into the ROM. Uncheck the models none of your behaviors use to save ROM.
+compiled into the ROM. Uncheck the models none of your behaviors use to save ROM — see
+[Build error: bank size overflow](#build-error-bank-size-overflow) if the build runs
+out of bank space.
 
 ### Modular components
 
@@ -376,6 +379,54 @@ Notes:
 - Gravity is only visible together with *Move vertically*.
 - *Turn at ledges* requires *Move horizontally*; *Bounce* requires *Move vertically*.
 
+### Build error: bank size overflow
+
+⚠️ If you enable a lot of components at once, the build can fail with:
+
+```
+BankPack: ERROR! Area _CODE_, bank 255, size 17752 is too large for bank size 16384
+(file ...\obj\dynamic_actor.o)
+?ASlink-Error-<cannot open> : "...lcc61000.lk"
+```
+
+This is **not** a bug — it means the compiled code of the file named in the error
+(here `dynamic_actor.o`) no longer fits in a single 16 KB ROM bank. A single object
+file cannot be split across banks, so the fix is to compile less code into it by
+**unchecking settings you don't use** in Settings → Engine fields → *Dynamic actor*.
+The number in the error tells you how much you need to shave off — in the example
+above, `17752 - 16384 = 1368` bytes.
+
+Check the **filename** in the error first, because different settings feed different
+object files:
+
+**If the error names `dynamic_actor.o`**, uncheck any of these (roughly largest saving
+first — pick the ones your game genuinely never uses):
+
+| Setting | Why it's a good candidate |
+|---|---|
+| Enable slope collision | Off by default. Adds slope handling to *every* compiled collision model, so it is usually the single biggest win |
+| Collision model: Triangle / Bounding box / Origin point | Each model is a separate set of routines. Most games only use one — uncheck the other two |
+| Topdown Z axis | Off by default. Adds a Z axis to movement, gravity and bounce throughout |
+| Component: Parent actors / moving platforms | Large: parenting chain + platform claim/release |
+| Component: Turn at ledges | Ledge/pit detection routines |
+| Component: Move horizontally / vertically | Only if your game truly moves on one axis |
+| Component: Bounce on floor/ceiling | Includes 32-bit math |
+| VM: Wait for collision | Its detection loop lives in `dynamic_actor.c` |
+| VM motion: Crawl step | Its wall-crawl routine lives in `dynamic_actor.c` |
+
+**If the error names `vm_dynamic_actor.o`**, uncheck the scripting natives instead —
+*VM: Wait for actor in range*, *VM: Wait for actor state*, *VM motion: Chase actor*,
+*VM motion: Move to position by velocity*. Those four do **not** shrink
+`dynamic_actor.o`, so they won't help with the error above.
+
+Remember that unchecking a **VM setting** while a script still uses the matching event
+fails at link time — delete those events first. Unchecking a **component** is always
+safe: behavior flags referencing it are just ignored at runtime.
+
+> The bundled `DynamicActorPluginExample` deliberately turns *everything* on to
+> demonstrate every feature, which puts it right at the bank limit. If you add to it and
+> hit this error, switching *Enable slope collision* off is usually enough.
+
 ## Compatibility with other plugins
 
 The plugin ships `engineAlt` variants so it can coexist with other engine-file plugins.
@@ -417,7 +468,7 @@ components are enabled and on the two slider settings. Per-actor costs are multi
 | Player position snapshot | 4 B (+2 B with Z axis) | *Parent actors* **and** parenting mode = *Inherit first parent velocity* |
 | Per actor: Z position + Z velocity | 3 B × 21 = **63 B** | *Topdown Z axis* |
 | Z scratch | **2 B** | *Topdown Z axis* |
-| Slope scratch | **1 B** | *Slope collision* (with bounding-box model) |
+| Slope scratch | **1 B** | *Slope collision* (with triangle/bounding-box model) |
 | Per actor: last-trigger index | 1 B × 21 = **21 B** | *Actors activate triggers* |
 
 **Totals:**

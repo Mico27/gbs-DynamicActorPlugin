@@ -1,0 +1,12 @@
+{
+  "_resourceType": "background",
+  "id": "16c84aa4-c54b-4a23-8ed4-44ae9df454d0",
+  "name": "court.mono",
+  "symbol": "bg_court_mono",
+  "tileColors": "",
+  "filename": "court.mono.png",
+  "width": 32,
+  "height": 26,
+  "imageWidth": 256,
+  "imageHeight": 208
+}
