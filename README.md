@@ -10,6 +10,9 @@ Works in every action scene type (GBS 4.3.0): **Platformer, Top Down, Adventure,
 Shoot 'Em Up, and Point and Click**. (Logo scenes have no actors and are not hooked.)
 
 
+https://github.com/user-attachments/assets/cb91889a-e531-4a79-b456-66c876b27699
+
+
 https://github.com/user-attachments/assets/e32d2233-d1c8-464a-ba14-fb5e5caad736
 
 ## How it works
