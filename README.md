@@ -390,7 +390,9 @@ BankPack: ERROR! Area _CODE_, bank 255, size 17752 is too large for bank size 16
 ```
 
 This is **not** a bug — it means the compiled code of the file named in the error
-(here `dynamic_actor.o`) no longer fits in a single 16 KB ROM bank. A single object
+(here `dynamic_actor.o`) no longer fits in a single 16 KB ROM bank. This is usually
+due to another plugin overriding the inline "tile_at" function, inflating it, thus
+inflating dynamic_actor.c making it exceed the bank limit. A single object
 file cannot be split across banks, so the fix is to compile less code into it by
 **unchecking settings you don't use** in Settings → Engine fields → *Dynamic actor*.
 The number in the error tells you how much you need to shave off — in the example
@@ -414,18 +416,9 @@ first — pick the ones your game genuinely never uses):
 | VM: Wait for collision | Its detection loop lives in `dynamic_actor.c` |
 | VM motion: Crawl step | Its wall-crawl routine lives in `dynamic_actor.c` |
 
-**If the error names `vm_dynamic_actor.o`**, uncheck the scripting natives instead —
-*VM: Wait for actor in range*, *VM: Wait for actor state*, *VM motion: Chase actor*,
-*VM motion: Move to position by velocity*. Those four do **not** shrink
-`dynamic_actor.o`, so they won't help with the error above.
-
 Remember that unchecking a **VM setting** while a script still uses the matching event
 fails at link time — delete those events first. Unchecking a **component** is always
 safe: behavior flags referencing it are just ignored at runtime.
-
-> The bundled `DynamicActorPluginExample` deliberately turns *everything* on to
-> demonstrate every feature, which puts it right at the bank limit. If you add to it and
-> hit this error, switching *Enable slope collision* off is usually enough.
 
 ## Compatibility with other plugins
 
