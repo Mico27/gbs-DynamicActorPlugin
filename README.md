@@ -206,14 +206,6 @@ is reset to 0 at the start of every frame.
   independent of the player. The player is skipped here (the engine drives its own
   trigger activation). Requires the *Actors activate triggers* engine component.
 
-## Spawning actors
-
-Runtime actor spawning (pooled bullets, cannons, random off-screen spawns) lives in the
-separate **Spawn Pool Actor Plugin** (`gbs-SpawnPoolActorPlugin`). It has no
-dependencies on this plugin, but the two pair naturally: pre-configure each pool
-actor's dynamic behavior + velocity in its *On Init* (then *Deactivate*), and spawned
-actors resume that behavior. The example project's Platform Movers cannon uses both.
-
 ## Events
 
 | Event | Purpose |
