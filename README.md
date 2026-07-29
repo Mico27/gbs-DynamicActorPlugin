@@ -28,9 +28,9 @@ Behavior definitions live in working RAM and are cleared on every scene load —
 define them in each scene's init script (put the Define events in a custom script
 to share them between scenes).
 
-Units: positions and velocities are in **subpixels** — 16 subpixels = 1 pixel.
-A velocity of 16 moves the actor 1 pixel per frame. *Bounciness* is 0-255,
-where 128 keeps half the energy per bounce and 255 is a perfect bounce.
+Units: positions and velocities are in **subpixels** — 32 subpixels = 1 pixel.
+A velocity of 32 moves the actor 1 pixel per frame. *Bounciness* is 0-255,
+where 128 keeps reflects the full velocity and 255 reflects x2 the velocity.
 
 ## Presets
 
@@ -205,14 +205,6 @@ is reset to 0 at the start of every frame.
   the player does. Each actor tracks its own current trigger (one byte of RAM per actor),
   independent of the player. The player is skipped here (the engine drives its own
   trigger activation). Requires the *Actors activate triggers* engine component.
-
-## Spawning actors
-
-Runtime actor spawning (pooled bullets, cannons, random off-screen spawns) lives in the
-separate **Spawn Pool Actor Plugin** (`gbs-SpawnPoolActorPlugin`). It has no
-dependencies on this plugin, but the two pair naturally: pre-configure each pool
-actor's dynamic behavior + velocity in its *On Init* (then *Deactivate*), and spawned
-actors resume that behavior. The example project's Platform Movers cannon uses both.
 
 ## Events
 
@@ -390,7 +382,9 @@ BankPack: ERROR! Area _CODE_, bank 255, size 17752 is too large for bank size 16
 ```
 
 This is **not** a bug — it means the compiled code of the file named in the error
-(here `dynamic_actor.o`) no longer fits in a single 16 KB ROM bank. A single object
+(here `dynamic_actor.o`) no longer fits in a single 16 KB ROM bank. This is usually
+due to another plugin overriding the inline "tile_at" function, inflating it, thus
+inflating dynamic_actor.c making it exceed the bank limit. A single object
 file cannot be split across banks, so the fix is to compile less code into it by
 **unchecking settings you don't use** in Settings → Engine fields → *Dynamic actor*.
 The number in the error tells you how much you need to shave off — in the example
@@ -414,18 +408,9 @@ first — pick the ones your game genuinely never uses):
 | VM: Wait for collision | Its detection loop lives in `dynamic_actor.c` |
 | VM motion: Crawl step | Its wall-crawl routine lives in `dynamic_actor.c` |
 
-**If the error names `vm_dynamic_actor.o`**, uncheck the scripting natives instead —
-*VM: Wait for actor in range*, *VM: Wait for actor state*, *VM motion: Chase actor*,
-*VM motion: Move to position by velocity*. Those four do **not** shrink
-`dynamic_actor.o`, so they won't help with the error above.
-
 Remember that unchecking a **VM setting** while a script still uses the matching event
 fails at link time — delete those events first. Unchecking a **component** is always
 safe: behavior flags referencing it are just ignored at runtime.
-
-> The bundled `DynamicActorPluginExample` deliberately turns *everything* on to
-> demonstrate every feature, which puts it right at the bank limit. If you add to it and
-> hit this error, switching *Enable slope collision* off is usually enough.
 
 ## Compatibility with other plugins
 
