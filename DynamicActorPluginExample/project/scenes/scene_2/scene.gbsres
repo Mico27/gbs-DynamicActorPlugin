@@ -7,7 +7,7 @@
   "tilesetId": "",
   "width": 32,
   "height": 26,
-  "type": "TOPDOWN",
+  "type": "ADVENTURE",
   "colorModeOverride": "none",
   "paletteIds": [
     "c39f8126-e117-4095-adb9-3720d2bbdcc8",
@@ -20,12 +20,234 @@
     "default-ui"
   ],
   "spritePaletteIds": [],
-  "collisions": "",
+  "collisions": "001e7+0f12+00147+",
   "autoFadeSpeed": 1,
   "symbol": "scene_2",
   "x": 280,
   "y": 96,
-  "script": [],
+  "script": [
+    {
+      "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
+      "args": {
+        "behaviorId": {
+          "type": "number",
+          "value": 1
+        },
+        "preset": "custom",
+        "compGravityY": false,
+        "compGravityZ": true,
+        "compTileCollision": false,
+        "compActorCollision": false,
+        "compPlatform": false,
+        "compLedgeStop": false,
+        "compReflectX": false,
+        "compReflectY": false,
+        "compReflectZ": true,
+        "animJumpY": false,
+        "animJumpZ": false,
+        "lockPositionAxes": "0",
+        "lockDirectionAxes": "0",
+        "collisionType": "0",
+        "triggerStateChange": false,
+        "triggerTileCollisionTop": false,
+        "triggerTileCollisionRight": false,
+        "triggerTileCollisionBottom": false,
+        "triggerTileCollisionLeft": false,
+        "triggerTileEnter": false,
+        "triggerHitActors": false,
+        "activateTriggers": true,
+        "gravity": {
+          "type": "number",
+          "value": 4
+        },
+        "maxFallVelocity": {
+          "type": "number",
+          "value": 64
+        },
+        "bounce": {
+          "type": "number",
+          "value": 128
+        },
+        "__label": "Ball behavior : 1",
+        "__collapse": false
+      },
+      "id": "2072c267-443e-47bc-bcf5-7461b6840f9e"
+    },
+    {
+      "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
+      "args": {
+        "behaviorId": {
+          "type": "number",
+          "value": 2
+        },
+        "preset": "custom",
+        "compGravityY": false,
+        "compGravityZ": false,
+        "compTileCollision": false,
+        "compActorCollision": false,
+        "compPlatform": false,
+        "compLedgeStop": false,
+        "compReflectX": false,
+        "compReflectY": false,
+        "compReflectZ": false,
+        "animJumpY": false,
+        "animJumpZ": false,
+        "lockPositionAxes": "4",
+        "lockDirectionAxes": "0",
+        "collisionType": "0",
+        "triggerStateChange": false,
+        "triggerTileCollisionTop": false,
+        "triggerTileCollisionRight": false,
+        "triggerTileCollisionBottom": false,
+        "triggerTileCollisionLeft": false,
+        "triggerTileEnter": false,
+        "triggerHitActors": false,
+        "activateTriggers": false,
+        "gravity": {
+          "type": "number",
+          "value": 0
+        },
+        "maxFallVelocity": {
+          "type": "number",
+          "value": 0
+        },
+        "bounce": {
+          "type": "number",
+          "value": 0
+        },
+        "__label": "Shadow behavior : 2",
+        "__collapse": true
+      },
+      "id": "88121714-d877-49d5-8ffb-688f6b29ef13"
+    },
+    {
+      "command": "EVENT_LOAD_PROJECTILE_SLOT",
+      "args": {
+        "__section": "projectile",
+        "slot": 0,
+        "spriteSheetId": "ae216477-3275-45bb-8458-005451cc230b",
+        "spriteStateId": "",
+        "speed": 0,
+        "animSpeed": 3,
+        "lifeTime": 1,
+        "initialOffset": 0,
+        "loopAnim": false,
+        "destroyOnHit": false,
+        "collisionGroup": "3",
+        "collisionMask": [],
+        "__collapse": true
+      },
+      "id": "571602b7-46d5-4a03-8730-fc14b606de7d"
+    },
+    {
+      "command": "EVENT_LOAD_PROJECTILE_SLOT",
+      "args": {
+        "__section": "projectile",
+        "slot": 1,
+        "spriteSheetId": "57b54b0d-0343-4969-8119-c2a57d8a7a1c",
+        "spriteStateId": "",
+        "speed": 0,
+        "animSpeed": 0,
+        "lifeTime": 0.2,
+        "initialOffset": 0,
+        "loopAnim": true,
+        "destroyOnHit": false,
+        "collisionGroup": "3",
+        "collisionMask": [],
+        "__collapse": true
+      },
+      "id": "c67e718b-43cb-4a8b-b974-9d1a0e79ac1b"
+    },
+    {
+      "command": "EVENT_LOAD_PROJECTILE_SLOT",
+      "args": {
+        "__section": "projectile",
+        "slot": 2,
+        "spriteSheetId": "a945f80b-a459-4d7e-b972-65ab23de17da",
+        "spriteStateId": "",
+        "speed": 0,
+        "animSpeed": 7,
+        "lifeTime": 0.2,
+        "initialOffset": 0,
+        "loopAnim": false,
+        "destroyOnHit": false,
+        "collisionGroup": "3",
+        "collisionMask": [],
+        "__collapse": true
+      },
+      "id": "aa0609a1-d461-4b7f-a79f-01a5ae0a8e8b"
+    },
+    {
+      "command": "EVENT_SET_INPUT_SCRIPT",
+      "args": {
+        "input": [
+          "b",
+          "a"
+        ],
+        "override": true,
+        "__scriptTabs": "press"
+      },
+      "children": {
+        "true": [
+          {
+            "command": "EVENT_ACTOR_SET_POSITION",
+            "args": {
+              "actorId": "a88303d0-2223-450c-9693-b5d458da97af",
+              "x": {
+                "type": "property",
+                "target": "player",
+                "property": "pxpos"
+              },
+              "y": {
+                "type": "property",
+                "target": "player",
+                "property": "pypos"
+              },
+              "units": "pixels",
+              "__collapse": true
+            },
+            "id": "8cfa54da-8092-4158-b118-495d5f388a86"
+          },
+          {
+            "command": "EVENT_SET_ACTOR_VELOCITY",
+            "args": {
+              "actorId": "a88303d0-2223-450c-9693-b5d458da97af",
+              "xVelocity": {
+                "type": "expression",
+                "value": "rnd(64) - 32"
+              },
+              "yVelocity": {
+                "type": "expression",
+                "value": "-(rnd(32) + 32)"
+              },
+              "__collapse": true
+            },
+            "id": "a373508f-977e-4cf0-a0b7-e0223192a149"
+          },
+          {
+            "command": "EVENT_SET_ACTOR_Z_VELOCITY",
+            "args": {
+              "actorId": "a88303d0-2223-450c-9693-b5d458da97af",
+              "zVelocity": {
+                "type": "expression",
+                "value": "-(rnd(64) + 32)"
+              }
+            },
+            "id": "84b48af7-1c28-4957-b18e-4610cdd50028"
+          },
+          {
+            "command": "EVENT_ACTOR_ACTIVATE",
+            "args": {
+              "actorId": "a88303d0-2223-450c-9693-b5d458da97af",
+              "__collapse": true
+            },
+            "id": "f7a29dae-157b-404e-b847-05a64a990a6c"
+          }
+        ]
+      },
+      "id": "5cb8b1ee-3b58-4948-a996-a2caaebb7e47"
+    }
+  ],
   "playerHit1Script": [],
   "playerHit2Script": [],
   "playerHit3Script": [],

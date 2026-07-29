@@ -1,0 +1,191 @@
+{
+  "_resourceType": "actor",
+  "id": "a88303d0-2223-450c-9693-b5d458da97af",
+  "name": "Ball",
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "009878ca-2ee3-4a58-b933-0acfa23c8072",
+  "prefabId": "",
+  "direction": "down",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "paletteId": "",
+  "isPinned": false,
+  "persistent": true,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "symbol": "actor_4",
+  "script": [],
+  "startScript": [
+    {
+      "command": "EVENT_SET_ACTOR_BEHAVIOR",
+      "args": {
+        "actorId": "$self$",
+        "behaviorId": {
+          "type": "number",
+          "value": 1
+        },
+        "state": "2",
+        "__collapse": true
+      },
+      "id": "630567d3-dda8-4714-89a5-0bac87944e9b"
+    },
+    {
+      "command": "EVENT_SET_ACTOR_Z_POSITION",
+      "args": {
+        "actorId": "$self$",
+        "zPosition": {
+          "type": "number",
+          "value": 512
+        },
+        "__collapse": true
+      },
+      "id": "72f576e0-e73e-4dad-977a-22166c9bcf33"
+    },
+    {
+      "command": "EVENT_THREAD_START",
+      "args": {
+        "variable": "T0",
+        "__scriptTabs": "true",
+        "__collapse": true,
+        "__comment": true
+      },
+      "children": {
+        "true": [
+          {
+            "command": "EVENT_LOOP",
+            "args": {},
+            "children": {
+              "true": [
+                {
+                  "command": "EVENT_ACTOR_GET_POSITION",
+                  "args": {
+                    "actorId": "$self$",
+                    "vectorX": "9",
+                    "vectorY": "10",
+                    "units": "pixels"
+                  },
+                  "id": "c47598b4-611c-415a-97b7-ebdd20067e6e"
+                },
+                {
+                  "command": "EVENT_GET_ACTOR_Z_POSITION",
+                  "args": {
+                    "actorId": "$self$",
+                    "variable": "8"
+                  },
+                  "id": "226b2d79-c758-430b-969f-3b8a627c8a86"
+                },
+                {
+                  "command": "EVENT_SET_VALUE",
+                  "args": {
+                    "variable": "9",
+                    "value": {
+                      "type": "expression",
+                      "value": "$09$  << 5"
+                    }
+                  },
+                  "id": "c518d68a-c470-4e57-b1cd-dc4bfd4f3959"
+                },
+                {
+                  "command": "EVENT_SET_VALUE",
+                  "args": {
+                    "variable": "10",
+                    "value": {
+                      "type": "expression",
+                      "value": "($10$  << 5) - $08$"
+                    }
+                  },
+                  "id": "51598c82-ef61-43cd-94f0-6e8c4ec0b3aa"
+                },
+                {
+                  "command": "EVENT_GBVM_SCRIPT",
+                  "args": {
+                    "script": "\n        VM_RPN\n            .R_REF      VAR_BALLX\n            .R_REF      VAR_BALLY\n            .R_INT16    0\n            .R_STOP\n        VM_PROJECTILE_LAUNCH    1, .ARG2\n        VM_POP                  3",
+                    "references": [
+                      {
+                        "type": "variable",
+                        "id": "9"
+                      },
+                      {
+                        "type": "variable",
+                        "id": "10"
+                      },
+                      {
+                        "type": "variable",
+                        "id": "8"
+                      }
+                    ]
+                  },
+                  "id": "1a08fcce-7fb0-4287-8e1f-02fa412f73e3"
+                },
+                {
+                  "command": "EVENT_WAIT",
+                  "args": {
+                    "time": {
+                      "type": "number",
+                      "value": 0.5
+                    },
+                    "frames": {
+                      "type": "number",
+                      "value": 2
+                    },
+                    "units": "frames"
+                  },
+                  "id": "30850ab3-c6e3-474b-b33c-2f26ebad9a4e"
+                }
+              ]
+            },
+            "id": "61f373bd-9e6b-4c67-aa71-d9a5536741cc"
+          }
+        ]
+      },
+      "id": "3f7c901f-4998-44ce-9545-dbc54c1a3c67"
+    },
+    {
+      "command": "EVENT_ACTOR_DEACTIVATE",
+      "args": {
+        "actorId": "$self$",
+        "__collapse": true
+      },
+      "id": "3efad811-21f4-4ab6-9a79-43c30c7a7c15"
+    }
+  ],
+  "updateScript": [
+    {
+      "command": "EVENT_WAIT_FOR_ACTOR_STATE",
+      "args": {
+        "actorId": "$self$",
+        "state": 1,
+        "invert": false,
+        "__comment": false
+      },
+      "id": "9d4cf08d-faa9-4614-8fb1-cb971ef85710"
+    },
+    {
+      "command": "EVENT_LAUNCH_PROJECTILE_SLOT",
+      "args": {
+        "__section": "source",
+        "actorId": "$self$",
+        "x": 0,
+        "y": 0,
+        "directionType": "direction",
+        "otherActorId": "$self$",
+        "direction": "up",
+        "angle": 0,
+        "angleVariable": "L0",
+        "targetActorId": "$self$",
+        "slot": 0,
+        "__comment": false
+      },
+      "id": "d69fa7f3-e309-4ea4-b48b-6566b11fddf3"
+    }
+  ],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": [],
+  "coordinateType": "tiles",
+  "x": 1,
+  "y": 1,
+  "_index": 1
+}

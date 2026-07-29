@@ -1,0 +1,50 @@
+{
+  "_resourceType": "actor",
+  "id": "a6677ba9-ae98-4a74-acfe-62c23489e0ec",
+  "name": "Ball Shadow",
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "4e466ea3-04e1-4b57-a5f7-3b2bfa76f122",
+  "prefabId": "",
+  "direction": "down",
+  "moveSpeed": 1,
+  "animSpeed": 0,
+  "paletteId": "",
+  "isPinned": false,
+  "persistent": true,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "symbol": "actor_5",
+  "script": [],
+  "startScript": [
+    {
+      "command": "EVENT_SET_ACTOR_BEHAVIOR",
+      "args": {
+        "actorId": "$self$",
+        "behaviorId": {
+          "type": "number",
+          "value": 2
+        },
+        "state": "1"
+      },
+      "id": "07fc99d9-947f-41a8-9e0c-0a4abf1d81cc"
+    },
+    {
+      "command": "EVENT_SET_ACTOR_LINKED_ACTOR",
+      "args": {
+        "actorId": "$self$",
+        "linkedActorId": "a88303d0-2223-450c-9693-b5d458da97af"
+      },
+      "id": "cf9c4a1c-02c9-4f2e-855d-4f388607df3b"
+    }
+  ],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": [],
+  "coordinateType": "tiles",
+  "x": 1,
+  "y": 1,
+  "_index": 0
+}

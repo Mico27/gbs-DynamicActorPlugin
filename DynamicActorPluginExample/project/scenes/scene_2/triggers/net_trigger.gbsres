@@ -1,0 +1,79 @@
+{
+  "_resourceType": "trigger",
+  "id": "32c141d7-024e-4c52-8024-346f9d88cbec",
+  "name": "Net trigger",
+  "prefabId": "",
+  "x": 6,
+  "y": 14,
+  "symbol": "trigger_1",
+  "prefabScriptOverrides": {},
+  "width": 20,
+  "height": 2,
+  "script": [
+    {
+      "command": "EVENT_GET_ACTOR_Z_POSITION",
+      "args": {
+        "actorId": "a88303d0-2223-450c-9693-b5d458da97af",
+        "variable": "8"
+      },
+      "id": "136feb7c-a786-4228-8d14-5cfe7d3b6d98"
+    },
+    {
+      "command": "EVENT_IF",
+      "args": {
+        "condition": {
+          "type": "lt",
+          "valueA": {
+            "type": "variable",
+            "value": "8"
+          },
+          "valueB": {
+            "type": "number",
+            "value": 300
+          }
+        },
+        "__collapseElse": true
+      },
+      "children": {
+        "true": [
+          {
+            "command": "EVENT_LAUNCH_PROJECTILE_SLOT",
+            "args": {
+              "__section": "source",
+              "actorId": "a88303d0-2223-450c-9693-b5d458da97af",
+              "x": 0,
+              "y": 4,
+              "directionType": "direction",
+              "otherActorId": "$self$",
+              "direction": "right",
+              "angle": 0,
+              "angleVariable": "L0",
+              "targetActorId": "$self$",
+              "slot": 2
+            },
+            "id": "2bc0b4d7-c392-4edc-8601-788337bb3b04"
+          },
+          {
+            "command": "EVENT_SET_ACTOR_VELOCITY",
+            "args": {
+              "actorId": "a88303d0-2223-450c-9693-b5d458da97af",
+              "xVelocity": {
+                "type": "number",
+                "value": 0
+              },
+              "yVelocity": {
+                "type": "number",
+                "value": 0
+              }
+            },
+            "id": "86937268-3f82-4239-89f8-98c355d31b84"
+          }
+        ],
+        "false": []
+      },
+      "id": "41a83787-a062-491c-ac24-5a4d7760b2d3"
+    }
+  ],
+  "leaveScript": [],
+  "_index": 0
+}

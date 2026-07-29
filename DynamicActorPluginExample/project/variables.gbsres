@@ -40,6 +40,21 @@
       "id": "7",
       "name": "NewState",
       "symbol": "var_newstate"
+    },
+    {
+      "id": "8",
+      "name": "BallZ",
+      "symbol": "var_ballz"
+    },
+    {
+      "id": "9",
+      "name": "BallX",
+      "symbol": "var_ballx"
+    },
+    {
+      "id": "10",
+      "name": "BallY",
+      "symbol": "var_bally"
     }
   ],
   "constants": []
