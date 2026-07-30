@@ -19,7 +19,16 @@
     "a8667522-33e5-485b-aaf8-b3d65e1ccc65",
     "default-ui"
   ],
-  "spritePaletteIds": [],
+  "spritePaletteIds": [
+    "",
+    "default-bg-6",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
   "collisions": "001e7+0f12+00147+",
   "autoFadeSpeed": 1,
   "symbol": "scene_2",
@@ -207,6 +216,18 @@
               "__collapse": true
             },
             "id": "8cfa54da-8092-4158-b118-495d5f388a86"
+          },
+          {
+            "command": "EVENT_SET_ACTOR_Z_POSITION",
+            "args": {
+              "actorId": "a88303d0-2223-450c-9693-b5d458da97af",
+              "zPosition": {
+                "type": "number",
+                "value": 256
+              },
+              "__collapse": true
+            },
+            "id": "bf2f51b7-2095-4489-b404-84aa96adee1e"
           },
           {
             "command": "EVENT_SET_ACTOR_VELOCITY",
