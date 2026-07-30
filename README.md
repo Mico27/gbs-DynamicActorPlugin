@@ -215,6 +215,7 @@ is reset to 0 at the start of every frame.
 | Get Actor Behavior | Read an actor's current slot into a variable |
 | Set Actor Velocity | Set X and Y velocity together |
 | Set Actor X / Y Velocity | Set one axis |
+| Get Actor X / Y Velocity | Read one axis into a variable |
 | Set Actor Velocity By Angle | Set both velocities from an angle (0 = up, 90 = right) and speed |
 | Set / Get Actor State | 0 = paused, 1 = grounded, 2 = airborne (auto-managed by gravity behaviors) |
 | Set / Get Actor Z Position, Set / Get Actor Z Velocity | Read/write actor height (needs *Topdown Z axis*) |
@@ -230,7 +231,7 @@ velocities can be driven by game state at runtime.
 
 Many events also have a **By Index** variant that takes a raw actor index (script value)
 instead of an actor picker, for addressing actors dynamically (e.g. pool actors spawned
-via `gbs-SpawnPoolActorPlugin`): *Set/Get Behavior*, *Set Velocity*, *Set X/Y Velocity*,
+via `gbs-SpawnPoolActorPlugin`): *Set/Get Behavior*, *Set Velocity*, *Set/Get X/Y Velocity*,
 *Set/Get State*, *Set Parent Actor*, and *Wait For Actor Collision*.
 
 ## Motion library events
