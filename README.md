@@ -404,7 +404,7 @@ first — pick the ones your game genuinely never uses):
 | Component: Parent actors / moving platforms | Large: parenting chain + platform claim/release |
 | Component: Turn at ledges | Ledge/pit detection routines |
 | Component: Move horizontally / vertically | Only if your game truly moves on one axis |
-| Component: Bounce on floor/ceiling | Includes 32-bit math |
+| Component: Bounce on floor/ceiling |  |
 | VM: Wait for collision | Its detection loop lives in `dynamic_actor.c` |
 | VM motion: Crawl step | Its wall-crawl routine lives in `dynamic_actor.c` |
 
