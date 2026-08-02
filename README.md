@@ -435,6 +435,17 @@ GBS auto-selects the matching variant when you also have any combination of
 - Scenes that never define a *Moving platform* behavior and never set a parent skip the
   entire end-of-frame parenting pass (claiming + position snapshots) — the parent
   component then costs one flag test per frame.
+- Every actor caches its own index in `actors[]` (1 byte, written once per scene by
+  `actors_init`). The runtime frequently holds only a pointer to an actor but has to
+  report its index — to the *Event actor index* engine field, and to the per-actor
+  last-trigger table. Deriving that with `actor - actors` makes SDCC emit a call to
+  `__divsint`, a 16-bit restoring division costing roughly **2600 cycles** — about 3.7%
+  of a frame — because `sizeof(actor_t)` is not a power of two. The worst case was
+  *Actors activate triggers*, which paid one division per flagged actor **every frame**.
+  Reading the cached byte costs ~8 cycles instead. Padding `actor_t` out to 64 bytes
+  would fix the same thing, but it costs 21–84 B of WRAM and is impossible in the
+  default and maximum configurations (66 B and 71 B per actor — the next power of two
+  is 128, i.e. +1200 B), so the cached byte is used instead.
 
 ## RAM (WRAM) usage
 
@@ -447,6 +458,7 @@ components are enabled and on the two slider settings. Per-actor costs are multi
 | Behavior table | 8 B × (behavior slots + 1) → **72 B** (8 slots) … **264 B** (32 slots) | always |
 | Core globals (event fields, callback table, scratch) | **44 B** | always |
 | Per actor: behavior id + state + X/Y velocity | 4 B × 21 = **84 B** | always |
+| Per actor: cached actor index | 1 B × 21 = **21 B** | always |
 | Per actor: parent pointer | 2 B × 21 = **42 B** | *Parent actors* |
 | Platform cache | 11 B × *Max moving platforms* → **22 B** (2) … **88 B** (8) | *Parent actors* |
 | Parent flag + counter | **2 B** | *Parent actors* |
@@ -460,13 +472,53 @@ components are enabled and on the two slider settings. Per-actor costs are multi
 **Totals:**
 
 - **Default configuration** (Parent actors on, *delta* parenting mode, Z axis off, slope
-  off, triggers on, 8 behavior slots, 2 platforms): **≈ 371 B**.
+  off, triggers on, 8 behavior slots, 2 platforms): **≈ 392 B**.
 - **Everything enabled** (all components on, *delta* mode, Z axis on, slope on, 32
-  behavior slots, 8 platforms): **≈ 737 B** — the plugin's maximum WRAM footprint.
-- **Leanest** (all optional components off, 8 slots): **≈ 200 B**.
+  behavior slots, 8 platforms): **≈ 758 B** — the plugin's maximum WRAM footprint.
+- **Leanest** (all optional components off, 8 slots): **≈ 221 B**.
 
 For reference, a stock GB Studio 4.3.0 project has roughly **850 B** of WRAM free, so even
 the maximum configuration fits, though it leaves little headroom — trim behavior slots,
 platforms, and unused components to reclaim space. Choosing the *static* or *velocity*
 parenting mode instead of *delta* also drops the per-actor position snapshot (84 B, or
 126 B with the Z axis).
+
+---
+
+<!-- BANK0:BEGIN -->
+## Bank 0 (HOME) Usage
+
+Bank 0 is the 16 KB non-switchable ROM bank that the GB Studio engine core,
+the interrupt handlers and the GBDK runtime all share. Banked ROM is cheap
+(add another bank), bank 0 is not, so it is usually the first thing a project
+runs out of.
+
+| | Bytes |
+|---|---|
+| Bank 0 used by this plugin | **+122** |
+| Bank 0 free with this plugin installed | **1,329** of 16,384 (92% used) |
+
+Everything else this plugin adds lives in banked ROM.
+
+| Module | This plugin | Stock engine | Bank 0 cost |
+|---|---|---|---|
+| `actor.c` | 993 | 871 | +122 |
+
+Modules that replace or patch a stock engine file only cost the *difference*:
+the stock version's bank 0 bytes were being spent anyway.
+
+<details><summary>How this was measured</summary>
+
+GB Studio 4.3.2, DMG target, default engine settings. Each module's bank 0
+contribution is the `A _HOME size` record that SDCC writes into its `.rel`
+object, summed over the engine sources this plugin provides. Stock sizes come
+from building projects whose only plugin ships no engine C, so every module in
+them is the untouched engine; two such builds were compared and agreed on all
+73 shared modules.
+
+The "free" figure is a stock project with this plugin and nothing else. Your
+own number will differ: other plugins, and any engine settings that change what
+the core compiles, move it independently of this plugin.
+
+</details>
+<!-- BANK0:END -->
