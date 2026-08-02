@@ -65,10 +65,20 @@
                   "id": "c52ef3c0-df86-439a-b546-c1ec9a26a2d0"
                 },
                 {
-                  "command": "EVENT_LAUNCH_PROJECTILE_SLOT",
+                  "command": "DYNPROJ_EVENT_LAUNCH_PROJECTILE_SLOT",
                   "args": {
-                    "__section": "source",
+                    "tabs": "source",
+                    "slot": 2,
+                    "sourceType": "actor",
                     "actorId": "a88303d0-2223-450c-9693-b5d458da97af",
+                    "posX": {
+                      "type": "number",
+                      "value": 0
+                    },
+                    "posY": {
+                      "type": "number",
+                      "value": 0
+                    },
                     "x": 0,
                     "y": 4,
                     "directionType": "direction",
@@ -77,9 +87,36 @@
                     "angle": 0,
                     "angleVariable": "L0",
                     "targetActorId": "$self$",
-                    "slot": 2
+                    "targetX": {
+                      "type": "number",
+                      "value": 0
+                    },
+                    "targetY": {
+                      "type": "number",
+                      "value": 0
+                    },
+                    "paramBehaviour": "plain",
+                    "paramX": {
+                      "type": "number",
+                      "value": 2
+                    },
+                    "paramTrailHead": "projectile",
+                    "paramTrailActor": "$self$",
+                    "paramY": {
+                      "type": "number",
+                      "value": 34
+                    },
+                    "paramPhase": {
+                      "type": "number",
+                      "value": 64
+                    },
+                    "paramActorIndex": {
+                      "type": "number",
+                      "value": 0
+                    },
+                    "__collapse": false
                   },
-                  "id": "801007d3-ac5c-4401-903a-4f76aa54cd3f"
+                  "id": "af283c90-22c2-4cdf-8a30-105d2f83b725"
                 },
                 {
                   "command": "EVENT_SET_ACTOR_VELOCITY",
@@ -131,10 +168,20 @@
                         "id": "c81f56fc-c4da-4afe-9888-f96662b280f0"
                       },
                       {
-                        "command": "EVENT_LAUNCH_PROJECTILE_SLOT",
+                        "command": "DYNPROJ_EVENT_LAUNCH_PROJECTILE_SLOT",
                         "args": {
-                          "__section": "source",
+                          "tabs": "source",
+                          "slot": 2,
+                          "sourceType": "actor",
                           "actorId": "a88303d0-2223-450c-9693-b5d458da97af",
+                          "posX": {
+                            "type": "number",
+                            "value": 0
+                          },
+                          "posY": {
+                            "type": "number",
+                            "value": 0
+                          },
                           "x": 0,
                           "y": 16,
                           "directionType": "direction",
@@ -143,9 +190,36 @@
                           "angle": 0,
                           "angleVariable": "L0",
                           "targetActorId": "$self$",
-                          "slot": 2
+                          "targetX": {
+                            "type": "number",
+                            "value": 0
+                          },
+                          "targetY": {
+                            "type": "number",
+                            "value": 0
+                          },
+                          "paramBehaviour": "plain",
+                          "paramX": {
+                            "type": "number",
+                            "value": 2
+                          },
+                          "paramTrailHead": "projectile",
+                          "paramTrailActor": "$self$",
+                          "paramY": {
+                            "type": "number",
+                            "value": 34
+                          },
+                          "paramPhase": {
+                            "type": "number",
+                            "value": 64
+                          },
+                          "paramActorIndex": {
+                            "type": "number",
+                            "value": 0
+                          },
+                          "__collapse": false
                         },
-                        "id": "214d93c6-b30f-4e14-bf38-d02cfc5b1b0f"
+                        "id": "8da56286-8b11-4fd5-a28c-d24e48ab313c"
                       },
                       {
                         "command": "EVENT_SET_ACTOR_Z_VELOCITY",

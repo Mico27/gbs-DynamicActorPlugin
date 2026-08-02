@@ -108,17 +108,14 @@ export const compile = (input, helpers) => {
     const spawn_result = _declareLocal("spawn_result", 1, true);
     dest = spawn_result;
   }
-  
-  const tmpPoolStart = _declareLocal("tmp_pool_start", 1, true);
-  variableSetToScriptValue(tmpPoolStart, input.poolActorIndex);
-  
+
   _addComment("Spawn Actor From Pool By Index");
 
   _stackPushConst(dest);  // FN_ARG4
   _stackPushScriptValue(scriptValueToPixels(input.y, input.units));                // FN_ARG3
   _stackPushScriptValue(scriptValueToPixels(input.x, input.units));                // FN_ARG2
   _stackPushScriptValue(input.poolCount);        // FN_ARG1
-  _stackPush(tmpPoolStart);        // FN_ARG0
+  _stackPushScriptValue(input.poolActorIndex);        // FN_ARG0
 
   _callNative("vm_spawn_pool_actor");
   _stackPop(5);

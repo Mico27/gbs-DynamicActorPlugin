@@ -1,7 +1,7 @@
-Index: include\gbs_types.h
+Index: include/gbs_types.h
 ===================================================================
---- include\gbs_types.h
-+++ include\gbs_types.h
+--- include/gbs_types.h
++++ include/gbs_types.h
 @@ -1,5 +1,5 @@
 -#ifndef GBS_TYPES_H
 +﻿#ifndef GBS_TYPES_H

@@ -78,7 +78,7 @@
           "value": 128
         },
         "__label": "Ball behavior : 1",
-        "__collapse": false
+        "__collapse": true
       },
       "id": "2072c267-443e-47bc-bcf5-7461b6840f9e"
     },
@@ -130,9 +130,9 @@
       "id": "88121714-d877-49d5-8ffb-688f6b29ef13"
     },
     {
-      "command": "EVENT_LOAD_PROJECTILE_SLOT",
+      "command": "DYNPROJ_EVENT_LOAD_PROJECTILE_SLOT",
       "args": {
-        "__section": "projectile",
+        "tabs": "behavior",
         "slot": 0,
         "spriteSheetId": "ae216477-3275-45bb-8458-005451cc230b",
         "spriteStateId": "",
@@ -144,33 +144,89 @@
         "destroyOnHit": false,
         "collisionGroup": "3",
         "collisionMask": [],
+        "preset": "custom",
+        "type": "0",
+        "collision": "0",
+        "gravity": {
+          "type": "number",
+          "value": 0
+        },
+        "bounce": {
+          "type": "number",
+          "value": 0
+        },
+        "amplitude": {
+          "type": "number",
+          "value": 30
+        },
+        "frequency": {
+          "type": "number",
+          "value": 10
+        },
+        "hookshotTileHit": 0,
+        "hookshotActorHit": 0,
+        "customX": "L0",
+        "customY": "L0",
+        "compInfiniteLifetime": false,
+        "compIgnorePlayer": true,
+        "compRemoveScript": false,
+        "compTileHitScript": false,
+        "compActorHitScript": false,
         "__collapse": true
       },
-      "id": "571602b7-46d5-4a03-8730-fc14b606de7d"
+      "id": "7135e6c7-c82c-41c5-9a70-40edd9814161"
     },
     {
-      "command": "EVENT_LOAD_PROJECTILE_SLOT",
+      "command": "DYNPROJ_EVENT_LOAD_PROJECTILE_SLOT",
       "args": {
-        "__section": "projectile",
+        "tabs": "projectile",
         "slot": 1,
         "spriteSheetId": "57b54b0d-0343-4969-8119-c2a57d8a7a1c",
         "spriteStateId": "",
         "speed": 0,
         "animSpeed": 0,
-        "lifeTime": 0.2,
+        "lifeTime": 0.1,
         "initialOffset": 0,
         "loopAnim": true,
         "destroyOnHit": false,
         "collisionGroup": "3",
         "collisionMask": [],
-        "__collapse": true
+        "preset": "custom",
+        "type": "0",
+        "collision": "0",
+        "gravity": {
+          "type": "number",
+          "value": 0
+        },
+        "bounce": {
+          "type": "number",
+          "value": 0
+        },
+        "amplitude": {
+          "type": "number",
+          "value": 2
+        },
+        "frequency": {
+          "type": "number",
+          "value": 8
+        },
+        "hookshotTileHit": 0,
+        "hookshotActorHit": 0,
+        "customX": "L0",
+        "customY": "L0",
+        "compInfiniteLifetime": false,
+        "compIgnorePlayer": true,
+        "compRemoveScript": false,
+        "compTileHitScript": false,
+        "compActorHitScript": false,
+        "__collapse": false
       },
-      "id": "c67e718b-43cb-4a8b-b974-9d1a0e79ac1b"
+      "id": "e1ff44a9-dca2-4f3c-a8cf-aaa471ee7942"
     },
     {
-      "command": "EVENT_LOAD_PROJECTILE_SLOT",
+      "command": "DYNPROJ_EVENT_LOAD_PROJECTILE_SLOT",
       "args": {
-        "__section": "projectile",
+        "tabs": "projectile",
         "slot": 2,
         "spriteSheetId": "a945f80b-a459-4d7e-b972-65ab23de17da",
         "spriteStateId": "",
@@ -182,9 +238,37 @@
         "destroyOnHit": false,
         "collisionGroup": "3",
         "collisionMask": [],
+        "preset": "custom",
+        "type": "0",
+        "collision": "0",
+        "gravity": {
+          "type": "number",
+          "value": 0
+        },
+        "bounce": {
+          "type": "number",
+          "value": 0
+        },
+        "amplitude": {
+          "type": "number",
+          "value": 30
+        },
+        "frequency": {
+          "type": "number",
+          "value": 10
+        },
+        "hookshotTileHit": 0,
+        "hookshotActorHit": 0,
+        "customX": "L0",
+        "customY": "L0",
+        "compInfiniteLifetime": false,
+        "compIgnorePlayer": true,
+        "compRemoveScript": false,
+        "compTileHitScript": false,
+        "compActorHitScript": false,
         "__collapse": true
       },
-      "id": "aa0609a1-d461-4b7f-a79f-01a5ae0a8e8b"
+      "id": "bfb813dd-cfba-4dbd-98f2-191db07d9935"
     },
     {
       "command": "EVENT_SET_INPUT_SCRIPT",
@@ -252,7 +336,8 @@
               "zVelocity": {
                 "type": "expression",
                 "value": "-(rnd(64) + 32)"
-              }
+              },
+              "__collapse": true
             },
             "id": "84b48af7-1c28-4957-b18e-4610cdd50028"
           },

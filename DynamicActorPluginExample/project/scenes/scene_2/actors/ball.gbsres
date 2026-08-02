@@ -48,8 +48,8 @@
       "args": {
         "variable": "T0",
         "__scriptTabs": "true",
-        "__collapse": true,
-        "__comment": true
+        "__collapse": false,
+        "__comment": false
       },
       "children": {
         "true": [
@@ -69,6 +69,11 @@
                   "id": "c47598b4-611c-415a-97b7-ebdd20067e6e"
                 },
                 {
+                  "command": "EVENT_IDLE",
+                  "args": {},
+                  "id": "2f83917f-50a3-4878-a15c-fd7dfe36e31b"
+                },
+                {
                   "command": "EVENT_GET_ACTOR_Z_POSITION",
                   "args": {
                     "actorId": "$self$",
@@ -77,47 +82,63 @@
                   "id": "226b2d79-c758-430b-969f-3b8a627c8a86"
                 },
                 {
-                  "command": "EVENT_SET_VALUE",
-                  "args": {
-                    "variable": "9",
-                    "value": {
-                      "type": "expression",
-                      "value": "$09$  << 5"
-                    }
-                  },
-                  "id": "c518d68a-c470-4e57-b1cd-dc4bfd4f3959"
+                  "command": "EVENT_IDLE",
+                  "args": {},
+                  "id": "821353c2-d0cf-48de-b4f7-1932c191b282"
                 },
                 {
-                  "command": "EVENT_SET_VALUE",
+                  "command": "DYNPROJ_EVENT_LAUNCH_PROJECTILE_SLOT",
                   "args": {
-                    "variable": "10",
-                    "value": {
+                    "tabs": "source",
+                    "slot": 1,
+                    "sourceType": "position",
+                    "actorId": "a88303d0-2223-450c-9693-b5d458da97af",
+                    "posX": {
+                      "type": "variable",
+                      "value": "9"
+                    },
+                    "posY": {
                       "type": "expression",
-                      "value": "($10$  << 5) - $08$"
-                    }
+                      "value": "$10$ - ($08$ >> 5)"
+                    },
+                    "x": 0,
+                    "y": 0,
+                    "directionType": "direction",
+                    "otherActorId": "$self$",
+                    "direction": "right",
+                    "angle": 0,
+                    "angleVariable": "L0",
+                    "targetActorId": "$self$",
+                    "targetX": {
+                      "type": "number",
+                      "value": 0
+                    },
+                    "targetY": {
+                      "type": "number",
+                      "value": 0
+                    },
+                    "paramBehaviour": "plain",
+                    "paramX": {
+                      "type": "number",
+                      "value": 2
+                    },
+                    "paramTrailHead": "actor",
+                    "paramTrailActor": "a88303d0-2223-450c-9693-b5d458da97af",
+                    "paramY": {
+                      "type": "number",
+                      "value": 34
+                    },
+                    "paramPhase": {
+                      "type": "number",
+                      "value": 64
+                    },
+                    "paramActorIndex": {
+                      "type": "number",
+                      "value": 0
+                    },
+                    "posUnits": "pixels"
                   },
-                  "id": "51598c82-ef61-43cd-94f0-6e8c4ec0b3aa"
-                },
-                {
-                  "command": "EVENT_GBVM_SCRIPT",
-                  "args": {
-                    "script": "\n        VM_RPN\n            .R_REF      VAR_BALLX\n            .R_REF      VAR_BALLY\n            .R_INT16    0\n            .R_STOP\n        VM_PROJECTILE_LAUNCH    1, .ARG2\n        VM_POP                  3",
-                    "references": [
-                      {
-                        "type": "variable",
-                        "id": "9"
-                      },
-                      {
-                        "type": "variable",
-                        "id": "10"
-                      },
-                      {
-                        "type": "variable",
-                        "id": "8"
-                      }
-                    ]
-                  },
-                  "id": "1a08fcce-7fb0-4287-8e1f-02fa412f73e3"
+                  "id": "09a4c789-fdde-4d08-88e0-16207a388483"
                 },
                 {
                   "command": "EVENT_WAIT",
@@ -163,10 +184,20 @@
       "id": "9d4cf08d-faa9-4614-8fb1-cb971ef85710"
     },
     {
-      "command": "EVENT_LAUNCH_PROJECTILE_SLOT",
+      "command": "DYNPROJ_EVENT_LAUNCH_PROJECTILE_SLOT",
       "args": {
-        "__section": "source",
+        "tabs": "source",
+        "slot": 0,
+        "sourceType": "actor",
         "actorId": "$self$",
+        "posX": {
+          "type": "number",
+          "value": 0
+        },
+        "posY": {
+          "type": "number",
+          "value": 0
+        },
         "x": 0,
         "y": 0,
         "directionType": "direction",
@@ -175,10 +206,35 @@
         "angle": 0,
         "angleVariable": "L0",
         "targetActorId": "$self$",
-        "slot": 0,
-        "__comment": false
+        "targetX": {
+          "type": "number",
+          "value": 0
+        },
+        "targetY": {
+          "type": "number",
+          "value": 0
+        },
+        "paramBehaviour": "plain",
+        "paramX": {
+          "type": "number",
+          "value": 2
+        },
+        "paramTrailHead": "projectile",
+        "paramTrailActor": "$self$",
+        "paramY": {
+          "type": "number",
+          "value": 34
+        },
+        "paramPhase": {
+          "type": "number",
+          "value": 64
+        },
+        "paramActorIndex": {
+          "type": "number",
+          "value": 0
+        }
       },
-      "id": "d69fa7f3-e309-4ea4-b48b-6566b11fddf3"
+      "id": "51ca306b-f668-4236-8982-6aa964bdba8b"
     }
   ],
   "hit1Script": [],
@@ -187,5 +243,5 @@
   "coordinateType": "tiles",
   "x": 1,
   "y": 1,
-  "_index": 1
+  "_index": 2
 }
