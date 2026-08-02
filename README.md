@@ -1,4 +1,6 @@
-# GBS Dynamic Actor Plugin
+# gbs-DynamicActorPlugin
+
+**Version 4.3.0 — Requires GB Studio ≥ 4.3.0**
 
 Gives GB Studio actors always-on dynamic behaviors — gravity, velocity, tile collision,
 ledge detection, bouncing, and parent-actor carrying (moving platforms, followers) —
@@ -6,7 +8,7 @@ that run every frame in the engine (no per-frame scripting cost). Behaviors are
 **designed in the IDE** by combining components in a single event, stored in RAM slots,
 and assigned to any number of actors.
 
-Works in every action scene type (GBS 4.3.0): **Platformer, Top Down, Adventure,
+Works in every action scene type: **Platformer, Top Down, Adventure,
 Shoot 'Em Up, and Point and Click**. (Logo scenes have no actors and are not hooked.)
 
 
@@ -15,14 +17,22 @@ https://github.com/user-attachments/assets/cb91889a-e531-4a79-b456-66c876b27699
 
 https://github.com/user-attachments/assets/e32d2233-d1c8-464a-ba14-fb5e5caad736
 
-## How it works
+---
 
-1. **Define behaviors** in your scene's *On Init* script with the **Define Actor Behavior**
-   event. Pick a preset or choose *Custom* and tick the components you want.
-   Each definition is stored in a numbered slot (1-8 by default, up to 32).
-2. **Assign a slot to an actor** with **Set Actor Behavior**. Many actors can share one slot.
-3. **Give actors velocity** with **Set Actor Velocity** (or the X/Y variants) and let the
-   engine handle the rest.
+## Table of Contents
+
+1. [Concepts](#concepts)
+2. [Project Setup](#project-setup)
+3. [Engine Settings](#engine-settings)
+4. [Size Limits and Restrictions](#size-limits-and-restrictions)
+5. [Events Reference](#events-reference)
+6. [Memory Footprint](#memory-footprint)
+
+---
+
+## Concepts
+
+### Behavior slots
 
 Behavior definitions live in working RAM and are cleared on every scene load —
 define them in each scene's init script (put the Define events in a custom script
@@ -32,7 +42,7 @@ Units: positions and velocities are in **subpixels** — 32 subpixels = 1 pixel.
 A velocity of 32 moves the actor 1 pixel per frame. *Bounciness* is 0-255,
 where 128 keeps reflects the full velocity and 255 reflects x2 the velocity.
 
-## Presets
+### Presets
 
 | Preset | Scene types | Components |
 |---|---|---|
@@ -50,7 +60,7 @@ Chasing, fleeing and homing are **not presets** — chase/flee is the waitable *
 Actor** event that steers a behavior's velocity toward or away from a target. Followers and
 attachments are done with **parent actors** (see below).
 
-## Custom components
+### Custom components
 
 Choosing the **Custom** preset exposes the component checkboxes below. There is no
 per-behavior "move on X/Y" toggle — an actor always moves by its velocity on both axes
@@ -87,7 +97,7 @@ Different slots can use different collision models — give the fast *Origin poi
 swarms and the accurate *Bounding box* to the few actors that need it. Only the models
 enabled in engine settings are compiled into the ROM (see below).
 
-## Parent actors (followers / moving platforms)
+### Parent actors (followers and moving platforms)
 
 Parenting is not a behavior component on the child: **any actor with a parent set
 inherits the parent actor's per-frame movement** (tile-collision checked), then still
@@ -101,7 +111,7 @@ runs its own behavior physics (gravity/move/collision) on top. Two ways to set i
   leave, so actors — or the player — can step onto it, be carried along, and still
   walk/fall/collide normally on top of it. Works in every scene type.
 
-### Parenting mode (engine setting)
+#### Parenting mode (engine setting)
 
 The **Parenting mode** engine setting picks *how* a parented actor follows its parent,
 globally for the whole game. Pick the cheapest one that does what you need:
@@ -147,7 +157,7 @@ Details (velocity/delta modes):
   At most *Max moving platforms* (engine setting, default 2) platforms can claim
   riders in a scene.
 
-## Topdown Z axis
+### Topdown Z axis
 
 Enable the **Topdown Z axis** engine setting to give actors a **Z position and Z velocity**
 (height above the ground) in top-down / adventure scenes. With it on:
@@ -162,7 +172,7 @@ This is how you build a top-down jump (hopping slime, thrown pot, Zelda-style le
 without a platformer scene. The Z fields cost 3 bytes of RAM per actor and are only
 compiled when the setting is on.
 
-## Actor event callbacks
+### Actor event callbacks
 
 A behavior can run a **script of your own** when certain engine events happen to the
 actor — a state change, a tile collision on any side, or entering a new tile. Wire it up
@@ -181,7 +191,7 @@ the script can branch on them: **Event actor index** (`dynamic_actor_event_actor
 tile x / y**. Use these for footstep sounds on tile-enter, damage/landing reactions on a
 specific-side collision, or state-driven animation swaps — all without polling per frame.
 
-## Triggering other actors and triggers
+### Triggering other actors and triggers
 
 By default only the **player** can set off an actor's On Hit script or a scene trigger.
 Two per-behavior options in **Define Actor Behavior** let a dynamic actor do it too.
@@ -206,7 +216,152 @@ is reset to 0 at the start of every frame.
   independent of the player. The player is skipped here (the engine drives its own
   trigger activation). Requires the *Actors activate triggers* engine component.
 
-## Events
+---
+
+## Project Setup
+
+1. **Define behaviors** in your scene's *On Init* script with the **Define Actor Behavior**
+   event. Pick a preset or choose *Custom* and tick the components you want.
+   Each definition is stored in a numbered slot (1-8 by default, up to 32).
+2. **Assign a slot to an actor** with **Set Actor Behavior**. Many actors can share one slot.
+3. **Give actors velocity** with **Set Actor Velocity** (or the X/Y variants) and let the
+   engine handle the rest.
+
+Compatibility variants are included so the plugin can coexist with other engine-file plugins. The matching variant is selected automatically when any combination of **ContinuousScenePlugin**, **ScreenScrollPlugin**, **MetaTilePlugin** and **SceneStackExPlugin** is also installed — no manual step needed.
+
+---
+
+## Engine Settings
+
+Group **Dynamic actor**:
+
+| Setting | Default | Notes |
+|---|---|---|
+| Collision model: Origin point | On | Compile the single-point (fastest) collision model |
+| Collision model: Triangle | On | Compile the triangle collision model |
+| Collision model: Bounding box | On | Compile the bounding-box collision model |
+| Enable slope collision | Off | Slope tile support (needs slope collision tiles) |
+| Max behavior slots | 8 | Slider (1-32). Each slot costs 8 bytes of RAM |
+| Max moving platforms | 2 | Slider (1-8). How many *Moving platform* actors can claim/release riders per scene; each costs 12 bytes of RAM. Platforms past the limit still move but never pick up riders |
+| Topdown Z axis | Off | Enable actor Z position/velocity fields and apply gravity to Z instead of Y (topdown jump/height). See [Topdown Z axis](#topdown-z-axis) |
+| Platforms attach the player only | Off | When on, a *Moving platform* only auto-attaches the player on contact; other actors are ignored (they can still be parented explicitly). Also skips the per-frame claim test on every non-player actor. Only shown when *Parent actors* is enabled |
+| Parenting mode | Apply all parents positions delta | How a parented actor follows its parent (see [Parenting mode](#parenting-mode-engine-setting)): *Static parenting* (rigid offset, no physics, fastest), *Inherit first parent velocity* (carried by direct parent's velocity, runs own physics), or *Apply all parents positions delta* (summed chain delta, follows any parent incl. the player, runs own physics). Only shown when *Parent actors* is enabled |
+
+The collision model each behavior uses is picked **per behavior slot** in the Define
+Actor Behavior event; the three checkboxes above only control which models are
+compiled into the ROM. Uncheck the models none of your behaviors use to save ROM — see
+[Build error: bank size overflow](#build-error-bank-size-overflow) if the build runs
+out of bank space.
+
+### Modular components
+
+Every physics/animation part of the engine is an independently compiled component.
+**All are enabled by default** (except *Topdown Z axis* and *Slope collision*). Uncheck
+the ones your game never uses to strip that code out of the ROM entirely. For example, a
+game that only needs falling objects can keep *Gravity* + *Move vertically* and disable
+the rest.
+
+| Component setting | Removes when unchecked |
+|---|---|
+| Component: Gravity | Gravity acceleration |
+| Component: Move horizontally | Horizontal movement + wall collision routines |
+| Component: Move vertically | Vertical movement + floor/ceiling collision routines |
+| Component: Turn at ledges | Ledge/pit detection routine |
+| Component: Turn at walls | Wall-bounce reversal (actors stop at walls instead) |
+| Component: Bounce on floor/ceiling | Bounce physics |
+| Component: Parent actors / moving platforms | Parent-actor inheritance **and** the Moving platform component |
+| Component: Collide with other actors | Actor-vs-actor collision blocking |
+| Component: Trigger other actors' On Hit | Firing a collided actor's On Hit script on contact |
+| Component: Actors activate triggers | Actor-driven trigger On Enter/On Leave (also frees 1 byte/actor of RAM) |
+| Component: Animation handling | Automatic face/idle/jump animation |
+
+The scripting natives are toggleable the same way — uncheck the ones no script in
+your game uses:
+
+| VM setting | Removes when unchecked |
+|---|---|
+| VM: Wait for collision | The Wait For Actor Collision events |
+| VM: Wait for actor in range | The Wait For Actor In Range events |
+| VM: Wait for actor state | The Wait For Actor State events |
+| VM motion: Chase actor | The Actor Chase Actor events |
+| VM motion: Move to position by velocity | The Actor Move To Position By Velocity events |
+| VM motion: Crawl step | The Actor Motion: Wall Crawl events. Also requires *Move horizontally* + *Move vertically* |
+
+Notes:
+- Disabling a component only removes its **code**. Behavior flags that reference a
+  disabled component are simply ignored at runtime, so nothing crashes — the actor just
+  won't perform that part. Disabling a **VM setting** while an event that needs it is
+  still used in a script *will* fail at link time — remove the events first.
+- Gravity is only visible together with *Move vertically*.
+- *Turn at ledges* requires *Move horizontally*; *Bounce* requires *Move vertically*.
+
+---
+
+## Size Limits and Restrictions
+
+### Build error: bank size overflow
+
+⚠️ If you enable a lot of components at once, the build can fail with:
+
+```
+BankPack: ERROR! Area _CODE_, bank 255, size 17752 is too large for bank size 16384
+(file ...\obj\dynamic_actor.o)
+?ASlink-Error-<cannot open> : "...lcc61000.lk"
+```
+
+This is **not** a bug — it means the compiled code of the file named in the error
+(here `dynamic_actor.o`) no longer fits in a single 16 KB ROM bank. This is usually
+caused by another plugin replacing the engine’s tile-lookup helper with a larger one,
+which pushes this plugin’s code over the bank limit. A single object
+file cannot be split across banks, so the fix is to compile less code into it by
+**unchecking settings you don't use** in Settings → Engine fields → *Dynamic actor*.
+The number in the error tells you how much you need to shave off — in the example
+above, `17752 - 16384 = 1368` bytes.
+
+Check the **filename** in the error first, because different settings feed different
+object files:
+
+**If the error names `dynamic_actor.o`**, uncheck any of these (roughly largest saving
+first — pick the ones your game genuinely never uses):
+
+| Setting | Why it's a good candidate |
+|---|---|
+| Enable slope collision | Off by default. Adds slope handling to *every* compiled collision model, so it is usually the single biggest win |
+| Collision model: Triangle / Bounding box / Origin point | Each model is a separate set of routines. Most games only use one — uncheck the other two |
+| Topdown Z axis | Off by default. Adds a Z axis to movement, gravity and bounce throughout |
+| Component: Parent actors / moving platforms | Large: parenting chain + platform claim/release |
+| Component: Turn at ledges | Ledge/pit detection routines |
+| Component: Move horizontally / vertically | Only if your game truly moves on one axis |
+| Component: Bounce on floor/ceiling |  |
+| VM: Wait for collision | Its detection loop is part of the same object file |
+| VM motion: Crawl step | Its wall-crawl routine is part of the same object file |
+
+Remember that unchecking a **VM setting** while a script still uses the matching event
+fails at link time — delete those events first. Unchecking a **component** is always
+safe: behavior flags referencing it are just ignored at runtime.
+
+### Performance notes
+
+- One flag-driven update pass over the **active** actor list only (off-screen actors are
+  already excluded by the engine's activation system).
+- Actors with no behavior and no parent cost two byte-compares and a pointer test per
+  frame — everything else (behavior lookup, tile math, flags) is only loaded after that
+  early-out.
+- Collision cost scales with the behavior's collision type: origin point does 1-2
+  collision tile reads per moving actor per frame.
+- Moving platforms don't scan the actor list themselves: each platform caches its box
+  once per frame, and a single end-of-frame pass claims/releases riders against those
+  cached boxes (parented actors are only tested against their own parent's box).
+- Scenes that never define a *Moving platform* behavior and never set a parent skip the
+  entire end-of-frame parenting pass (claiming + position snapshots) — the parent
+  component then costs one flag test per frame.
+- Actors cache their own list index, so the runtime never has to compute it. That
+  matters most for *Actors activate triggers*, which needs the index for every
+  flagged actor on every frame.
+
+---
+
+## Events Reference
 
 | Event | Purpose |
 |---|---|
@@ -231,10 +386,10 @@ velocities can be driven by game state at runtime.
 
 Many events also have a **By Index** variant that takes a raw actor index (script value)
 instead of an actor picker, for addressing actors dynamically (e.g. pool actors spawned
-via `gbs-SpawnPoolActorPlugin`): *Set/Get Behavior*, *Set Velocity*, *Set/Get X/Y Velocity*,
+via the [SpawnPoolActorPlugin](https://github.com/Mico27/gbs-SpawnPoolActorPlugin)): *Set/Get Behavior*, *Set Velocity*, *Set/Get X/Y Velocity*,
 *Set/Get State*, *Set Parent Actor*, and *Wait For Actor Collision*.
 
-## Motion library events
+### Motion library events
 
 A library of ready-made movement patterns built on top of the behavior system. Each
 event drives an actor's velocity over time (with waits in between), so they are meant
@@ -260,9 +415,9 @@ to the fastest wave that fits that range.
 | Actor Motion: Bezier | Follow a quadratic (3-point) or cubic (4-point) Bezier curve baked into the script at compile time — control points in pixels relative to the start. *Cycles* and *Stop at end* like the wave events | Move X + Move Y |
 | Actor Motion: Swoop | Eased dive-then-climb on Y (bat/keese dive; combine with an X velocity to swoop while flying) | Move Y, no gravity |
 | Actor Motion: Charge At Target | Wait until row/column-aligned with a target, dash at it, stop on impact (optionally at ledges / other actors) | Move on the dash axis |
-| Actor Motion: Wall Crawl | Crawl along walls/ceilings/floors and wrap around corners, Zelda-Spark style (right- or left-hand wall follower, runs forever). Backed by the `vm_actor_crawl_step` engine native; fully solid tiles count as wall, map borders included | Move X + Move Y, tile collision off |
+| Actor Motion: Wall Crawl | Crawl along walls/ceilings/floors and wrap around corners, Zelda-Spark style (right- or left-hand wall follower, runs forever). Fully solid tiles count as wall, map borders included | Move X + Move Y, tile collision off |
 
-## Wait events:
+### Wait events
 
 | Event | Blocks until |
 |---|---|
@@ -280,8 +435,8 @@ Notes:
 - **Sine / Circle / Bezier** have a *Cycles* field (0 = repeat forever inside the event)
   and a *Stop at end* checkbox — untick it to chain seamlessly into the next motion event
   without a velocity hiccup.
-- The runtime events (**Chase, Move To Position, Charge**, the **Waits**) poll each frame
-  with `idle`, so they cost one native call per frame per waiting actor at most.
+- The runtime events (**Chase, Move To Position, Charge**, the **Waits**) poll each frame,
+  so they cost one native call per frame per waiting actor at most.
 - **Wall Crawl** moves in 8px cell steps; its speed is snapped to 1/2/4/8/16/32/64 so
   turn decisions always happen exactly on cell boundaries. Place the crawler on an
   8px-aligned tile next to a wall (tile coordinates in the editor are always aligned).
@@ -308,146 +463,9 @@ Recipe examples (update script of the enemy, everything inside a Loop event):
 - **Top-down hop**: enable *Topdown Z axis*; behavior = Gravity Z + Bounce on z ground;
   loop { Set Z Velocity (up) → Wait For Actor State: grounded → Wait }.
 
-## Engine settings (Settings → Engine fields)
+---
 
-Group **Dynamic actor**:
-
-| Setting | Default | Notes |
-|---|---|---|
-| Collision model: Origin point | On | Compile the single-point (fastest) collision model |
-| Collision model: Triangle | On | Compile the triangle collision model |
-| Collision model: Bounding box | On | Compile the bounding-box collision model |
-| Enable slope collision | Off | Slope tile support (needs slope collision tiles) |
-| Max behavior slots | 8 | Slider (1-32). Each slot costs 8 bytes of RAM |
-| Max moving platforms | 2 | Slider (1-8). How many *Moving platform* actors can claim/release riders per scene; each costs 12 bytes of RAM. Platforms past the limit still move but never pick up riders |
-| Topdown Z axis | Off | Enable actor Z position/velocity fields and apply gravity to Z instead of Y (topdown jump/height). See [Topdown Z axis](#topdown-z-axis) |
-| Platforms attach the player only | Off | When on, a *Moving platform* only auto-attaches the player on contact; other actors are ignored (they can still be parented explicitly). Also skips the per-frame claim test on every non-player actor. Only shown when *Parent actors* is enabled |
-| Parenting mode | Apply all parents positions delta | How a parented actor follows its parent (see [Parenting mode](#parenting-mode-engine-setting)): *Static parenting* (rigid offset, no physics, fastest), *Inherit first parent velocity* (carried by direct parent's velocity, runs own physics), or *Apply all parents positions delta* (summed chain delta, follows any parent incl. the player, runs own physics). Only shown when *Parent actors* is enabled |
-
-The collision model each behavior uses is picked **per behavior slot** in the Define
-Actor Behavior event; the three checkboxes above only control which models are
-compiled into the ROM. Uncheck the models none of your behaviors use to save ROM — see
-[Build error: bank size overflow](#build-error-bank-size-overflow) if the build runs
-out of bank space.
-
-### Modular components
-
-Every physics/animation part of the engine is an independently compiled component.
-**All are enabled by default** (except *Topdown Z axis* and *Slope collision*). Uncheck
-the ones your game never uses to strip that code out of the ROM entirely
-(`#ifdef`-guarded at compile time). For example, a game that only needs falling objects
-can keep *Gravity* + *Move vertically* and disable the rest.
-
-| Component setting | Removes when unchecked |
-|---|---|
-| Component: Gravity | Gravity acceleration |
-| Component: Move horizontally | Horizontal movement + wall collision routines |
-| Component: Move vertically | Vertical movement + floor/ceiling collision routines |
-| Component: Turn at ledges | Ledge/pit detection routine |
-| Component: Turn at walls | Wall-bounce reversal (actors stop at walls instead) |
-| Component: Bounce on floor/ceiling | Bounce physics |
-| Component: Parent actors / moving platforms | Parent-actor inheritance **and** the Moving platform component |
-| Component: Collide with other actors | Actor-vs-actor collision blocking |
-| Component: Trigger other actors' On Hit | Firing a collided actor's On Hit script on contact |
-| Component: Actors activate triggers | Actor-driven trigger On Enter/On Leave (also frees 1 byte/actor of RAM) |
-| Component: Animation handling | Automatic face/idle/jump animation |
-
-The scripting natives are toggleable the same way — uncheck the ones no script in
-your game uses:
-
-| VM setting | Removes when unchecked |
-|---|---|
-| VM: Wait for collision | `vm_wait_for_collision` (Wait For Actor Collision events) |
-| VM: Wait for actor in range | `vm_wait_for_actor_in_range` (Wait For Actor In Range events) |
-| VM: Wait for actor state | `vm_wait_for_actor_state` (Wait For Actor State events) |
-| VM motion: Chase actor | `vm_actor_chase_actor` (Actor Chase Actor events) |
-| VM motion: Move to position by velocity | `vm_actor_move_to_pos_by_velocity` (Actor Move To Position By Velocity) |
-| VM motion: Crawl step | `vm_actor_crawl_step` (Actor Motion: Wall Crawl). Also requires *Move horizontally* + *Move vertically* |
-
-Notes:
-- Disabling a component only removes its **code**. Behavior flags that reference a
-  disabled component are simply ignored at runtime, so nothing crashes — the actor just
-  won't perform that part. Disabling a **VM setting** while an event that needs it is
-  still used in a script *will* fail at link time — remove the events first.
-- Gravity is only visible together with *Move vertically*.
-- *Turn at ledges* requires *Move horizontally*; *Bounce* requires *Move vertically*.
-
-### Build error: bank size overflow
-
-⚠️ If you enable a lot of components at once, the build can fail with:
-
-```
-BankPack: ERROR! Area _CODE_, bank 255, size 17752 is too large for bank size 16384
-(file ...\obj\dynamic_actor.o)
-?ASlink-Error-<cannot open> : "...lcc61000.lk"
-```
-
-This is **not** a bug — it means the compiled code of the file named in the error
-(here `dynamic_actor.o`) no longer fits in a single 16 KB ROM bank. This is usually
-due to another plugin overriding the inline "tile_at" function, inflating it, thus
-inflating dynamic_actor.c making it exceed the bank limit. A single object
-file cannot be split across banks, so the fix is to compile less code into it by
-**unchecking settings you don't use** in Settings → Engine fields → *Dynamic actor*.
-The number in the error tells you how much you need to shave off — in the example
-above, `17752 - 16384 = 1368` bytes.
-
-Check the **filename** in the error first, because different settings feed different
-object files:
-
-**If the error names `dynamic_actor.o`**, uncheck any of these (roughly largest saving
-first — pick the ones your game genuinely never uses):
-
-| Setting | Why it's a good candidate |
-|---|---|
-| Enable slope collision | Off by default. Adds slope handling to *every* compiled collision model, so it is usually the single biggest win |
-| Collision model: Triangle / Bounding box / Origin point | Each model is a separate set of routines. Most games only use one — uncheck the other two |
-| Topdown Z axis | Off by default. Adds a Z axis to movement, gravity and bounce throughout |
-| Component: Parent actors / moving platforms | Large: parenting chain + platform claim/release |
-| Component: Turn at ledges | Ledge/pit detection routines |
-| Component: Move horizontally / vertically | Only if your game truly moves on one axis |
-| Component: Bounce on floor/ceiling |  |
-| VM: Wait for collision | Its detection loop lives in `dynamic_actor.c` |
-| VM motion: Crawl step | Its wall-crawl routine lives in `dynamic_actor.c` |
-
-Remember that unchecking a **VM setting** while a script still uses the matching event
-fails at link time — delete those events first. Unchecking a **component** is always
-safe: behavior flags referencing it are just ignored at runtime.
-
-## Compatibility with other plugins
-
-The plugin ships `engineAlt` variants so it can coexist with other engine-file plugins.
-GBS auto-selects the matching variant when you also have any combination of
-**ContinuousScenePlugin**, **ScreenScrollPlugin**, **MetaTilePlugin** and
-**SceneStackExPlugin** installed — no manual step needed.
-
-## Performance notes
-
-- One flag-driven update pass over the **active** actor list only (off-screen actors are
-  already excluded by the engine's activation system).
-- Actors with no behavior and no parent cost two byte-compares and a pointer test per
-  frame — everything else (behavior lookup, tile math, flags) is only loaded after that
-  early-out.
-- Collision cost scales with the behavior's collision type: origin point does 1-2
-  collision tile reads per moving actor per frame.
-- Moving platforms don't scan the actor list themselves: each platform caches its box
-  once per frame, and a single end-of-frame pass claims/releases riders against those
-  cached boxes (parented actors are only tested against their own parent's box).
-- Scenes that never define a *Moving platform* behavior and never set a parent skip the
-  entire end-of-frame parenting pass (claiming + position snapshots) — the parent
-  component then costs one flag test per frame.
-- Every actor caches its own index in `actors[]` (1 byte, written once per scene by
-  `actors_init`). The runtime frequently holds only a pointer to an actor but has to
-  report its index — to the *Event actor index* engine field, and to the per-actor
-  last-trigger table. Deriving that with `actor - actors` makes SDCC emit a call to
-  `__divsint`, a 16-bit restoring division costing roughly **2600 cycles** — about 3.7%
-  of a frame — because `sizeof(actor_t)` is not a power of two. The worst case was
-  *Actors activate triggers*, which paid one division per flagged actor **every frame**.
-  Reading the cached byte costs ~8 cycles instead. Padding `actor_t` out to 64 bytes
-  would fix the same thing, but it costs 21–84 B of WRAM and is impossible in the
-  default and maximum configurations (66 B and 71 B per actor — the next power of two
-  is 128, i.e. +1200 B), so the cached byte is used instead.
-
-## RAM (WRAM) usage
+## Memory Footprint
 
 All of the plugin's state lives in WRAM. How much it consumes depends on which
 components are enabled and on the two slider settings. Per-actor costs are multiplied by
@@ -482,6 +500,11 @@ the maximum configuration fits, though it leaves little headroom — trim behavi
 platforms, and unused components to reclaim space. Choosing the *static* or *velocity*
 parenting mode instead of *delta* also drops the per-actor position snapshot (84 B, or
 126 B with the Z axis).
+
+**ROM:** all of the plugin's code lives in banked ROM apart from the bank 0 figure below,
+and scales with which components are enabled — see [Engine Settings](#engine-settings).
+
+**SRAM:** not used. Save slots and cartridge requirements are unaffected.
 
 ---
 
