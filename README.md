@@ -183,13 +183,35 @@ in two places:
    event*, *Trigger tile enter event*).
 2. **Attach a Script to a Dynamic Actor Event** to register the script that runs when that
    event fires, and **Remove a Script from a Dynamic Actor Event** to clear it. Slots:
-   *State change*, *Tile collision (Top / Right / Bottom / Left / Any)*, *Tile enter*.
+   *State change*, *Tile collision (Top / Right / Bottom / Left / Any)*, *Tile enter*,
+   *Actor activated*, *Actor deactivated*.
 
 Before the callback runs, the plugin fills in engine fields describing what happened, so
 the script can branch on them: **Event actor index** (`dynamic_actor_event_actor_idx`),
 **Event behavior index**, **Event state**, **Event tile collision** value, and **Event
 tile x / y**. Use these for footstep sounds on tile-enter, damage/landing reactions on a
 specific-side collision, or state-driven animation swaps — all without polling per frame.
+
+### Actor activated / deactivated callbacks
+
+*Actor activated* and *Actor deactivated* are two extra slots of **Attach a Script to a
+Dynamic Actor Event**. Unlike the other callbacks they need no behavior flag and fire for
+**every** actor in the scene, whether or not it runs a dynamic behavior: the engine calls
+them from `activate_actor_impl()` / `deactivate_actor_impl()`, which covers the automatic
+deactivation that happens when an actor scrolls offscreen as well as manual Activate /
+Deactivate Actor events.
+
+**Event actor index** tells the script which actor changed. Points worth knowing:
+
+* The registrations are cleared by `dynamic_actor_init()` on every scene load, so attach
+  them from the scene's **On Init**.
+* The **player is never reported**. The engine activates it once per scene load - before
+  the callback table has been cleared - and never deactivates it afterwards, so skipping
+  it both closes that window and costs nothing.
+* Like every other dynamic actor callback, a slot runs one script at a time: if an actor
+  activates while the previous activation script is still running, that firing is skipped.
+* Turn the whole thing off with the *Events: Actor activated / deactivated* engine
+  setting; the plugin's `actor.c` then compiles as if the hooks were not there.
 
 ### Triggering other actors and triggers
 
@@ -380,6 +402,10 @@ safe: behavior flags referencing it are just ignored at runtime.
 | Get Actor Collision | Find the first collidable actor at a pixel position (index, or -1 for none) |
 | Attach a Script to a Dynamic Actor Event | Register a script to run when a behavior's state-change / tile-collision / tile-enter event fires |
 | Remove a Script from a Dynamic Actor Event | Clear an attached script slot |
+| Actor Iterate In Area | Run a script once per actor inside a rectangular area (tiles or pixels, anchored to the scene or to the visible screen, origin or bounding box, optionally skipping inactive actors) |
+| Actor Get Property (Extended) | Read an actor field no stock event exposes: collision group and its extra flags, raw flags, active / hidden / pinned / persistent / disabled, animation state, tick and frame range, base and reserved tiles, bounds, script handles |
+| Actor Set Property (Extended) | Write the same fields. The active flag is preserved - use the stock Activate / Deactivate Actor events for it |
+| Actor Trigger Script | Force an actor's On Interact, On Hit (per collision group) or On Update script to run |
 
 All numeric event inputs accept variables and expressions, so behavior parameters and
 velocities can be driven by game state at runtime.
@@ -387,7 +413,8 @@ velocities can be driven by game state at runtime.
 Many events also have a **By Index** variant that takes a raw actor index (script value)
 instead of an actor picker, for addressing actors dynamically (e.g. pool actors spawned
 via the [SpawnPoolActorPlugin](https://github.com/Mico27/gbs-SpawnPoolActorPlugin)): *Set/Get Behavior*, *Set Velocity*, *Set/Get X/Y Velocity*,
-*Set/Get State*, *Set Parent Actor*, and *Wait For Actor Collision*.
+*Set/Get State*, *Set Parent Actor*, *Wait For Actor Collision*, *Actor Get/Set Property
+(Extended)*, and *Actor Trigger Script*.
 
 ### Motion library events
 

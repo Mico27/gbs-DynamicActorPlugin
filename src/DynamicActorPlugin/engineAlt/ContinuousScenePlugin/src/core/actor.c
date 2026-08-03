@@ -18,6 +18,7 @@
 #include "vm.h"
 #include "macro.h"
 #include "data/states_defines.h"
+#include "dynamic_actor.h"
 #include "continuous_scene.h"
 
 #ifdef STRICT
@@ -276,6 +277,7 @@ static void deactivate_actor_impl(actor_t *actor) {
     if ((actor->hscript_hit & SCRIPT_TERMINATED) == 0) {
         script_detach_hthread(actor->hscript_hit);
     }
+    DYNAMIC_ACTOR_ON_DEACTIVATE(actor);
 }
 
 void deactivate_actor(actor_t *actor) BANKED {
@@ -332,6 +334,7 @@ static void activate_actor_impl(actor_t *actor) {
         script_execute(actor->script_update.bank, actor->script_update.ptr, &(actor->hscript_update), 0);
     }
     actor->hscript_hit = SCRIPT_TERMINATED;
+    DYNAMIC_ACTOR_ON_ACTIVATE(actor);
 }
 
 void activate_actor(actor_t *actor) BANKED {
