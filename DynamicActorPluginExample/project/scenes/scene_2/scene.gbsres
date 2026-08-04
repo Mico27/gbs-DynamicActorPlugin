@@ -29,7 +29,7 @@
     "",
     ""
   ],
-  "collisions": "001e7+0f12+00147+",
+  "collisions": "0fc1+001e+0f2+001e+0f2+001e+0f2+001e+0f2+001e+0f2+001e+0f2+001e+0f2+001e+0f2+001e+0f2+001e+0f2+001e+0f2+001e+0f2+001e+0f2+001e+0f2+001e+0f2+001e+0f2+001e+0f2+001e+0f2+001e+0f21+",
   "autoFadeSpeed": 1,
   "symbol": "scene_2",
   "x": 280,
@@ -45,12 +45,12 @@
         "preset": "custom",
         "compGravityY": false,
         "compGravityZ": true,
-        "compTileCollision": false,
+        "compTileCollision": true,
         "compActorCollision": false,
         "compPlatform": false,
         "compLedgeStop": false,
         "compReflectX": false,
-        "compReflectY": false,
+        "compReflectY": true,
         "compReflectZ": true,
         "animJumpY": false,
         "animJumpZ": false,
@@ -78,7 +78,7 @@
           "value": 128
         },
         "__label": "Ball behavior : 1",
-        "__collapse": true
+        "__collapse": false
       },
       "id": "2072c267-443e-47bc-bcf5-7461b6840f9e"
     },
@@ -172,7 +172,8 @@
         "compRemoveScript": false,
         "compTileHitScript": false,
         "compActorHitScript": false,
-        "__collapse": true
+        "__collapse": true,
+        "__comment": false
       },
       "id": "7135e6c7-c82c-41c5-9a70-40edd9814161"
     },
@@ -219,7 +220,7 @@
         "compRemoveScript": false,
         "compTileHitScript": false,
         "compActorHitScript": false,
-        "__collapse": false
+        "__collapse": true
       },
       "id": "e1ff44a9-dca2-4f3c-a8cf-aaa471ee7942"
     },
@@ -278,10 +279,30 @@
           "a"
         ],
         "override": true,
-        "__scriptTabs": "press"
+        "__scriptTabs": "press",
+        "__collapse": true
       },
       "children": {
         "true": [
+          {
+            "command": "EVENT_CAMERA_EX_LOCK_ACTORS",
+            "args": {
+              "targetCount": 2,
+              "median": 0,
+              "actor0": "$self$",
+              "actor1": "a88303d0-2223-450c-9693-b5d458da97af",
+              "actor2": "$self$",
+              "actor3": "$self$",
+              "smoothSpeed": 0,
+              "pathMode": 3,
+              "axis": [
+                "x",
+                "y"
+              ],
+              "__collapse": true
+            },
+            "id": "98bdacf7-b63f-4473-9ecc-d9f9c19b763a"
+          },
           {
             "command": "EVENT_ACTOR_SET_POSITION",
             "args": {

@@ -55,6 +55,11 @@
       "id": "10",
       "name": "BallY",
       "symbol": "var_bally"
+    },
+    {
+      "id": "11",
+      "name": "ActorCursor",
+      "symbol": "var_actorcursor"
     }
   ],
   "constants": []

@@ -1,0 +1,59 @@
+export const id = "EVENT_REPLACE_BACKGROUND_TILE_ATTR";
+export const name = "Set background tile attribute";
+export const groups = ["EVENT_GROUP_SCREEN"];
+
+export const autoLabel = (fetchArg) => {
+  return `Set background tile attribute`;
+};
+
+export const fields = [
+  {
+    key: `x`,
+    label: "X",
+    type: "value",
+    width: "50%",
+    defaultValue: {
+      type: "number",
+      value: 0,
+    },
+  },
+  {
+    key: `y`,
+    label: "Y",
+    type: "value",
+    width: "50%",
+    defaultValue: {
+      type: "number",
+      value: 0,
+    },
+  },
+  {
+    key: `tile_attribute`,
+    label: "Tile attribute",
+    type: "value",
+    defaultValue: {
+      type: "number",
+      value: 0,
+    },
+  },
+];
+
+export const compile = (input, helpers) => {
+  const __submapFeatureEnabled = (key) => {
+    const fv = helpers.engineFieldValues && helpers.engineFieldValues.find((s) => s.id === key);
+    if (fv && fv.value !== undefined && fv.value !== null) return !!fv.value;
+    const def = helpers.engineFields && helpers.engineFields[key];
+    return def ? !!def.defaultValue : true;
+  };
+  if (!__submapFeatureEnabled("SUBMAP_ENABLE_TILE_GET_SET")) {
+    throw new Error("This event requires the \"Individual tile getters/setters\" engine setting to be enabled (Settings → Engine → Submapping Ex).");
+  }
+
+  const { _callNative, _stackPushScriptValue, _stackPop, _addComment } = helpers;
+  _addComment("Replace background tile attribute");
+  _stackPushScriptValue(input.tile_attribute);
+  _stackPushScriptValue(input.y);
+  _stackPushScriptValue(input.x);
+  _callNative("vm_replace_background_attribute_tile");
+  _stackPop(3);
+};
