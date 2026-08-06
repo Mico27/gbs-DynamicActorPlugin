@@ -116,6 +116,30 @@
     {
       "id": "METATILE_ENTER_DETECTION",
       "value": "METATILE_ENTER_ORIGIN_POINT"
+    },
+    {
+      "id": "DYNAMIC_ACTOR_MAX_BEHAVIORS",
+      "value": 4
+    },
+    {
+      "id": "DYNPROJ_ENABLE_HOOKSHOT",
+      "value": 0
+    },
+    {
+      "id": "DYNPROJ_ENABLE_TRAIL",
+      "value": 0
+    },
+    {
+      "id": "DYNPROJ_ENABLE_CHAIN",
+      "value": 0
+    },
+    {
+      "id": "DYNAMIC_ACTOR_MAX_PLATFORMS",
+      "value": 1
+    },
+    {
+      "id": "DYNPROJ_MAX_PROJECTILES",
+      "value": 6
     }
   ]
 }

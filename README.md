@@ -263,8 +263,9 @@ Group **Dynamic actor**:
 | Collision model: Triangle | On | Compile the triangle collision model |
 | Collision model: Bounding box | On | Compile the bounding-box collision model |
 | Enable slope collision | Off | Slope tile support (needs slope collision tiles) |
-| Max behavior slots | 8 | Slider (1-32). Each slot costs 8 bytes of RAM |
-| Max moving platforms | 2 | Slider (1-8). How many *Moving platform* actors can claim/release riders per scene; each costs 12 bytes of RAM. Platforms past the limit still move but never pick up riders |
+| Max actors | 21 | Slider (1-21). Size of the engine's `actors[]` array, player included. See [Max actors](#max-actors) |
+| Max behavior slots | 8 | Slider (1-15). Each slot costs 8 bytes of RAM. Capped at 15 — see [Behavior id and state share a byte](#behavior-id-and-state-share-a-byte) |
+| Max moving platforms | 2 | Slider (1-8). How many *Moving platform* actors can claim/release riders per scene; each costs 11 bytes of RAM. Platforms past the limit still move but never pick up riders |
 | Topdown Z axis | Off | Enable actor Z position/velocity fields and apply gravity to Z instead of Y (topdown jump/height). See [Topdown Z axis](#topdown-z-axis) |
 | Platforms attach the player only | Off | When on, a *Moving platform* only auto-attaches the player on contact; other actors are ignored (they can still be parented explicitly). Also skips the per-frame claim test on every non-player actor. Only shown when *Parent actors* is enabled |
 | Parenting mode | Apply all parents positions delta | How a parented actor follows its parent (see [Parenting mode](#parenting-mode-engine-setting)): *Static parenting* (rigid offset, no physics, fastest), *Inherit first parent velocity* (carried by direct parent's velocity, runs own physics), or *Apply all parents positions delta* (summed chain delta, follows any parent incl. the player, runs own physics). Only shown when *Parent actors* is enabled |
@@ -274,6 +275,33 @@ Actor Behavior event; the three checkboxes above only control which models are
 compiled into the ROM. Uncheck the models none of your behaviors use to save ROM — see
 [Build error: bank size overflow](#build-error-bank-size-overflow) if the build runs
 out of bank space.
+
+### Max actors
+
+GB Studio sizes its `actors[]` array once, at compile time, for the whole game — every
+slot costs a full `actor_t` of WRAM whether a scene uses it or not. Stock is 21: the
+player plus the 20 actors the editor allows in a single scene. With this plugin's
+per-actor fields an `actor_t` runs 60-71 bytes depending on which components are on, so
+the array alone is 1.2-1.5 KB.
+
+**Max actors** lowers that ceiling. A game whose busiest scene holds 8 actors can set it
+to 9 and hand back roughly 850 bytes of WRAM. A scene that does hold more actors than the
+limit still loads — the engine keeps the first ones and drops the rest — so pick the
+number from your most crowded scene, not your average one.
+
+Raising it above 21 has no effect worth having: the editor caps a scene at 20 actors, so
+the extra slots stay empty and only cost RAM.
+
+### Behavior id and state share a byte
+
+Each actor's behavior id and behavior state live in the same byte of `actor_t`, four
+bits each. That is why **Max behavior slots** stops at 15, and why an actor state has to
+be **0-15**.
+
+The four states the plugin manages itself are paused (0), grounded (1), airborne Y (2)
+and airborne Z (3); **4 through 15 are free** for your own state machines. Only *Set
+Actor State* can reach them, and a value above 15 wraps around — *Wait For Actor State*
+wraps the value it compares the same way, so the two stay consistent.
 
 ### Modular components
 
@@ -495,14 +523,17 @@ Recipe examples (update script of the enemy, everything inside a Loop event):
 ## Memory Footprint
 
 All of the plugin's state lives in WRAM. How much it consumes depends on which
-components are enabled and on the two slider settings. Per-actor costs are multiplied by
-`MAX_ACTORS` (**21**, the engine's fixed actor-array size — active *and* inactive slots).
+components are enabled and on the slider settings. Per-actor costs are multiplied by
+`MAX_ACTORS` — the **Max actors** setting, **21** by default (active *and* inactive
+slots). The figures below assume that default; lowering it scales every per-actor row
+down proportionally, and shrinks the engine's own `actors[]` array on top of that
+(60-71 B per slot).
 
 | What | Size | Present when |
 |---|---|---|
-| Behavior table | 8 B × (behavior slots + 1) → **72 B** (8 slots) … **264 B** (32 slots) | always |
+| Behavior table | 8 B × (behavior slots + 1) → **72 B** (8 slots) … **128 B** (15 slots) | always |
 | Core globals (event fields, callback table, scratch) | **44 B** | always |
-| Per actor: behavior id + state + X/Y velocity | 4 B × 21 = **84 B** | always |
+| Per actor: packed behavior id + state, X/Y velocity | 3 B × 21 = **63 B** | always |
 | Per actor: cached actor index | 1 B × 21 = **21 B** | always |
 | Per actor: parent pointer | 2 B × 21 = **42 B** | *Parent actors* |
 | Platform cache | 11 B × *Max moving platforms* → **22 B** (2) … **88 B** (8) | *Parent actors* |
@@ -517,16 +548,18 @@ components are enabled and on the two slider settings. Per-actor costs are multi
 **Totals:**
 
 - **Default configuration** (Parent actors on, *delta* parenting mode, Z axis off, slope
-  off, triggers on, 8 behavior slots, 2 platforms): **≈ 392 B**.
-- **Everything enabled** (all components on, *delta* mode, Z axis on, slope on, 32
-  behavior slots, 8 platforms): **≈ 758 B** — the plugin's maximum WRAM footprint.
-- **Leanest** (all optional components off, 8 slots): **≈ 221 B**.
+  off, triggers on, 8 behavior slots, 2 platforms, 21 actors): **≈ 371 B**.
+- **Everything enabled** (all components on, *delta* mode, Z axis on, slope on, 15
+  behavior slots, 8 platforms, 21 actors): **≈ 601 B** — the plugin's maximum WRAM
+  footprint.
+- **Leanest** (all optional components off, 8 slots, 21 actors): **≈ 200 B**.
 
 For reference, a stock GB Studio 4.3.0 project has roughly **850 B** of WRAM free, so even
 the maximum configuration fits, though it leaves little headroom — trim behavior slots,
 platforms, and unused components to reclaim space. Choosing the *static* or *velocity*
 parenting mode instead of *delta* also drops the per-actor position snapshot (84 B, or
-126 B with the Z axis).
+126 B with the Z axis). By far the biggest single lever, though, is **Max actors**: each
+slot you cut off the top frees a whole `actor_t` (60-71 B) plus the per-actor rows above.
 
 **ROM:** all of the plugin's code lives in banked ROM apart from the bank 0 figure below,
 and scales with which components are enabled — see [Engine Settings](#engine-settings).

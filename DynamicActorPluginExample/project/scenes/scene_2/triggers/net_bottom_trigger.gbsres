@@ -3,26 +3,25 @@
   "id": "e5a51499-5c3d-4e1c-9465-57905692b70a",
   "name": "Net bottom trigger",
   "prefabId": "",
-  "x": 6,
+  "x": 7,
   "y": 16,
   "symbol": "trigger_2",
   "prefabScriptOverrides": {},
-  "width": 20,
+  "width": 18,
   "height": 1,
   "script": [
     {
       "command": "EVENT_IF",
       "args": {
         "condition": {
-          "type": "lt",
+          "type": "ne",
           "valueA": {
-            "type": "property",
-            "target": "a88303d0-2223-450c-9693-b5d458da97af",
-            "property": "pypos"
+            "type": "variable",
+            "value": "13"
           },
           "valueB": {
             "type": "number",
-            "value": 132
+            "value": 0
           }
         },
         "__collapseElse": false
@@ -52,7 +51,7 @@
                 }
               },
               "__collapseElse": false,
-              "__collapse": true
+              "__collapse": false
             },
             "children": {
               "true": [
@@ -129,7 +128,7 @@
                     },
                     "yVelocity": {
                       "type": "number",
-                      "value": 0
+                      "value": -8
                     }
                   },
                   "id": "1612dd5e-e4e3-4e43-98c6-ddab9e2afc2d"
@@ -155,7 +154,8 @@
                         "value": 448
                       }
                     },
-                    "__collapseElse": true
+                    "__collapseElse": true,
+                    "__collapse": true
                   },
                   "children": {
                     "true": [
@@ -252,6 +252,18 @@
                     "false": []
                   },
                   "id": "1cdea914-7771-432f-bc1e-d18d8252e283"
+                },
+                {
+                  "command": "EVENT_SET_VALUE",
+                  "args": {
+                    "variable": "13",
+                    "value": {
+                      "type": "number",
+                      "value": 0
+                    },
+                    "__collapse": true
+                  },
+                  "id": "49f54a3b-cdd6-4008-bb93-e74b50cdd879"
                 }
               ]
             },

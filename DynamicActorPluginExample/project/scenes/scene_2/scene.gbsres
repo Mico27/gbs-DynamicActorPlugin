@@ -21,7 +21,7 @@
   ],
   "spritePaletteIds": [
     "",
-    "default-bg-6",
+    "8cce3a2d-3f8e-4850-84f1-91e97ccbe7a0",
     "",
     "",
     "",
@@ -35,6 +35,18 @@
   "x": 280,
   "y": 96,
   "script": [
+    {
+      "command": "EVENT_STREAM_ACTOR_SPRITESHEET",
+      "args": {
+        "actorId": "$self$",
+        "spriteSheetId": "28405cae-58b0-4014-bf8c-c878f93efb47",
+        "spriteStateId": "",
+        "reserveTiles": 0,
+        "uploadNow": true,
+        "setBounds": true
+      },
+      "id": "ffd1f6d2-7222-4256-a2eb-556df41d4a0d"
+    },
     {
       "command": "EVENT_DEFINE_ACTOR_BEHAVIOR",
       "args": {
@@ -78,7 +90,7 @@
           "value": 128
         },
         "__label": "Ball behavior : 1",
-        "__collapse": false
+        "__collapse": true
       },
       "id": "2072c267-443e-47bc-bcf5-7461b6840f9e"
     },
@@ -285,6 +297,18 @@
       "children": {
         "true": [
           {
+            "command": "EVENT_SET_VALUE",
+            "args": {
+              "variable": "13",
+              "value": {
+                "type": "number",
+                "value": 0
+              },
+              "__collapse": true
+            },
+            "id": "23df9223-7b2c-4774-b44e-e09c8ad3dc6a"
+          },
+          {
             "command": "EVENT_CAMERA_EX_LOCK_ACTORS",
             "args": {
               "targetCount": 2,
@@ -373,10 +397,17 @@
         ]
       },
       "id": "5cb8b1ee-3b58-4948-a996-a2caaebb7e47"
+    },
+    {
+      "command": "EVENT_GBVM_SCRIPT",
+      "args": {
+        "references": []
+      },
+      "id": "0c2b3110-a193-456c-a261-4a47dabffc36"
     }
   ],
   "playerHit1Script": [],
   "playerHit2Script": [],
   "playerHit3Script": [],
-  "playerSpriteSheetId": "28405cae-58b0-4014-bf8c-c878f93efb47"
+  "playerSpriteSheetId": "049f37df-a5bd-41e3-a499-c6ee514ef3e2"
 }

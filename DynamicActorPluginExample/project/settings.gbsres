@@ -1,8 +1,8 @@
 {
   "_resourceType": "settings",
   "startSceneId": "b9438b03-0b49-4595-9876-7739d6a8ad83",
-  "startX": 20,
-  "startY": 22,
+  "startX": 23,
+  "startY": 21,
   "startMoveSpeed": 1,
   "startAnimSpeed": 15,
   "startDirection": "down",
@@ -111,6 +111,9 @@
   "showRomUsageAfterBuild": false,
   "romFilename": "",
   "defaultSceneTypeId": "TOPDOWN",
-  "disabledSceneTypeIds": [],
+  "disabledSceneTypeIds": [
+    "POINTNCLICK",
+    "SHMUP"
+  ],
   "autoTileFlipEnabled": true
 }

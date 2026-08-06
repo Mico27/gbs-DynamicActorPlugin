@@ -7,15 +7,15 @@
   "tilesetId": "",
   "width": 20,
   "height": 18,
-  "type": "TOPDOWN",
+  "type": "ADVENTURE",
   "colorModeOverride": "none",
   "paletteIds": [],
   "spritePaletteIds": [],
   "collisions": "0f15+0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0013+0f!0010+0f3+",
   "autoFadeSpeed": 1,
   "symbol": "scene_3",
-  "x": 84.84615384615384,
-  "y": 268.3076923076923,
+  "x": 88,
+  "y": 272,
   "script": [
     {
       "command": "EVENT_SET_INPUT_SCRIPT",

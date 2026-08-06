@@ -200,7 +200,7 @@
           "type": "number",
           "value": 128
         },
-        "__collapse": false
+        "__collapse": true
       },
       "id": "c44c66e9-3491-4c1d-8e9f-40a9c0a6b34d"
     },

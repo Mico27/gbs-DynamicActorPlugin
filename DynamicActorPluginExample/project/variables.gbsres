@@ -60,6 +60,21 @@
       "id": "11",
       "name": "ActorCursor",
       "symbol": "var_actorcursor"
+    },
+    {
+      "id": "12",
+      "name": "BallVelY",
+      "symbol": "var_ballvely"
+    },
+    {
+      "id": "13",
+      "name": "Ball_Is_North",
+      "symbol": "var_ball_is_north"
+    },
+    {
+      "id": "14",
+      "name": "SceneType",
+      "symbol": "var_scenetype"
     }
   ],
   "constants": []
