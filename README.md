@@ -192,6 +192,19 @@ the script can branch on them: **Event actor index** (`dynamic_actor_event_actor
 tile x / y**. Use these for footstep sounds on tile-enter, damage/landing reactions on a
 specific-side collision, or state-driven animation swaps — all without polling per frame.
 
+Each group of slots has its own engine setting, and unticking one compiles that group
+out entirely — the dispatch disappears from the physics loop and the slots stop costing
+RAM:
+
+| Setting | Slots it compiles |
+|---|---|
+| *Events: Actor state changed* | State change |
+| *Events: Tile collision / tile enter* | Tile collision (Top / Right / Bottom / Left / Any), Tile enter |
+| *Events: Actor activated / deactivated* | Actor activated, Actor deactivated |
+
+Attaching a script to a slot whose setting is off is refused at compile time with a
+message naming the setting, rather than failing later or silently doing nothing.
+
 ### Actor activated / deactivated callbacks
 
 *Actor activated* and *Actor deactivated* are two extra slots of **Attach a Script to a
@@ -336,6 +349,11 @@ your game uses:
 | VM motion: Chase actor | The Actor Chase Actor events |
 | VM motion: Move to position by velocity | The Actor Move To Position By Velocity events |
 | VM motion: Crawl step | The Actor Motion: Wall Crawl events. Also requires *Move horizontally* + *Move vertically* |
+| Tools: Get tile collision | The Get Tile Collision event |
+| Tools: Get actor at point | The Get Actor Collision event |
+| Tools: Iterate actors in area | The Actor Iterate In Area event |
+| Tools: Get / Set extended actor properties | The Actor Get / Set Property (Extended) events |
+| Tools: Force trigger actor script | The Actor Trigger Script event |
 
 Notes:
 - Disabling a component only removes its **code**. Behavior flags that reference a
@@ -382,9 +400,13 @@ first — pick the ones your game genuinely never uses):
 | Component: Parent actors / moving platforms | Large: parenting chain + platform claim/release |
 | Component: Turn at ledges | Ledge/pit detection routines |
 | Component: Move horizontally / vertically | Only if your game truly moves on one axis |
-| Component: Bounce on floor/ceiling |  |
+| Component: Bounce on floor/ceiling | Bounce physics, including the 32-bit damping math |
+| Events: Tile collision / tile enter | Removes the callback dispatch from every collision site in the physics loop |
 | VM: Wait for collision | Its detection loop is part of the same object file |
 | VM motion: Crawl step | Its wall-crawl routine is part of the same object file |
+
+For the exact byte figure of every setting, see
+[What each engine setting costs](#what-each-engine-setting-costs).
 
 Remember that unchecking a **VM setting** while a script still uses the matching event
 fails at link time — delete those events first. Unchecking a **component** is always
@@ -519,6 +541,83 @@ Recipe examples (update script of the enemy, everything inside a Loop event):
   loop { Set Z Velocity (up) → Wait For Actor State: grounded → Wait }.
 
 ---
+
+<!-- SETTINGCOST:BEGIN -->
+### What each engine setting costs
+
+Every setting here changes what gets compiled. Figures are what you **get back by
+turning the setting off**; rows marked *off by default* show what turning it **on**
+costs instead, and sliders show the cost per step. A dash means that budget does not
+move.
+
+| Setting | Bank 0 | WRAM | Banked ROM |
+|---|---|---|---|
+| Collision model: Origin point | — | — | **1,574 B** |
+| Collision model: Triangle | — | — | **1,779 B** |
+| Collision model: Bounding box | — | — | **1,976 B** |
+| Enable slope collision *(off by default — cost of turning it on)* | — | +1 B | +1,629 B |
+| Max actors *(slider 1–21, default 21)* | — | 67 B/step | 31.65 B/step |
+| Max behavior slots *(slider 1–15, default 8)* | — | 8 B/step | — |
+| Max moving platforms *(slider 1–8, default 2)* | — | 11 B/step | — |
+| Component: Gravity | — | — | **308 B** |
+| Topdown Z axis *(off by default — cost of turning it on)* | +91 B | +107 B | +1,113 B |
+| Component: Move horizontally | — | — | **5,735 B** |
+| Component: Move vertically | — | — | **4,329 B** |
+| Component: Turn at ledges | — | — | **1,947 B** |
+| Component: Turn at walls | — | — | **54 B** |
+| Component: Bounce on floor/ceiling | — | — | **208 B** |
+| Component: Parent actors / moving platforms | — | **150 B** | **2,119 B** |
+| Parenting mode → *Static parenting (Fast)* | — | −84 B | −406 B |
+| Parenting mode → *Inherit first parent velocity (Slower)* | — | −80 B | −152 B |
+| Platforms attach the player only *(off by default — cost of turning it on)* | — | — | +25 B |
+| Component: Collide with other actors | — | — | **1,111 B** |
+| Component: Trigger other actors' On Hit | — | — | **706 B** |
+| Component: Actors activate triggers | — | **21 B** | **505 B** |
+| Component: Animation handling | — | — | **419 B** |
+| Events: Actor state changed | — | — | **131 B** |
+| Events: Tile collision / tile enter | — | — | **1,171 B** |
+| Events: Actor activated / deactivated | — | **10 B** | **193 B** |
+| Tools: Iterate actors in area | — | — | **884 B** |
+| Tools: Get / Set extended actor properties | — | — | **1,432 B** |
+| Tools: Force trigger actor script | — | — | **395 B** |
+| Tools: Get tile collision | — | — | **176 B** |
+| Tools: Get actor at point | — | — | **376 B** |
+| VM: Wait for collision | — | — | **1,129 B** |
+| VM: Wait for actor in range | — | — | **431 B** |
+| VM: Wait for actor state | — | — | **134 B** |
+| VM motion: Chase actor | — | — | **855 B** |
+| VM motion: Move to position by velocity | — | — | **2,309 B** |
+| VM motion: Crawl step | — | — | **2,268 B** |
+
+Turning off every on-by-default switch above frees **181 B** of WRAM, **34,654 B** of banked ROM — the full
+span between this plugin at its fullest and stripped to nothing. Treat it as a
+ceiling rather than a recipe: you keep whatever your game actually uses.
+
+- **Max actors**: going from 1 to 21 moves WRAM by +1,340 B, banked ROM by +633 B.
+- **Max behavior slots**: going from 1 to 15 moves WRAM by +112 B.
+- **Max moving platforms**: going from 1 to 8 moves WRAM by +77 B.
+
+- **Parenting mode** only applies when *Component: Parent actors / moving platforms* is enabled.
+- **Platforms attach the player only** only applies when *Component: Parent actors / moving platforms* is enabled.
+
+<details><summary>How these were measured</summary>
+
+GB Studio 4.3.0-e1. Each of this plugin's `engine/src/**/*.c` files was compiled with
+the toolchain and flags GB Studio itself uses (`lcc -msm83:gb
+-Wf--max-allocs-per-node 3000 -DHUGE_TRACKER -DRUMBLE_ENABLE=0x08u`) against a merged
+include tree, once with every setting at its default and once per setting toggled. The
+SDCC object files' area records were then diffed: `_HOME` is bank 0,
+`_DATA`/`_INITIALIZED`/`_BSS` are WRAM, and `_CODE*`/`_CONST`/`_LIT`/`_INITIALIZER` are
+banked ROM.
+
+Two caveats. Only this plugin's own engine sources are measured, so a setting that also
+changes a struct shared with stock engine files can move a few more bytes in files the
+plugin does not ship. And each setting is toggled on its own: a handful measure slightly
+*negative* because enabling their code lets the compiler drop a fallback path elsewhere,
+and settings that gate other settings only show their own contribution.
+
+</details>
+<!-- SETTINGCOST:END -->
 
 ## Memory Footprint
 
