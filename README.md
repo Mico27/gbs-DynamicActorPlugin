@@ -199,11 +199,27 @@ RAM:
 | Setting | Slots it compiles |
 |---|---|
 | *Events: Actor state changed* | State change |
-| *Events: Tile collision / tile enter* | Tile collision (Top / Right / Bottom / Left / Any), Tile enter |
+| *Events: Tile collision* | Tile collision (Top / Right / Bottom / Left / Any) |
+| *Events: Tile enter* | Tile enter |
 | *Events: Actor activated / deactivated* | Actor activated, Actor deactivated |
 
 Attaching a script to a slot whose setting is off is refused at compile time with a
 message naming the setting, rather than failing later or silently doing nothing.
+
+The two tile groups share one dispatch helper, so switching off just one of them saves
+its own dispatch code but not the shared part — turning off **both** saves noticeably
+more than the sum of the two rows in
+[What each engine setting costs](#what-each-engine-setting-costs).
+
+#### Tile enter grid
+
+*Tile enter* normally fires on every 8×8 tile the actor crosses. The **Tile enter grid**
+setting switches that to **16×16**, so it fires once per metatile instead — usually what
+you want in a 16px-grid game, and a quarter as many script launches.
+
+Only the change detection is coarsened. The script still receives the real 8×8 tile the
+actor arrived on, so **Event tile x / y** and **Event tile collision** keep meaning
+exactly what they did before.
 
 ### Actor activated / deactivated callbacks
 
@@ -401,7 +417,7 @@ first — pick the ones your game genuinely never uses):
 | Component: Turn at ledges | Ledge/pit detection routines |
 | Component: Move horizontally / vertically | Only if your game truly moves on one axis |
 | Component: Bounce on floor/ceiling | Bounce physics, including the 32-bit damping math |
-| Events: Tile collision / tile enter | Removes the callback dispatch from every collision site in the physics loop |
+| Events: Tile collision | Removes the callback dispatch from every collision site in the physics loop |
 | VM: Wait for collision | Its detection loop is part of the same object file |
 | VM motion: Crawl step | Its wall-crawl routine is part of the same object file |
 
@@ -566,7 +582,7 @@ move.
 | Component: Turn at ledges | — | — | **1,947 B** |
 | Component: Turn at walls | — | — | **54 B** |
 | Component: Bounce on floor/ceiling | — | — | **208 B** |
-| Component: Parent actors / moving platforms | — | **150 B** | **2,119 B** |
+| Component: Parent actors / moving platforms | — | **150 B** | **2,120 B** |
 | Parenting mode → *Static parenting (Fast)* | — | −84 B | −406 B |
 | Parenting mode → *Inherit first parent velocity (Slower)* | — | −80 B | −152 B |
 | Platforms attach the player only *(off by default — cost of turning it on)* | — | — | +25 B |
@@ -575,7 +591,9 @@ move.
 | Component: Actors activate triggers | — | **21 B** | **505 B** |
 | Component: Animation handling | — | — | **419 B** |
 | Events: Actor state changed | — | — | **131 B** |
-| Events: Tile collision / tile enter | — | — | **1,171 B** |
+| Events: Tile collision | — | — | **776 B** |
+| Events: Tile enter | — | — | **118 B** |
+| Tile enter grid → *16x16 tiles* | — | — | +8 B |
 | Events: Actor activated / deactivated | — | **10 B** | **193 B** |
 | Tools: Iterate actors in area | — | — | **884 B** |
 | Tools: Get / Set extended actor properties | — | — | **1,432 B** |
@@ -589,7 +607,7 @@ move.
 | VM motion: Move to position by velocity | — | — | **2,309 B** |
 | VM motion: Crawl step | — | — | **2,268 B** |
 
-Turning off every on-by-default switch above frees **181 B** of WRAM, **34,654 B** of banked ROM — the full
+Turning off every on-by-default switch above frees **181 B** of WRAM, **34,378 B** of banked ROM — the full
 span between this plugin at its fullest and stripped to nothing. Treat it as a
 ceiling rather than a recipe: you keep whatever your game actually uses.
 
@@ -599,6 +617,7 @@ ceiling rather than a recipe: you keep whatever your game actually uses.
 
 - **Parenting mode** only applies when *Component: Parent actors / moving platforms* is enabled.
 - **Platforms attach the player only** only applies when *Component: Parent actors / moving platforms* is enabled.
+- **Tile enter grid** only applies when *Events: Tile enter* is enabled.
 
 <details><summary>How these were measured</summary>
 
